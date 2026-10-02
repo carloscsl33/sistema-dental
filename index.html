@@ -1,11 +1,268 @@
 <!doctype html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Clínica Dental | Gestión</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"></head>
-<body><aside class="sidebar"><a class="brand" href="#centro" data-page-link="centro"><span class="brand-icon">D</span><span>Clínica Dental</span></a><nav class="navigation"><a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a><a class="nav-item" href="#calendario" data-page-link="calendario"><i>▦</i>Calendario</a><a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a><a class="nav-item" href="#pacientes" data-page-link="pacientes"><i>♟</i>Pacientes</a><a class="nav-item" href="#finanzas" data-page-link="finanzas"><i>$</i>Finanzas</a><a class="nav-item admin-only" href="#administrar" data-page-link="administrar"><i>⚙</i>Administrar <b>Admin</b></a></nav><div class="sidebar-footer"><div class="help-card"><span class="help-bubble">?</span><strong>¿Necesitas ayuda?</strong><p>Consulta la guía del sistema.</p><a href="#soporte">DOCUMENTACIÓN</a></div><div class="profile"><span class="profile-avatar">LM</span><div><strong>Luisa Martínez</strong><small>Administradora</small></div><button class="logout-button" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button></div></div></aside>
-<main><header class="topbar"><div><p id="breadcrumb">Páginas <b>/</b> Dashboard</p><h1 id="page-title">Centro de Mando</h1></div><div class="top-actions"><label class="search"><span>⌕</span><input id="patient-search" type="search" placeholder="Buscar paciente..."></label><button class="new-button" id="new-appointment">+ Nueva cita</button></div></header>
-<section class="app-page active" id="page-centro"><section class="stats"><article class="stat-card"><div><p>Citas de Hoy</p><strong id="today-count">12</strong><small class="green-text">Agenda activa</small></div><span class="stat-icon">▦</span></article><article class="stat-card"><div><p>Ingresos del Día</p><strong>$2,500</strong><small class="green-text">+18% esta semana</small></div><span class="stat-icon money">$</span></article><article class="stat-card"><div><p>Pacientes Atendidos</p><strong>08</strong><small class="green-text">67% de las citas</small></div><span class="stat-icon check">✓</span></article></section>
-<section class="appointment-grid"><article class="card appointment-card"><header class="card-head"><div><h2>Citas de Hoy</h2><p class="green-text">Actualiza el estatus y genera la siguiente cita al terminar.</p></div><a class="view-link" href="#citas" data-page-link="citas">Ver completo →</a></header><div class="today-table-head"><span>Hora</span><span>Paciente</span><span>Cobro</span><span>Estatus</span><span></span></div><div class="appointment-list" id="today-list"></div></article><article class="card appointment-card"><header class="card-head"><div><h2>Citas de Mañana</h2><p>Recordatorios pendientes de enviar.</p></div><a class="view-link" href="#citas" data-page-link="citas">Ver completo →</a></header><div class="tomorrow-list" id="tomorrow-list"></div></article></section>
-<section class="card dashboard-calendar"><header class="card-head"><div><h2>Calendario de citas</h2><p>Septiembre 2026</p></div><a class="outline-button" href="#calendario" data-page-link="calendario">Ver completo →</a></header><div class="week-head"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div><div class="calendar-grid" id="dashboard-calendar"></div></section></section>
-<section class="app-page" id="page-calendario"><section class="card full-calendar-card"><header class="card-head"><div><h2>Calendario clínico</h2><p>Vista mensual de la agenda</p></div><div class="calendar-controls"><button>‹</button><strong>Septiembre 2026</strong><button>›</button></div></header><div class="week-head"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div><div class="calendar-grid large" id="full-calendar"></div></section></section>
-<section class="app-page" id="page-citas"><section class="card full-list-card"><header class="card-head"><div><h2>Gestión de citas</h2><p>Agenda completa; actualiza el estatus desde cada registro.</p></div><button class="new-button">+ Nueva cita</button></header><div class="filter-row"><button class="filter active-filter">Hoy</button><button class="filter">Mañana</button><button class="filter">Esta semana</button><button class="filter">Pendientes</button></div><div class="appointment-list expanded" id="all-appointments"></div></section></section>
-<section class="app-page" id="page-pacientes"><section class="card module-placeholder"><span class="large-module-icon">♟</span><h2>Pacientes</h2><p>Busca, da de alta y consulta el expediente integral de cada paciente.</p><button class="new-button">+ Nuevo paciente</button></section></section><section class="app-page" id="page-finanzas"><section class="card module-placeholder"><span class="large-module-icon">$</span><h2>Finanzas</h2><p>Registra abonos, consulta saldos y prepara tu corte mensual.</p><button class="new-button">+ Registrar pago</button></section></section>
-<section class="app-page" id="page-administrar"><section class="admin-header"><div><p class="eyebrow">SOLO ADMINISTRADORES</p><h2>Administrar usuarios y roles</h2><span>Configura quién puede acceder y qué puede hacer dentro del sistema.</span></div><button class="new-button">+ Agregar usuario</button></section><section class="card users-card"><table><thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Acceso</th><th></th></tr></thead><tbody><tr><td><div class="person"><span class="person-avatar avatar-purple">LM</span><strong>Luisa Martínez</strong></div></td><td>luisa@clinicadental.mx</td><td><span class="role admin">Administradora</span></td><td><span class="access enabled">● Activo</span></td><td><button class="row-action">Editar</button></td></tr><tr><td><div class="person"><span class="person-avatar avatar-blue">DM</span><strong>Dra. Medina</strong></div></td><td>medina@clinicadental.mx</td><td><span class="role doctor">Doctora</span></td><td><span class="access enabled">● Activo</span></td><td><button class="row-action">Editar</button></td></tr><tr><td><div class="person"><span class="person-avatar avatar-orange">CR</span><strong>Carla Ruiz</strong></div></td><td>carla@clinicadental.mx</td><td><span class="role reception">Recepción</span></td><td><span class="access enabled">● Activo</span></td><td><button class="row-action">Editar</button></td></tr></tbody></table></section></section></main><div class="modal-backdrop" id="appointment-modal" aria-hidden="true"><form class="appointment-modal" id="appointment-form"><button type="button" class="modal-close" id="modal-close" aria-label="Cerrar">×</button><p class="eyebrow">REAGENDAR PACIENTE</p><h2>Generar nueva cita</h2><p class="modal-copy">Al guardar, se registra la nueva cita y este paciente sale de la agenda de hoy.</p><label>Paciente<input id="modal-patient" readonly></label><label>Fecha<input id="modal-date" type="date" required></label><label>Hora<input id="modal-time" type="time" required></label><button class="new-button" type="submit">Confirmar nueva cita</button></form></div><div class="toast" id="toast" role="status"></div><script src="app.js"></script></body></html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clínica Dental | Gestión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#centro" data-page-link="centro">
+      <span class="brand-icon">D</span>
+      <span>Clínica Dental</span>
+    </a>
+    <nav class="navigation">
+      <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
+      <a class="nav-item" href="#calendario" data-page-link="calendario"><i>▦</i>Calendario</a>
+      <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
+      <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i>♟</i>Pacientes</a>
+      <a class="nav-item" href="#finanzas" data-page-link="finanzas"><i>$</i>Finanzas</a>
+      <a class="nav-item admin-only" href="#administrar" data-page-link="administrar"><i>⚙</i>Administrar <b>Admin</b></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="help-card">
+        <span class="help-bubble">?</span>
+        <strong>¿Necesitas ayuda?</strong>
+        <p>Consulta la guía del sistema.</p>
+        <a href="#soporte">DOCUMENTACIÓN</a>
+      </div>
+      <div class="profile">
+        <span class="profile-avatar">LM</span>
+        <div>
+          <strong>Luisa Martínez</strong>
+          <small>Administradora</small>
+        </div>
+        <button class="logout-button" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div>
+        <p id="breadcrumb">Páginas <b>/</b> Dashboard</p>
+        <h1 id="page-title">Centro de Mando</h1>
+      </div>
+      <div class="top-actions">
+        <label class="search">
+          <span>⌕</span>
+          <input id="patient-search" type="search" placeholder="Buscar paciente...">
+        </label>
+        <button class="new-button" id="new-appointment">+ Nueva cita</button>
+      </div>
+    </header>
+
+    <section class="app-page active" id="page-centro">
+      <section class="stats">
+        <article class="stat-card">
+          <div>
+            <p>Citas de Hoy</p>
+            <strong id="today-count">12</strong>
+            <small class="green-text">Agenda activa</small>
+          </div>
+          <span class="stat-icon">▦</span>
+        </article>
+        <article class="stat-card">
+          <div>
+            <p>Ingresos del Día</p>
+            <strong>$2,500</strong>
+            <small class="green-text">+18% esta semana</small>
+          </div>
+          <span class="stat-icon money">$</span>
+        </article>
+        <article class="stat-card">
+          <div>
+            <p>Pacientes Atendidos</p>
+            <strong>08</strong>
+            <small class="green-text">67% de las citas</small>
+          </div>
+          <span class="stat-icon check">✓</span>
+        </article>
+      </section>
+
+      <section class="appointment-grid">
+        <article class="card appointment-card">
+          <header class="card-head">
+            <div>
+              <h2>Citas de Hoy</h2>
+              <p class="green-text">Actualiza el estatus y genera la siguiente cita al terminar.</p>
+            </div>
+            <a class="view-link" href="#citas" data-page-link="citas">Ver completo →</a>
+          </header>
+          <div class="today-table-head">
+            <span>Hora</span>
+            <span>Paciente</span>
+            <span>Cobro</span>
+            <span>Estatus</span>
+            <span></span>
+          </div>
+          <div class="appointment-list" id="today-list"></div>
+        </article>
+        <article class="card appointment-card">
+          <header class="card-head">
+            <div>
+              <h2>Citas de Mañana</h2>
+              <p>Recordatorios pendientes de enviar.</p>
+            </div>
+            <a class="view-link" href="#citas" data-page-link="citas">Ver completo →</a>
+          </header>
+          <div class="tomorrow-list" id="tomorrow-list"></div>
+        </article>
+      </section>
+
+      <section class="card dashboard-calendar">
+        <header class="card-head">
+          <div>
+            <h2>Calendario de citas</h2>
+            <p>Septiembre 2026</p>
+          </div>
+          <a class="outline-button" href="#calendario" data-page-link="calendario">Ver completo →</a>
+        </header>
+        <div class="week-head">
+          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+        </div>
+        <div class="calendar-grid" id="dashboard-calendar"></div>
+      </section>
+    </section>
+
+    <section class="app-page" id="page-calendario">
+      <section class="card full-calendar-card">
+        <header class="card-head">
+          <div>
+            <h2>Calendario clínico</h2>
+            <p>Vista mensual de la agenda</p>
+          </div>
+          <div class="calendar-controls">
+            <button>‹</button>
+            <strong>Septiembre 2026</strong>
+            <button>›</button>
+          </div>
+        </header>
+        <div class="week-head">
+          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+        </div>
+        <div class="calendar-grid large" id="full-calendar"></div>
+      </section>
+    </section>
+
+    <section class="app-page" id="page-citas">
+      <section class="card full-list-card">
+        <header class="card-head">
+          <div>
+            <h2>Gestión de citas</h2>
+            <p>Agenda completa; actualiza el estatus desde cada registro.</p>
+          </div>
+          <button class="new-button">+ Nueva cita</button>
+        </header>
+        <div class="filter-row">
+          <button class="filter active-filter">Hoy</button>
+          <button class="filter">Mañana</button>
+          <button class="filter">Esta semana</button>
+          <button class="filter">Pendientes</button>
+        </div>
+        <div class="appointment-list expanded" id="all-appointments"></div>
+      </section>
+    </section>
+
+    <section class="app-page" id="page-pacientes">
+      <section class="card module-placeholder">
+        <span class="large-module-icon">♟</span>
+        <h2>Pacientes</h2>
+        <p>Busca, da de alta y consulta el expediente integral de cada paciente.</p>
+        <button class="new-button">+ Nuevo paciente</button>
+      </section>
+    </section>
+
+    <section class="app-page" id="page-finanzas">
+      <section class="card module-placeholder">
+        <span class="large-module-icon">$</span>
+        <h2>Finanzas</h2>
+        <p>Registra abonos, consulta saldos y prepara tu corte mensual.</p>
+        <button class="new-button">+ Registrar pago</button>
+      </section>
+    </section>
+
+    <section class="app-page" id="page-administrar">
+      <section class="admin-header">
+        <div>
+          <p class="eyebrow">SOLO ADMINISTRADORES</p>
+          <h2>Administrar usuarios y roles</h2>
+          <span>Configura quién puede acceder y qué puede hacer dentro del sistema.</span>
+        </div>
+        <button class="new-button">+ Agregar usuario</button>
+      </section>
+      <section class="card users-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Acceso</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="person-avatar avatar-purple">LM</span>
+                  <strong>Luisa Martínez</strong>
+                </div>
+              </td>
+              <td>luisa@clinicadental.mx</td>
+              <td><span class="role admin">Administradora</span></td>
+              <td><span class="access enabled">● Activo</span></td>
+              <td><button class="row-action">Editar</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="person-avatar avatar-blue">DM</span>
+                  <strong>Dra. Medina</strong>
+                </div>
+              </td>
+              <td>medina@clinicadental.mx</td>
+              <td><span class="role doctor">Doctora</span></td>
+              <td><span class="access enabled">● Activo</span></td>
+              <td><button class="row-action">Editar</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="person">
+                  <span class="person-avatar avatar-orange">CR</span>
+                  <strong>Carla Ruiz</strong>
+                </div>
+              </td>
+              <td>carla@clinicadental.mx</td>
+              <td><span class="role reception">Recepción</span></td>
+              <td><span class="access enabled">● Activo</span></td>
+              <td><button class="row-action">Editar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="appointment-modal" aria-hidden="true">
+    <form class="appointment-modal" id="appointment-form">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Cerrar">×</button>
+      <p class="eyebrow">REAGENDAR PACIENTE</p>
+      <h2>Generar nueva cita</h2>
+      <p class="modal-copy">Al guardar, se registra la nueva cita y este paciente sale de la agenda de hoy.</p>
+      <label>Paciente<input id="modal-patient" readonly></label>
+      <label>Fecha<input id="modal-date" type="date" required></label>
+      <label>Hora<input id="modal-time" type="time" required></label>
+      <button class="new-button" type="submit">Confirmar nueva cita</button>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
