@@ -44,7 +44,6 @@
   <main>
     <header class="topbar">
       <div>
-        <p id="breadcrumb">Páginas <b>/</b> Dashboard</p>
         <h1 id="page-title">Centro de Mando</h1>
       </div>
       <div class="top-actions">
@@ -62,7 +61,6 @@
           <div>
             <p>Citas de Hoy</p>
             <strong id="today-count">12</strong>
-            <small class="green-text">Agenda activa</small>
           </div>
           <span class="stat-icon">▦</span>
         </article>
@@ -70,7 +68,6 @@
           <div>
             <p>Ingresos del Día</p>
             <strong>$2,500</strong>
-            <small class="green-text">+18% esta semana</small>
           </div>
           <span class="stat-icon money">$</span>
         </article>
@@ -78,7 +75,6 @@
           <div>
             <p>Pacientes Atendidos</p>
             <strong>08</strong>
-            <small class="green-text">67% de las citas</small>
           </div>
           <span class="stat-icon check">✓</span>
         </article>
@@ -154,26 +150,39 @@
         <header class="card-head">
           <div>
             <h2>Gestión de citas</h2>
-            <p>Agenda completa; actualiza el estatus desde cada registro.</p>
+            <p>Consulta la agenda, edita citas y revisa la información de tus pacientes.</p>
           </div>
-          <button class="new-button">+ Nueva cita</button>
+          <button class="new-button" data-open-appointment>+ Nueva cita</button>
         </header>
-        <div class="filter-row">
-          <button class="filter active-filter">Hoy</button>
-          <button class="filter">Mañana</button>
-          <button class="filter">Esta semana</button>
-          <button class="filter">Pendientes</button>
+        <div class="filter-row" role="group" aria-label="Filtrar citas">
+          <button class="filter active-filter" data-appointment-filter="today" aria-pressed="true">Hoy</button>
+          <button class="filter" data-appointment-filter="tomorrow" aria-pressed="false">Mañana</button>
+          <button class="filter" data-appointment-filter="all" aria-pressed="false">Todas las citas</button>
         </div>
         <div class="appointment-list expanded" id="all-appointments"></div>
       </section>
     </section>
 
     <section class="app-page" id="page-pacientes">
-      <section class="card module-placeholder">
-        <span class="large-module-icon">♟</span>
-        <h2>Pacientes</h2>
-        <p>Busca, da de alta y consulta el expediente integral de cada paciente.</p>
-        <button class="new-button">+ Nuevo paciente</button>
+      <section class="card patient-directory">
+        <header class="card-head patient-directory-head">
+          <div>
+            <h2>Directorio de pacientes</h2>
+            <p>Busca un paciente y consulta el resumen de sus citas.</p>
+          </div>
+          <label class="patient-directory-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="directory-search" type="search" placeholder="Buscar por nombre o motivo" aria-label="Buscar pacientes">
+          </label>
+        </header>
+        <div class="patient-directory-layout">
+          <div class="patient-list" id="patient-list" aria-label="Lista de pacientes"></div>
+          <section class="patient-details" id="patient-details" aria-live="polite">
+            <span class="large-module-icon">♟</span>
+            <h2>Selecciona un paciente</h2>
+            <p>Su información y próximas citas aparecerán aquí.</p>
+          </section>
+        </div>
       </section>
     </section>
 
@@ -253,9 +262,16 @@
     <form class="appointment-modal" id="appointment-form">
       <button type="button" class="modal-close" id="modal-close" aria-label="Cerrar">×</button>
       <p class="eyebrow">REAGENDAR PACIENTE</p>
-      <h2>Generar nueva cita</h2>
+      <h2 id="modal-title">Generar nueva cita</h2>
       <p class="modal-copy">Al guardar, se registra la nueva cita y este paciente sale de la agenda de hoy.</p>
-      <label>Paciente<input id="modal-patient" readonly></label>
+      <label>Paciente<input id="modal-patient" placeholder="Nombre del paciente"></label>
+      <label>Motivo de cita<input id="modal-motive" type="text" maxlength="32" placeholder="Ej. Control de brackets"></label>
+      <label>Saldo para el siguiente cobro
+        <div class="amount-row">
+          <input id="modal-amount" type="number" min="0" step="50" placeholder="0" value="0">
+          <label class="checkbox-row"><input id="modal-full-payment" type="checkbox"> Cobro completo</label>
+        </div>
+      </label>
       <label>Fecha<input id="modal-date" type="date" required></label>
       <label>Hora<input id="modal-time" type="time" required></label>
       <button class="new-button" type="submit">Confirmar nueva cita</button>
