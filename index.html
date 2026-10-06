@@ -1,284 +1,1658 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Clínica Dental | Gestión</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@700;800&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@700;800&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
+
+  <!-- ==================================================
+       SIDEBAR
+  =================================================== -->
+
   <aside class="sidebar">
-    <a class="brand" href="#centro" data-page-link="centro">
-      <span class="brand-icon">D</span>
-      <span>Clínica Dental</span>
-    </a>
-    <nav class="navigation">
-      <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
-      <a class="nav-item" href="#calendario" data-page-link="calendario"><i>▦</i>Calendario</a>
-      <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
-      <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i>♟</i>Pacientes</a>
-      <a class="nav-item" href="#finanzas" data-page-link="finanzas"><i>$</i>Finanzas</a>
-      <a class="nav-item admin-only" href="#administrar" data-page-link="administrar"><i>⚙</i>Administrar <b>Admin</b></a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="help-card">
-        <span class="help-bubble">?</span>
-        <strong>¿Necesitas ayuda?</strong>
-        <p>Consulta la guía del sistema.</p>
-        <a href="#soporte">DOCUMENTACIÓN</a>
-      </div>
-      <div class="profile">
-        <span class="profile-avatar">LM</span>
-        <div>
-          <strong>Luisa Martínez</strong>
-          <small>Administradora</small>
-        </div>
-        <button class="logout-button" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
-      </div>
+
+<a
+  class="brand"
+  href="#centro"
+  data-page-link="centro">
+
+  <span class="brand-icon">D</span>
+  <span>Clínica Dental</span>
+
+</a>
+
+<nav class="navigation">
+
+  <a
+    class="nav-item active"
+    href="#centro"
+    data-page-link="centro">
+
+    <i>▥</i>
+    Centro de Mando
+
+  </a>
+
+  <a
+    class="nav-item"
+    href="#calendario"
+    data-page-link="calendario">
+
+    <i>▦</i>
+    Calendario
+
+  </a>
+
+  <a
+    class="nav-item"
+    href="#citas"
+    data-page-link="citas">
+
+    <i>◷</i>
+    Citas
+
+  </a>
+
+  <a
+    class="nav-item"
+    href="#pacientes"
+    data-page-link="pacientes">
+
+    <i>♟</i>
+    Pacientes
+
+  </a>
+
+  <a
+    class="nav-item"
+    href="#finanzas"
+    data-page-link="finanzas">
+
+    <i>$</i>
+    Finanzas
+
+  </a>
+
+  <a
+    class="nav-item admin-only"
+    href="#administrar"
+    data-page-link="administrar">
+
+    <i>⚙</i>
+    Administrar
+    <b>Admin</b>
+
+  </a>
+
+</nav>
+
+<div class="sidebar-footer">
+
+  <div class="profile">
+
+    <span class="profile-avatar">
+      LM
+    </span>
+
+    <div>
+      <strong>Luisa Martínez</strong>
+      <small>Administradora</small>
     </div>
-  </aside>
 
-  <main>
-    <header class="topbar">
-      <div>
-        <h1 id="page-title">Centro de Mando</h1>
-      </div>
-      <div class="top-actions">
-        <label class="search">
-          <span>⌕</span>
-          <input id="patient-search" type="search" placeholder="Buscar paciente...">
-        </label>
-        <button class="new-button" id="new-appointment">+ Nueva cita</button>
-      </div>
-    </header>
+    <button
+      class="logout-button"
+      aria-label="Cerrar sesión"
+      title="Cerrar sesión">
 
-    <section class="app-page active" id="page-centro">
-      <section class="stats">
-        <article class="stat-card">
-          <div>
-            <p>Citas de Hoy</p>
-            <strong id="today-count">12</strong>
-          </div>
-          <span class="stat-icon">▦</span>
-        </article>
-        <article class="stat-card">
-          <div>
-            <p>Ingresos del Día</p>
-            <strong>$2,500</strong>
-          </div>
-          <span class="stat-icon money">$</span>
-        </article>
-        <article class="stat-card">
-          <div>
-            <p>Pacientes Atendidos</p>
-            <strong>08</strong>
-          </div>
-          <span class="stat-icon check">✓</span>
-        </article>
-      </section>
+      ↪
 
-      <section class="appointment-grid">
-        <article class="card appointment-card">
-          <header class="card-head">
-            <div>
-              <h2>Citas de Hoy</h2>
-              <p class="green-text">Actualiza el estatus y genera la siguiente cita al terminar.</p>
-            </div>
-            <a class="view-link" href="#citas" data-page-link="citas">Ver completo →</a>
-          </header>
-          <div class="today-table-head">
-            <span>Hora</span>
-            <span>Paciente</span>
-            <span>Cobro</span>
-            <span>Estatus</span>
-            <span></span>
-          </div>
-          <div class="appointment-list" id="today-list"></div>
-        </article>
-        <article class="card appointment-card">
-          <header class="card-head">
-            <div>
-              <h2>Citas de Mañana</h2>
-              <p>Recordatorios pendientes de enviar.</p>
-            </div>
-            <a class="view-link" href="#citas" data-page-link="citas">Ver completo →</a>
-          </header>
-          <div class="tomorrow-list" id="tomorrow-list"></div>
-        </article>
-      </section>
+    </button>
 
-      <section class="card dashboard-calendar">
-        <header class="card-head">
-          <div>
-            <h2>Calendario de citas</h2>
-            <p>Septiembre 2026</p>
-          </div>
-          <a class="outline-button" href="#calendario" data-page-link="calendario">Ver completo →</a>
-        </header>
-        <div class="week-head">
-          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
-        </div>
-        <div class="calendar-grid" id="dashboard-calendar"></div>
-      </section>
-    </section>
-
-    <section class="app-page" id="page-calendario">
-      <section class="card full-calendar-card">
-        <header class="card-head">
-          <div>
-            <h2>Calendario clínico</h2>
-            <p>Vista mensual de la agenda</p>
-          </div>
-          <div class="calendar-controls">
-            <button>‹</button>
-            <strong>Septiembre 2026</strong>
-            <button>›</button>
-          </div>
-        </header>
-        <div class="week-head">
-          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
-        </div>
-        <div class="calendar-grid large" id="full-calendar"></div>
-      </section>
-    </section>
-
-    <section class="app-page" id="page-citas">
-      <section class="card full-list-card">
-        <header class="card-head">
-          <div>
-            <h2>Gestión de citas</h2>
-            <p>Consulta la agenda, edita citas y revisa la información de tus pacientes.</p>
-          </div>
-          <button class="new-button" data-open-appointment>+ Nueva cita</button>
-        </header>
-        <div class="filter-row" role="group" aria-label="Filtrar citas">
-          <button class="filter active-filter" data-appointment-filter="today" aria-pressed="true">Hoy</button>
-          <button class="filter" data-appointment-filter="tomorrow" aria-pressed="false">Mañana</button>
-          <button class="filter" data-appointment-filter="all" aria-pressed="false">Todas las citas</button>
-        </div>
-        <div class="appointment-list expanded" id="all-appointments"></div>
-      </section>
-    </section>
-
-    <section class="app-page" id="page-pacientes">
-      <section class="card patient-directory">
-        <header class="card-head patient-directory-head">
-          <div>
-            <h2>Directorio de pacientes</h2>
-            <p>Busca un paciente y consulta el resumen de sus citas.</p>
-          </div>
-          <label class="patient-directory-search">
-            <span aria-hidden="true">⌕</span>
-            <input id="directory-search" type="search" placeholder="Buscar por nombre o motivo" aria-label="Buscar pacientes">
-          </label>
-        </header>
-        <div class="patient-directory-layout">
-          <div class="patient-list" id="patient-list" aria-label="Lista de pacientes"></div>
-          <section class="patient-details" id="patient-details" aria-live="polite">
-            <span class="large-module-icon">♟</span>
-            <h2>Selecciona un paciente</h2>
-            <p>Su información y próximas citas aparecerán aquí.</p>
-          </section>
-        </div>
-      </section>
-    </section>
-
-    <section class="app-page" id="page-finanzas">
-      <section class="card module-placeholder">
-        <span class="large-module-icon">$</span>
-        <h2>Finanzas</h2>
-        <p>Registra abonos, consulta saldos y prepara tu corte mensual.</p>
-        <button class="new-button">+ Registrar pago</button>
-      </section>
-    </section>
-
-    <section class="app-page" id="page-administrar">
-      <section class="admin-header">
-        <div>
-          <p class="eyebrow">SOLO ADMINISTRADORES</p>
-          <h2>Administrar usuarios y roles</h2>
-          <span>Configura quién puede acceder y qué puede hacer dentro del sistema.</span>
-        </div>
-        <button class="new-button">+ Agregar usuario</button>
-      </section>
-      <section class="card users-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Correo</th>
-              <th>Rol</th>
-              <th>Acceso</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <div class="person">
-                  <span class="person-avatar avatar-purple">LM</span>
-                  <strong>Luisa Martínez</strong>
-                </div>
-              </td>
-              <td>luisa@clinicadental.mx</td>
-              <td><span class="role admin">Administradora</span></td>
-              <td><span class="access enabled">● Activo</span></td>
-              <td><button class="row-action">Editar</button></td>
-            </tr>
-            <tr>
-              <td>
-                <div class="person">
-                  <span class="person-avatar avatar-blue">DM</span>
-                  <strong>Dra. Medina</strong>
-                </div>
-              </td>
-              <td>medina@clinicadental.mx</td>
-              <td><span class="role doctor">Doctora</span></td>
-              <td><span class="access enabled">● Activo</span></td>
-              <td><button class="row-action">Editar</button></td>
-            </tr>
-            <tr>
-              <td>
-                <div class="person">
-                  <span class="person-avatar avatar-orange">CR</span>
-                  <strong>Carla Ruiz</strong>
-                </div>
-              </td>
-              <td>carla@clinicadental.mx</td>
-              <td><span class="role reception">Recepción</span></td>
-              <td><span class="access enabled">● Activo</span></td>
-              <td><button class="row-action">Editar</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </section>
-  </main>
-
-  <div class="modal-backdrop" id="appointment-modal" aria-hidden="true">
-    <form class="appointment-modal" id="appointment-form">
-      <button type="button" class="modal-close" id="modal-close" aria-label="Cerrar">×</button>
-      <p class="eyebrow">REAGENDAR PACIENTE</p>
-      <h2 id="modal-title">Generar nueva cita</h2>
-      <p class="modal-copy">Al guardar, se registra la nueva cita y este paciente sale de la agenda de hoy.</p>
-      <label>Paciente<input id="modal-patient" placeholder="Nombre del paciente"></label>
-      <label>Motivo de cita<input id="modal-motive" type="text" maxlength="32" placeholder="Ej. Control de brackets"></label>
-      <label>Saldo para el siguiente cobro
-        <div class="amount-row">
-          <input id="modal-amount" type="number" min="0" step="50" placeholder="0" value="0">
-          <label class="checkbox-row"><input id="modal-full-payment" type="checkbox"> Cobro completo</label>
-        </div>
-      </label>
-      <label>Fecha<input id="modal-date" type="date" required></label>
-      <label>Hora<input id="modal-time" type="time" required></label>
-      <button class="new-button" type="submit">Confirmar nueva cita</button>
-    </form>
   </div>
 
-  <div class="toast" id="toast" role="status"></div>
+</div>
+
+  </aside>
+
+  <!-- ==================================================
+       MAIN
+  =================================================== -->
+
+  <main>
+
+<!-- ==================================================
+     TOPBAR
+=================================================== -->
+
+<header class="topbar">
+
+  <div>
+    <h1 id="page-title">
+      Centro de Mando
+    </h1>
+  </div>
+
+  <div class="top-actions">
+
+    <label class="search">
+      <span aria-hidden="true">⌕</span>
+
+      <input
+        id="patient-search"
+        type="search"
+        placeholder="Buscar paciente..."
+        autocomplete="off"
+        aria-label="Buscar paciente"
+      >
+
+      <div
+        id="patient-search-results"
+        class="patient-search-results"
+        aria-hidden="true">
+      </div>
+
+    </label>
+
+    <button
+      class="new-button"
+      id="new-patient-dashboard"
+      type="button">
+      + Nuevo paciente
+    </button>
+
+    <button
+      class="new-button"
+      id="new-appointment"
+      type="button">
+      + Nueva cita
+    </button>
+
+  </div>
+
+</header>
+
+<!-- ==================================================
+     CENTRO DE MANDO
+=================================================== -->
+
+<section
+  class="app-page active"
+  id="page-centro">
+
+  <section class="stats">
+
+    <article class="stat-card">
+
+      <div>
+
+        <p>Citas de Hoy</p>
+
+        <strong id="today-count">
+          0
+        </strong>
+
+      </div>
+
+      <span class="stat-icon">
+        ▦
+      </span>
+
+    </article>
+
+
+    <article class="stat-card">
+
+      <div>
+
+        <p>Ingresos del Día</p>
+
+        <strong id="today-income">
+          $0
+        </strong>
+
+      </div>
+
+      <span class="stat-icon money">
+        $
+      </span>
+
+    </article>
+
+
+    <article class="stat-card">
+
+      <div>
+
+        <p>Pacientes Atendidos</p>
+
+        <strong id="attended-count">
+          0
+        </strong>
+
+      </div>
+
+      <span class="stat-icon check">
+        ✓
+      </span>
+
+    </article>
+
+  </section>
+
+
+  <section class="appointment-grid">
+
+    <!-- CITAS DE HOY -->
+
+    <article class="card appointment-card">
+
+      <header class="card-head">
+
+        <div>
+
+          <h2>Citas de Hoy</h2>
+
+          <p class="green-text">
+            Actualiza el estatus y genera la siguiente cita al terminar.
+          </p>
+
+        </div>
+
+        <a
+          class="view-link"
+          href="#citas"
+          data-page-link="citas">
+
+          Ver completo →
+
+        </a>
+
+      </header>
+
+
+      <div class="today-table-head">
+
+        <span>Hora</span>
+        <span>Paciente</span>
+        <span>Cobro</span>
+        <span>Estatus</span>
+        <span></span>
+
+      </div>
+
+
+      <div
+        class="appointment-list"
+        id="today-list">
+      </div>
+
+    </article>
+
+
+    <!-- CITAS DE MAÑANA -->
+
+    <article class="card appointment-card">
+
+      <header class="card-head">
+
+        <div>
+
+          <h2>Citas de Mañana</h2>
+
+          <p>
+            Recordatorios pendientes de enviar.
+          </p>
+
+        </div>
+
+        <a
+          class="view-link"
+          href="#citas"
+          data-page-link="citas">
+
+          Ver completo →
+
+        </a>
+
+      </header>
+
+
+      <div
+        class="tomorrow-list"
+        id="tomorrow-list">
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- CALENDARIO DEL DASHBOARD -->
+
+  <section class="card dashboard-calendar">
+
+    <header class="card-head">
+
+      <div>
+
+        <h2>
+          Calendario de citas
+        </h2>
+
+        <p id="dashboard-calendar-title">
+          Cargando calendario...
+        </p>
+
+      </div>
+
+      <a
+        class="outline-button"
+        href="#calendario"
+        data-page-link="calendario">
+
+        Ver completo →
+
+      </a>
+
+    </header>
+
+
+    <div class="week-head">
+
+      <span>Lun</span>
+      <span>Mar</span>
+      <span>Mié</span>
+      <span>Jue</span>
+      <span>Vie</span>
+      <span>Sáb</span>
+      <span>Dom</span>
+
+    </div>
+
+
+    <div
+      class="calendar-grid"
+      id="dashboard-calendar">
+    </div>
+
+  </section>
+
+</section>
+
+
+<!-- ==================================================
+     CALENDARIO
+=================================================== -->
+
+<section
+  class="app-page"
+  id="page-calendario">
+
+  <section class="card full-calendar-card">
+
+    <header class="card-head">
+
+      <div>
+
+        <h2>
+          Calendario clínico
+        </h2>
+
+        <p>
+          Vista mensual de la agenda
+        </p>
+
+      </div>
+
+
+      <div
+        class="calendar-controls"
+        id="full-calendar-controls">
+
+        <button
+          type="button"
+          id="previous-month"
+          aria-label="Mes anterior">
+
+          ‹
+
+        </button>
+
+        <strong id="full-calendar-title">
+          Cargando...
+        </strong>
+
+        <button
+          type="button"
+          id="next-month"
+          aria-label="Mes siguiente">
+
+          ›
+
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <div class="week-head">
+
+      <span>Lun</span>
+      <span>Mar</span>
+      <span>Mié</span>
+      <span>Jue</span>
+      <span>Vie</span>
+      <span>Sáb</span>
+      <span>Dom</span>
+
+    </div>
+
+
+    <div
+      class="calendar-grid large"
+      id="full-calendar">
+    </div>
+
+  </section>
+
+</section>
+
+
+<!-- ==================================================
+     CITAS
+=================================================== -->
+
+<section
+  class="app-page"
+  id="page-citas">
+
+  <section class="card full-list-card">
+
+    <header class="card-head">
+
+      <div>
+
+        <h2>
+          Gestión de citas
+        </h2>
+
+        <p>
+          Consulta la agenda, edita citas y revisa la información de tus pacientes.
+        </p>
+
+      </div>
+
+    </header>
+
+
+    <div
+      class="filter-row"
+      role="group"
+      aria-label="Filtrar citas">
+
+      <button
+        class="filter active-filter"
+        data-appointment-filter="today"
+        aria-pressed="true">
+
+        Hoy
+
+      </button>
+
+      <button
+        class="filter"
+        data-appointment-filter="tomorrow"
+        aria-pressed="false">
+
+        Mañana
+
+      </button>
+
+      <button
+        class="filter"
+        data-appointment-filter="all"
+        aria-pressed="false">
+
+        Todas las citas
+
+      </button>
+
+    </div>
+
+
+    <div
+      class="appointment-list expanded"
+      id="all-appointments">
+    </div>
+
+  </section>
+
+</section>
+
+
+<!-- ==================================================
+     PACIENTES
+=================================================== -->
+
+<section
+  class="app-page"
+  id="page-pacientes">
+
+  <section class="card patient-directory">
+
+    <header class="card-head patient-directory-head">
+
+      <div>
+
+        <h2>
+          Directorio de pacientes
+        </h2>
+
+        <p>
+          Busca un paciente y consulta el resumen de su expediente.
+        </p>
+
+      </div>
+
+    </header>
+
+
+    <div class="patient-directory-layout">
+
+      <div
+        class="patient-list"
+        id="patient-list"
+        aria-label="Lista de pacientes">
+      </div>
+
+
+      <section
+        class="patient-details"
+        id="patient-details"
+        aria-live="polite">
+
+        <span class="large-module-icon">
+          ♟
+        </span>
+
+        <h2>
+          Selecciona un paciente
+        </h2>
+
+        <p>
+          Su expediente, información y próximas citas aparecerán aquí.
+        </p>
+
+      </section>
+
+    </div>
+
+  </section>
+
+</section>
+
+
+<!-- ==================================================
+     FINANZAS
+=================================================== -->
+
+<section
+  class="app-page"
+  id="page-finanzas">
+
+  <section class="card module-placeholder">
+
+    <span class="large-module-icon">
+      $
+    </span>
+
+    <h2>
+      Finanzas
+    </h2>
+
+    <p>
+      Registra abonos, consulta saldos y prepara tu corte mensual.
+    </p>
+
+    <button
+      class="new-button"
+      type="button">
+
+      + Registrar pago
+
+    </button>
+
+  </section>
+
+</section>
+
+
+<!-- ==================================================
+     ADMINISTRAR
+=================================================== -->
+
+<section
+  class="app-page"
+  id="page-administrar">
+
+  <section class="admin-header">
+
+    <div>
+
+      <p class="eyebrow">
+        SOLO ADMINISTRADORES
+      </p>
+
+      <h2>
+        Administrar usuarios y roles
+      </h2>
+
+      <span>
+        Configura quién puede acceder y qué puede hacer dentro del sistema.
+      </span>
+
+    </div>
+
+
+    <button
+      class="new-button"
+      type="button">
+
+      + Agregar usuario
+
+    </button>
+
+  </section>
+
+
+  <section class="card users-card">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Usuario</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Acceso</th>
+          <th></th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <tr>
+
+          <td>
+
+            <div class="person">
+
+              <span class="person-avatar avatar-purple">
+                LM
+              </span>
+
+              <strong>
+                Luisa Martínez
+              </strong>
+
+            </div>
+
+          </td>
+
+          <td>
+
+            <a href="mailto:luisa@clinicadental.mx">
+              luisa@clinicadental.mx
+            </a>
+
+          </td>
+
+          <td>
+
+            <span class="role admin">
+              Administradora
+            </span>
+
+          </td>
+
+          <td>
+
+            <span class="access enabled">
+              ● Activo
+            </span>
+
+          </td>
+
+          <td>
+
+            <button
+              class="row-action"
+              type="button">
+
+              Editar
+
+            </button>
+
+          </td>
+
+        </tr>
+
+
+        <tr>
+
+          <td>
+
+            <div class="person">
+
+              <span class="person-avatar avatar-blue">
+                DM
+              </span>
+
+              <strong>
+                Dra. Medina
+              </strong>
+
+            </div>
+
+          </td>
+
+          <td>
+
+            <a href="mailto:medina@clinicadental.mx">
+              medina@clinicadental.mx
+            </a>
+
+          </td>
+
+          <td>
+
+            <span class="role doctor">
+              Doctora
+            </span>
+
+          </td>
+
+          <td>
+
+            <span class="access enabled">
+              ● Activo
+            </span>
+
+          </td>
+
+          <td>
+
+            <button
+              class="row-action"
+              type="button">
+
+              Editar
+
+            </button>
+
+          </td>
+
+        </tr>
+
+
+        <tr>
+
+          <td>
+
+            <div class="person">
+
+              <span class="person-avatar avatar-orange">
+                CR
+              </span>
+
+              <strong>
+                Carla Ruiz
+              </strong>
+
+            </div>
+
+          </td>
+
+          <td>
+
+            <a href="mailto:carla@clinicadental.mx">
+              carla@clinicadental.mx
+            </a>
+
+          </td>
+
+          <td>
+
+            <span class="role reception">
+              Recepción
+            </span>
+
+          </td>
+
+          <td>
+
+            <span class="access enabled">
+              ● Activo
+            </span>
+
+          </td>
+
+          <td>
+
+            <button
+              class="row-action"
+              type="button">
+
+              Editar
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </section>
+
+</section>
+
+  </main>
+
+  <!-- ==================================================
+       MODAL NUEVA CITA
+  =================================================== -->
+
+  <div
+    class="modal-backdrop"
+    id="appointment-modal"
+    aria-hidden="true">
+
+<form
+  class="appointment-modal"
+  id="appointment-form">
+
+  <button
+    type="button"
+    class="modal-close"
+    id="modal-close"
+    aria-label="Cerrar">
+
+    ×
+
+  </button>
+
+
+  <p class="eyebrow">
+    REAGENDAR PACIENTE
+  </p>
+
+  <h2 id="modal-title">
+    Generar nueva cita
+  </h2>
+
+  <p class="modal-copy">
+    Al guardar, se registra la nueva cita y este paciente sale de la agenda de hoy.
+  </p>
+
+
+  <!-- ==================================================
+       PACIENTE REGISTRADO
+  =================================================== -->
+
+  <label class="patient-search-field">
+
+    Paciente
+
+    <input
+      id="modal-patient"
+      name="paciente"
+      type="text"
+      placeholder="Escribe el nombre del paciente"
+      autocomplete="off"
+      required
+      role="combobox"
+      aria-autocomplete="list"
+      aria-controls="modal-patient-suggestions"
+      aria-expanded="false">
+
+    <!--
+      Este campo almacenará el ID del paciente seleccionado.
+      El JS deberá asignarlo únicamente cuando se seleccione
+      un paciente existente.
+    -->
+
+    <input
+      id="modal-patient-id"
+      name="pacienteId"
+      type="hidden"
+      value="">
+
+    <!--
+      Lista dinámica de pacientes registrados.
+      El JS insertará aquí las coincidencias.
+    -->
+
+    <div
+      class="patient-suggestions"
+      id="modal-patient-suggestions"
+      role="listbox"
+      aria-label="Pacientes registrados">
+    </div>
+
+    <small
+      class="field-help"
+      id="modal-patient-help">
+
+      Selecciona un paciente registrado para continuar.
+
+    </small>
+
+  </label>
+
+
+  <!-- ==================================================
+       MOTIVO
+  =================================================== -->
+
+  <label>
+
+    Motivo de cita
+
+    <input
+      id="modal-motive"
+      type="text"
+      maxlength="32"
+      placeholder="Ej. Control de brackets"
+      required>
+
+  </label>
+
+
+  <!-- ==================================================
+       SALDO
+  =================================================== -->
+
+  <label>
+
+    Saldo para el siguiente cobro
+
+    <div class="amount-row">
+
+      <input
+        id="modal-amount"
+        type="number"
+        min="0"
+        step="50"
+        placeholder="0"
+        value="0">
+
+      <label class="checkbox-row">
+
+        <input
+          id="modal-full-payment"
+          type="checkbox">
+
+        Cobro completo
+
+      </label>
+
+    </div>
+
+  </label>
+
+
+  <!-- ==================================================
+       FECHA
+  =================================================== -->
+
+  <label>
+
+    Fecha
+
+    <input
+      id="modal-date"
+      type="date"
+      required>
+
+  </label>
+
+
+  <!-- ==================================================
+       HORA
+  =================================================== -->
+
+  <label>
+
+    Hora
+
+    <input
+      id="modal-time"
+      type="time"
+      required>
+
+  </label>
+
+
+  <button
+    class="new-button"
+    id="confirm-appointment"
+    type="submit">
+
+    Confirmar nueva cita
+
+  </button>
+
+</form>
+
+  </div>
+
+  <!-- ==================================================
+       MODAL NUEVO PACIENTE
+  =================================================== -->
+
+  <div
+    class="modal-backdrop patient-modal-backdrop"
+    id="patient-modal"
+    aria-hidden="true">
+
+<form
+  class="patient-modal"
+  id="patient-form"
+  autocomplete="off">
+
+
+  <!-- ==================================================
+       ENCABEZADO DEL EXPEDIENTE
+  =================================================== -->
+
+  <div class="patient-modal-header">
+
+    <div class="patient-modal-heading">
+
+      <p class="eyebrow">
+        REGISTRO DE PACIENTE
+      </p>
+
+      <h2 id="patient-modal-title">
+        Nuevo paciente
+      </h2>
+
+      <p class="modal-copy">
+        Registra y administra la información del expediente clínico.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="modal-close"
+      id="patient-modal-close"
+      aria-label="Cerrar">
+
+      ×
+
+    </button>
+
+  </div>
+
+
+  <div
+    class="patient-form-scroll"
+    id="patient-form-scroll">
+
+
+    <!-- ==================================================
+         CATEGORÍA 01
+         DATOS GENERALES
+    =================================================== -->
+
+    <section
+      class="patient-form-category active"
+      data-patient-category="generales"
+      aria-hidden="false">
+
+      <div class="form-section-header">
+
+        <div>
+
+          <h3>
+            Datos generales
+          </h3>
+
+          <p>
+            Información general y datos de contacto del paciente.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <label>
+
+          Nombre(s)
+
+          <input
+            id="patient-name"
+            name="nombre"
+            type="text"
+            placeholder="Nombre del paciente"
+            required>
+
+        </label>
+
+
+        <label>
+
+          Apellidos
+
+          <input
+            id="patient-lastname"
+            name="apellidos"
+            type="text"
+            placeholder="Apellidos"
+            required>
+
+        </label>
+
+
+        <label>
+
+          Fecha de nacimiento
+
+          <input
+            id="patient-birthdate"
+            name="fechaNacimiento"
+            type="date">
+
+        </label>
+
+
+        <label>
+
+          Sexo
+
+          <select
+            id="patient-sex"
+            name="sexo">
+
+            <option value="">
+              Seleccionar
+            </option>
+
+            <option value="femenino">
+              Femenino
+            </option>
+
+            <option value="masculino">
+              Masculino
+            </option>
+
+            <option value="otro">
+              Otro
+            </option>
+
+            <option value="no-especificado">
+              Prefiero no especificar
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label>
+
+          Teléfono
+
+          <input
+            id="patient-phone"
+            name="telefono"
+            type="tel"
+            placeholder="10 dígitos">
+
+        </label>
+
+
+        <label>
+
+          Correo electrónico
+
+          <input
+            id="patient-email"
+            name="correo"
+            type="email"
+            placeholder="correo@ejemplo.com">
+
+        </label>
+
+
+        <label class="full-width">
+
+          Dirección
+
+          <input
+            id="patient-address"
+            name="direccion"
+            type="text"
+            placeholder="Calle, número, colonia, ciudad">
+
+        </label>
+
+      </div>
+
+
+      <!-- CONTACTO DE EMERGENCIA -->
+
+      <div class="subsection">
+
+        <div class="subsection-heading">
+
+          <h4>
+            Contacto de emergencia
+          </h4>
+
+          <p>
+            Persona a contactar en caso de emergencia.
+          </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+          <label>
+
+            Nombre completo
+
+            <input
+              id="emergency-name"
+              name="contactoEmergencia"
+              type="text"
+              placeholder="Nombre del contacto">
+
+          </label>
+
+
+          <label>
+
+            Parentesco
+
+            <input
+              id="emergency-relation"
+              name="parentescoEmergencia"
+              type="text"
+              placeholder="Ej. Madre, padre, pareja">
+
+          </label>
+
+
+          <label>
+
+            Teléfono
+
+            <input
+              id="emergency-phone"
+              name="telefonoEmergencia"
+              type="tel"
+              placeholder="10 dígitos">
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         CATEGORÍA 02
+         EXPEDIENTE MÉDICO
+    =================================================== -->
+
+    <section
+      class="patient-form-category"
+      data-patient-category="medico"
+      aria-hidden="true">
+
+      <div class="form-section-header">
+
+        <div>
+
+          <h3>
+            Expediente médico
+          </h3>
+
+          <p>
+            Información médica relevante para la atención odontológica.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <label>
+
+          Tipo de sangre
+
+          <select
+            id="patient-blood"
+            name="tipoSangre">
+
+            <option value="">
+              Seleccionar
+            </option>
+
+            <option value="A+">
+              A+
+            </option>
+
+            <option value="A-">
+              A-
+            </option>
+
+            <option value="B+">
+              B+
+            </option>
+
+            <option value="B-">
+              B-
+            </option>
+
+            <option value="AB+">
+              AB+
+            </option>
+
+            <option value="AB-">
+              AB-
+            </option>
+
+            <option value="O+">
+              O+
+            </option>
+
+            <option value="O-">
+              O-
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label class="full-width">
+
+          Antecedentes médicos
+
+          <textarea
+            id="medical-history"
+            name="antecedentesMedicos"
+            rows="4"
+            placeholder="Enfermedades, cirugías, antecedentes relevantes..."></textarea>
+
+        </label>
+
+
+        <label class="full-width">
+
+          Alergias
+
+          <textarea
+            id="patient-allergies"
+            name="alergias"
+            rows="3"
+            placeholder="Medicamentos, alimentos u otras alergias..."></textarea>
+
+        </label>
+
+
+        <label class="full-width">
+
+          Medicamentos actuales
+
+          <textarea
+            id="patient-medications"
+            name="medicamentos"
+            rows="3"
+            placeholder="Medicamentos que consume actualmente..."></textarea>
+
+        </label>
+
+
+        <label class="full-width">
+
+          Observaciones médicas
+
+          <textarea
+            id="medical-notes"
+            name="observacionesMedicas"
+            rows="4"
+            placeholder="Información adicional que deba conocer el odontólogo..."></textarea>
+
+        </label>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         CATEGORÍA 03
+         HISTORIAL CLÍNICO
+    =================================================== -->
+
+    <section
+      class="patient-form-category"
+      data-patient-category="clinico"
+      aria-hidden="true">
+
+      <div class="form-section-header">
+
+        <div>
+
+          <h3>
+            Historial clínico
+          </h3>
+
+          <p>
+            Tratamientos realizados, avances y archivos del paciente.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <label class="full-width">
+
+          Tratamiento actual
+
+          <input
+            id="clinical-treatment"
+            name="tratamientoActual"
+            type="text"
+            placeholder="Ej. Ortodoncia, limpieza, extracción...">
+
+        </label>
+
+
+        <label class="full-width">
+
+          Diagnóstico / motivo del tratamiento
+
+          <textarea
+            id="clinical-diagnosis"
+            name="diagnostico"
+            rows="4"
+            placeholder="Describe el diagnóstico o motivo del tratamiento..."></textarea>
+
+        </label>
+
+
+        <label class="full-width">
+
+          Avance / notas clínicas
+
+          <textarea
+            id="clinical-progress"
+            name="avanceClinico"
+            rows="5"
+            placeholder="Registra el avance, procedimiento realizado y observaciones de la cita..."></textarea>
+
+        </label>
+
+
+        <label>
+
+          Fecha del registro
+
+          <input
+            id="clinical-date"
+            name="fechaRegistroClinico"
+            type="date">
+
+        </label>
+
+      </div>
+
+
+      <!-- ARCHIVOS -->
+
+      <div class="subsection">
+
+        <div class="subsection-heading">
+
+          <h4>
+            Documentos y fotografías
+          </h4>
+
+          <p>
+            Archivos relacionados con el expediente del paciente.
+          </p>
+
+        </div>
+
+
+        <p class="field-help">
+
+          Puedes adjuntar fotografías, radiografías, documentos u otros archivos relacionados con el expediente.
+
+        </p>
+
+
+        <label class="file-upload">
+
+          <span class="file-upload-icon">
+            +
+          </span>
+
+          <span>
+
+            <strong>
+              Subir archivo
+            </strong>
+
+            <small>
+              Documento, fotografía, radiografía, etc.
+            </small>
+
+          </span>
+
+
+          <input
+            id="clinical-files"
+            name="archivosClinicos"
+            type="file"
+            multiple
+            accept="image/*,.pdf,.doc,.docx">
+
+        </label>
+
+
+        <div
+          class="file-list"
+          id="clinical-file-list">
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <div class="patient-form-actions">
+
+    <button
+      type="button"
+      class="outline-button"
+      id="patient-cancel">
+
+      Cancelar
+
+    </button>
+
+
+    <button
+      type="submit"
+      class="new-button"
+      id="patient-save">
+
+      Guardar paciente
+
+    </button>
+
+  </div>
+
+</form>
+
+  </div>
+
+  <!-- ==================================================
+       TOAST
+  =================================================== -->
+
+  <div
+    class="toast"
+    id="toast"
+    role="status">
+  </div>
+
   <script src="app.js"></script>
+
 </body>
+
 </html>
