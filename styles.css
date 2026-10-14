@@ -29,7 +29,10 @@ body {
   overflow-x: hidden;
 }
 
-body.modal-open {
+body.modal-open,
+body:has(#patient-modal.is-open),
+body:has(#patient-modal.active),
+body:has(#patient-modal[aria-hidden="false"]) {
   overflow: hidden;
   height: 100vh;
   overscroll-behavior: none;
@@ -50,11 +53,6 @@ a {
   text-decoration: none;
   color: inherit;
 }
-
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
 
 .sidebar {
   position: fixed;
@@ -138,47 +136,6 @@ a {
   margin-top: auto;
 }
 
-.help-card {
-  padding: 15px;
-  border-radius: 13px;
-  background: #1FA7A0;
-  color: #fff;
-  margin-bottom: 18px;
-}
-
-.help-bubble {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: #fff;
-  color: #1FA7A0;
-  font-weight: 800;
-}
-
-.help-card strong {
-  display: block;
-  font-size: 13px;
-  margin: 9px 0 3px;
-}
-
-.help-card p {
-  font-size: 11px;
-  margin: 0 0 12px;
-}
-
-.help-card a {
-  display: block;
-  padding: 9px;
-  border-radius: 8px;
-  background: #fff;
-  text-align: center;
-  color: var(--ink);
-  font-size: 10px;
-  font-weight: 800;
-}
-
 .profile {
   display: flex;
   align-items: center;
@@ -227,11 +184,6 @@ a {
   cursor: pointer;
 }
 
-
-/* =========================================================
-   CONTENIDO PRINCIPAL
-   ========================================================= */
-
 main {
   margin-left: 235px;
   padding: 25px 30px 40px;
@@ -265,6 +217,7 @@ main {
 }
 
 .search {
+  position: relative;
   display: flex;
   align-items: center;
   width: 250px;
@@ -273,6 +226,95 @@ main {
   background: #fff;
   padding: 0 12px;
   color: #77849a;
+}
+
+.patient-search-results {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: none;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid #e1e6ee;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(33, 48, 81, 0.14);
+}
+
+.patient-search-results.open {
+  display: block;
+}
+
+.patient-search-result {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 9px;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.patient-search-result:hover,
+.patient-search-result:focus-visible {
+  outline: none;
+  background: #f4f7fa;
+}
+
+.patient-search-result-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eef2f7;
+  color: #60708b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.patient-search-result-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.patient-search-result-copy strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-search-result-copy small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.patient-search-result-action {
+  flex: 0 0 auto;
+  color: #60708b;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.patient-search-empty {
+  margin: 0;
+  padding: 14px 10px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
 }
 
 .search span {
@@ -306,11 +348,6 @@ main {
 .app-page.active {
   display: block;
 }
-
-
-/* =========================================================
-   ESTADÍSTICAS
-   ========================================================= */
 
 .stats {
   display: grid;
@@ -370,19 +407,6 @@ main {
   flex-shrink: 0;
 }
 
-.money {
-  background: #1FA7A0;
-}
-
-.check {
-  background: #1FA7A0;
-}
-
-
-/* =========================================================
-   TARJETAS GENERALES
-   ========================================================= */
-
 .card {
   padding: 20px 20px 18px;
 }
@@ -413,13 +437,9 @@ main {
   border: 1px solid #D6F1EF;
   border-radius: 7px;
   padding: 8px 10px;
+  cursor: pointer;
   white-space: nowrap;
 }
-
-
-/* =========================================================
-   GRID DE CITAS
-   ========================================================= */
 
 .appointment-grid {
   display: grid;
@@ -430,8 +450,8 @@ main {
 .today-table-head,
 .appointment-card .appointment-row {
   display: grid;
-  grid-template-columns: 68px minmax(120px, 1.5fr) 74px 100px 80px;
-  gap: 6px;
+  grid-template-columns: 62px minmax(120px, 1.4fr) 68px minmax(190px, 1fr);
+  gap: 10px;
   align-items: center;
 }
 
@@ -459,6 +479,19 @@ main {
 .appointment-card .appointment-row {
   border-top: 1px solid var(--line);
   padding: 10px 2px;
+}
+
+
+.today-appointment-badge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #d6f2ed;
+  color: #13857e;
+  font-size: 9px;
+  font-weight: 800;
+  vertical-align: middle;
 }
 
 .time {
@@ -489,12 +522,6 @@ main {
   gap: 8px;
   align-items: center;
   min-width: 0;
-}
-
-.person-avatar {
-  width: 31px;
-  height: 31px;
-  border-radius: 8px;
 }
 
 .avatar-purple {
@@ -537,80 +564,121 @@ main {
   text-align: center;
 }
 
-.charge button {
-  display: block;
-  border: 0;
-  background: transparent;
-  padding: 1px 0;
-  color: #1FA7A0;
-  font-size: 10px;
-  cursor: pointer;
+.appointment-status {
+  min-width: 0;
 }
 
-.status-dots {
-  display: flex;
-  gap: 5px;
-  justify-content: center;
+.appointment-status-current {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #fff3df;
+  color: #a7650b;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.appointment-status-current,
+.appointment-status-label {
+  background: #fff3df;
+  color: #a7650b;
+}
+
+.appointment-status-current.confirmed,
+.appointment-status-label.confirmed {
+  background: #e4f6f2;
+  color: #14877f;
+}
+
+.appointment-status-current.postponed,
+.appointment-status-label.postponed {
+  background: #fff0f0;
+  color: #b74242;
+}
+
+.appointment-status-label {
+  display: inline-flex;
   align-items: center;
-}
-
-.status-dot {
-  width: 13px;
-  height: 13px;
-  border: 0;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 0 3px transparent;
-}
-
-.pending {
-  background: #ffbc65;
-}
-
-.confirmed {
-  background: #1FA7A0;
-}
-
-.postponed {
-  background: #ff2828;
-}
-
-.status-dot.selected {
-  box-shadow: 0 0 0 3px #D6F1EF;
-}
-
-.status-text {
-  display: block;
-  margin-top: 3px;
+  padding: 5px 10px;
+  border-radius: 999px;
   font-size: 10px;
-  text-align: center;
-  color: #8290a5;
+  font-weight: 800;
 }
 
-.new-followup {
-  border: 1px solid #D6F1EF;
+.status-actions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #e8edf2;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.status-action {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 27px;
+  padding: 4px 5px;
+  border: 1px solid transparent;
   border-radius: 6px;
-  background: #F4FBFA;
-  color: #1FA7A0;
-  padding: 8px 7px;
-  font-size: 10px;
+  background: transparent;
+  color: #65738a;
+  font-size: 9px;
   font-weight: 700;
   cursor: pointer;
 }
 
+.status-action.finish.selected {
+  border-color: #c8e9e3;
+  background: #e4f6f2;
+  color: #14877f;
+}
 
-/* =========================================================
-   CITAS DE MAÑANA
-   ========================================================= */
+.status-action.pending.selected {
+  border-color: #f5dfb8;
+  background: #fff3df;
+  color: #a7650b;
+}
+
+.status-action.cancel.selected {
+  border-color: #f0caca;
+  background: #fff0f0;
+  color: #b74242;
+}
+
+.status-action:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
 
 .tomorrow-row {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px;
+  grid-template-columns: minmax(0, 1fr) max-content;
   gap: 8px;
   align-items: center;
   padding: 12px 2px;
   border-bottom: 1px solid var(--line);
+}
+
+.tomorrow-row .whatsapp {
+  position: relative;
+  width: 82px;
+  box-sizing: border-box;
+}
+
+.tomorrow-row .whatsapp svg {
+  position: absolute;
+  left: 10px;
+}
+
+.tomorrow-row .whatsapp span {
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
 .tomorrow-point {
@@ -647,27 +715,44 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #D6F1EF;
-  border-radius: 8px;
-  background: linear-gradient(
-    180deg,
-    #F4FBFA 0%,
-    #EAF8F6 100%
-  );
-  color: #1FA7A0;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  font-size: 16px;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #168c52;
+  border-radius: 999px;
+  background: #1fae61;
+  color: #ffffff;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(35, 188, 177, 0.12);
+  box-shadow: 0 2px 5px rgba(22, 140, 82, 0.18);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
+.whatsapp svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
 
-/* =========================================================
-   CALENDARIO DEL DASHBOARD
-   ========================================================= */
+.whatsapp:hover {
+  background: #168c52;
+  box-shadow: 0 3px 8px rgba(22, 140, 82, 0.24);
+}
+
+.whatsapp:active {
+  transform: scale(0.97);
+}
+
+.whatsapp:focus-visible {
+  outline: 2px solid #168c52;
+  outline-offset: 2px;
+}
 
 .dashboard-calendar {
   margin-top: 22px;
@@ -682,7 +767,7 @@ main {
 
 .week-head {
   margin-top: 17px;
-  color: #a6b0c0;
+  color: #1FA7A0;
   font-size: 11px;
   font-weight: 700;
   text-align: center;
@@ -696,14 +781,29 @@ main {
 }
 
 .day {
+  display: block;
+  width: 100%;
   min-width: 0;
   height: 84px;
   padding: 6px;
+  border-top: 0;
+  border-left: 0;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  color: #9da8b8;
+  background: #fff;
+  color: #929598;
   font-size: 12px;
+  font-family: inherit;
+  text-align: left;
   overflow: hidden;
+  cursor: pointer;
+}
+
+.day:hover,
+.day:focus-visible {
+  background-color: #f3fbfa;
+  outline: 2px solid #1FA7A0;
+  outline-offset: -2px;
 }
 
 .day.muted {
@@ -715,6 +815,141 @@ main {
   background: #EAF8F6;
   color: #1FA7A0;
   font-weight: 800;
+}
+
+.day.muted:hover,
+.day.muted:focus-visible {
+  background: #f3fbfa;
+}
+
+#daily-agenda-modal {
+  z-index: 1200;
+}
+
+.daily-agenda-modal {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  padding: 25px;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 18px 55px rgba(21, 32, 57, 0.24);
+}
+
+.daily-agenda-modal h2 {
+  margin: 0;
+  padding-right: 35px;
+  color: var(--ink);
+  font: 800 20px "Nunito Sans", sans-serif;
+}
+
+.daily-agenda-modal .modal-copy {
+  margin: 6px 0 18px;
+  color: #8e9aae;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.daily-agenda-list {
+  max-height: calc(100vh - 155px);
+  overflow-y: auto;
+  border-top: 1px solid var(--line);
+}
+
+.daily-agenda-slot {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 9px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+.daily-agenda-slot.is-blocked {
+  background: #fff7ed;
+}
+
+.daily-agenda-slot.is-blocked .daily-agenda-free-label {
+  color: #a45124;
+  font-weight: 700;
+}
+
+.daily-agenda-time {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.daily-agenda-slot-content {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.daily-agenda-appointment {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.daily-agenda-appointment strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-agenda-appointment span,
+.daily-agenda-free-label {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.daily-agenda-book {
+  padding: 6px 10px;
+  border: 1px solid #bde5e1;
+  border-radius: 7px;
+  background: #f1fbfa;
+  color: #168e88;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.daily-agenda-slot-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.daily-agenda-block,
+.daily-agenda-unblock {
+  padding: 6px 8px;
+  border: 1px solid #e4d8ca;
+  border-radius: 7px;
+  background: #fff;
+  color: #7a6855;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.daily-agenda-block:hover,
+.daily-agenda-unblock:hover {
+  background: #fff7ed;
+}
+
+.daily-agenda-unblock {
+  border-color: #f0c9aa;
+  color: #a45124;
+}
+
+.daily-agenda-book:hover {
+  background: #e1f5f3;
 }
 
 .event {
@@ -739,61 +974,6 @@ main {
 .large .day {
   height: 115px;
 }
-
-
-/* =========================================================
-   CALENDARIO COMPLETO
-   ========================================================= */
-
-.full-calendar-card {
-  min-height: 620px;
-  overflow: hidden;
-}
-
-.full-calendar-card .calendar-grid {
-  width: 100%;
-}
-
-.calendar-controls {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  font-size: 12px;
-}
-
-.calendar-controls button,
-.filter,
-.period {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: #fff;
-  padding: 6px;
-  color: #708097;
-  cursor: pointer;
-}
-
-.calendar-controls button {
-  min-width: 30px;
-  min-height: 30px;
-}
-
-.filter-row {
-  display: flex;
-  gap: 8px;
-  margin: 18px 0;
-  flex-wrap: wrap;
-}
-
-.active-filter {
-  background: #E7F7F5;
-  color: #1FA7A0;
-  font-weight: 700;
-}
-
-
-/* =========================================================
-   LISTA GENERAL DE CITAS
-   ========================================================= */
 
 .expanded {
   max-height: none;
@@ -857,6 +1037,17 @@ main {
   flex-wrap: wrap;
 }
 
+.managed-appointment-actions .delete-action {
+  background: #fff0f0;
+  color: #b74242;
+}
+
+.managed-appointment-actions .appointment-edit-button {
+  border-color: #e2e8f0;
+  background: #fff;
+  color: #60708b;
+}
+
 .patient-info-button {
   border: 1px solid #e2e8f0;
   border-radius: 6px;
@@ -873,6 +1064,47 @@ main {
   filter: brightness(0.97);
 }
 
+.patient-info-button.patient-general-add-advance {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: #fff;
+  padding: 9px 13px;
+  font-size: 12px;
+}
+
+.patient-general-appointment-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid #d8eeeb;
+  border-radius: 9px;
+  background: #f3fbfa;
+}
+
+.patient-general-appointment-details {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.patient-general-appointment-details span {
+  color: #168b85;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.patient-general-appointment-details strong {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.patient-general-appointment-action .patient-general-add-advance {
+  flex: 0 0 auto;
+}
+
 .empty-state {
   margin: 0;
   padding: 24px 12px;
@@ -885,11 +1117,6 @@ main {
   grid-template-columns: 62px minmax(180px, 1.5fr) 92px 118px 100px;
   padding: 13px 4px;
 }
-
-
-/* =========================================================
-   DIRECTORIO DE PACIENTES
-   ========================================================= */
 
 .patient-directory {
   min-height: 500px;
@@ -921,7 +1148,7 @@ main {
 
 .patient-directory-layout {
   display: grid;
-  grid-template-columns: minmax(250px, 0.85fr) minmax(0, 1.4fr);
+  grid-template-columns: minmax(190px, 0.65fr) minmax(0, 1.75fr);
   min-height: 380px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -929,8 +1156,8 @@ main {
 }
 
 .patient-list {
-  max-height: 560px;
-  overflow: auto;
+  min-width: 0;
+  overflow: visible;
   border-right: 1px solid var(--line);
   -webkit-overflow-scrolling: touch;
 }
@@ -996,15 +1223,90 @@ main {
   font-size: 21px;
 }
 
-
-/* =========================================================
-   DETALLES DEL PACIENTE
-   ========================================================= */
-
 .patient-details {
   padding: 24px;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.patient-folder-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 5px;
+  margin: 24px 0 0;
+  padding: 0 8px;
+  overflow: visible;
+  border-bottom: 1px solid #d8e1e8;
+  scrollbar-width: thin;
+}
+
+.patient-folder-tab {
+  position: relative;
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  margin-bottom: -1px;
+  padding: 9px 10px 10px;
+  border: 1px solid #dce5eb;
+  border-bottom-color: #d8e1e8;
+  border-radius: 10px 10px 0 0;
+  background: #f2f6f8;
+  color: #64748a;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.patient-folder-tab::before {
+  position: absolute;
+  top: -5px;
+  left: 12px;
+  width: 34px;
+  height: 5px;
+  border: 1px solid #dce5eb;
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  background: inherit;
+  content: "";
+}
+
+.patient-folder-tab > span {
+  color: #26a69e;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.patient-folder-tab:hover {
+  background: #eaf5f4;
+  color: #168780;
+}
+
+.patient-folder-tab.active {
+  z-index: 1;
+  border-color: #b9e2de;
+  border-bottom-color: #fff;
+  background: #fff;
+  color: #168780;
+  transform: translateY(1px);
+}
+
+.patient-folder-panel[hidden] {
+  display: none !important;
+}
+
+.patient-folder-panel {
+  margin-top: 0;
+  max-height: none;
+  overflow-x: visible;
+  overflow-y: visible;
+  padding-top: 22px;
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
 }
 
 .patient-details > .large-module-icon {
@@ -1029,6 +1331,38 @@ main {
 .patient-details-heading h2 {
   margin: 2px 0 0;
   font: 800 20px "Nunito Sans", sans-serif;
+}
+
+.patient-details-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.patient-details-actions .delete-action {
+  background: #fff0f0;
+  color: #b74242;
+}
+
+.patient-history-entry-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.patient-history-entry-heading > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.patient-history-entry-heading .clinical-service-record-remove {
+  flex: 0 0 auto;
+  background: #fff0f0;
+  color: #b74242;
 }
 
 .patient-details-avatar {
@@ -1079,6 +1413,24 @@ main {
   border-top: 1px solid var(--line);
 }
 
+.patient-appointment-history > div.is-today-appointment {
+  padding-left: 9px;
+  border-left: 3px solid var(--teal);
+  background: #effaf8;
+}
+
+.patient-appointment-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.appointment-observation-count {
+  color: var(--teal) !important;
+  font-weight: 700;
+}
+
 .patient-appointment-history span strong,
 .patient-appointment-history span small {
   display: block;
@@ -1090,10 +1442,83 @@ main {
   font-size: 11px;
 }
 
+.patient-appointments-more {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid #cdebe7;
+  border-radius: 7px;
+  background: #f2fbf9;
+  color: #14877f;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
-/* =========================================================
-   PLACEHOLDER DE MÓDULOS
-   ========================================================= */
+.patient-appointments-more:hover {
+  background: #e7f7f5;
+}
+
+.patient-appointments-backdrop {
+  z-index: 22;
+}
+
+.patient-appointments-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 48px);
+  padding: 30px;
+}
+
+.patient-appointments-modal h2 {
+  margin-right: 35px;
+}
+
+.patient-appointments-modal .modal-copy {
+  margin: 7px 35px 16px 0;
+}
+
+.patient-appointments-list {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.patient-appointments-list .patient-appointment-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 10px;
+  border-top: 1px solid var(--line);
+}
+
+.patient-appointments-list .patient-appointment-entry > span {
+  min-width: 0;
+}
+
+.patient-appointments-list .patient-appointment-entry strong,
+.patient-appointments-list .patient-appointment-entry small {
+  display: block;
+}
+
+.patient-appointments-list .patient-appointment-entry > span > strong {
+  font-size: 14px;
+}
+
+.patient-appointments-list .patient-appointment-entry small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.patient-appointments-list .patient-appointment-entry .appointment-observation-count {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.patient-appointments-modal .appointment-notes-actions {
+  flex: 0 0 auto;
+}
 
 .module-placeholder {
   display: flex;
@@ -1110,6 +1535,200 @@ main {
   font-size: 13px;
 }
 
+.auth-preview-screen {
+  display: none;
+}
+
+.auth-preview-mode > :not(.auth-preview-screen) {
+  display: none !important;
+}
+
+.auth-preview-mode .auth-preview-screen.is-active {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(31, 167, 160, 0.11), transparent 38%),
+    #f4f7fa;
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  padding: 36px;
+  border: 1px solid #e8edf2;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(32, 43, 69, 0.11);
+}
+
+.auth-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  font-size: 21px;
+}
+
+.auth-card .eyebrow {
+  margin-bottom: 7px;
+}
+
+.auth-card h1 {
+  margin: 0;
+  color: var(--ink);
+  font: 800 25px/1.25 "Nunito Sans", sans-serif;
+}
+
+.auth-description {
+  margin: 10px 0 24px;
+  color: #7b899d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.auth-card label {
+  display: block;
+  margin: 15px 0;
+  color: #617088;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.auth-card input {
+  display: block;
+  width: 100%;
+  min-height: 45px;
+  margin-top: 6px;
+  padding: 11px 12px;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  outline: none;
+}
+
+.auth-card input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(31, 167, 160, 0.12);
+}
+
+.auth-submit {
+  width: 100%;
+  min-height: 45px;
+  margin-top: 8px;
+}
+
+.auth-preview-notice {
+  margin: 14px 0 0;
+  color: #7b899d;
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.auth-pending-card {
+  text-align: center;
+}
+
+.auth-pending-icon {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 20px;
+  border-radius: 18px;
+  background: #fff6e7;
+  color: #d89422;
+  font-size: 31px;
+}
+
+.auth-pending-email {
+  display: grid;
+  gap: 5px;
+  margin: 24px 0 10px;
+  padding: 14px;
+  border: 1px solid #e9edf3;
+  border-radius: 10px;
+  color: #7b899d;
+  font-size: 11px;
+}
+
+.auth-pending-email strong {
+  color: #a96c0b;
+  font-size: 13px;
+}
+
+.auth-pending-card .modal-secondary-button {
+  margin-top: 20px;
+}
+
+.access-requests-card {
+  min-height: 290px;
+}
+
+.access-requests-card .card-head {
+  align-items: center;
+}
+
+.access-requests-card .card-head h3 {
+  margin: 0 0 5px;
+  color: var(--ink);
+  font: 800 16px "Nunito Sans", sans-serif;
+}
+
+.access-requests-card .card-head p {
+  max-width: 560px;
+  margin: 0;
+  color: #8e9aae;
+  font-size: 12px;
+}
+
+.pending-count {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: #fff6e7;
+  color: #a96c0b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.access-requests-empty {
+  display: grid;
+  justify-items: center;
+  padding: 36px 18px 22px;
+  text-align: center;
+}
+
+.access-requests-empty .large-module-icon {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  font-size: 21px;
+}
+
+.access-requests-empty h3 {
+  margin: 0;
+  color: var(--ink);
+  font: 800 15px "Nunito Sans", sans-serif;
+}
+
+.access-requests-empty p {
+  max-width: 480px;
+  margin: 7px 0 0;
+  color: #8e9aae;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .large-module-icon {
   display: grid;
   place-items: center;
@@ -1120,11 +1739,6 @@ main {
   color: #1FA7A0;
   font-size: 27px;
 }
-
-
-/* =========================================================
-   ADMINISTRACIÓN
-   ========================================================= */
 
 .admin-header {
   display: flex;
@@ -1181,16 +1795,8 @@ main {
   color: #6b5dc0;
 }
 
-.role.doctor {
-  background: #E7F7F5;
-  color: #1FA7A0;
-}
-
-.role.reception {
-  background: #E7F7F5;
-  color: #1FA7A0;
-}
-
+.role.doctor,
+.role.reception,
 .access.enabled {
   background: #E7F7F5;
   color: #1FA7A0;
@@ -1207,11 +1813,6 @@ main {
   cursor: pointer;
   white-space: nowrap;
 }
-
-
-/* =========================================================
-   MODALES GENERALES
-   ========================================================= */
 
 .modal-backdrop {
   display: none;
@@ -1231,12 +1832,12 @@ main {
 
 .appointment-modal {
   position: relative;
-  width: min(410px, 100%);
+  width: min(560px, 100%);
   max-height: calc(100vh - 36px);
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-  padding: 25px;
+  padding: 28px;
   border-radius: 15px;
   background: #fff;
   box-shadow: 0 18px 55px rgba(21, 32, 57, 0.24);
@@ -1262,6 +1863,10 @@ main {
   font-weight: 700;
 }
 
+.appointment-modal [hidden] {
+  display: none;
+}
+
 .appointment-modal input,
 .appointment-modal select,
 .appointment-modal textarea {
@@ -1276,36 +1881,35 @@ main {
   outline: none;
 }
 
+.appointment-modal input[type="date"] {
+  min-height: 42px;
+  padding: 9px 11px;
+  border-color: #d7e3e8;
+  background: linear-gradient(135deg, #fff 0%, #f7fbfb 100%);
+  color-scheme: light;
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.appointment-modal input[type="date"]:hover {
+  border-color: #78c3bd;
+}
+
+.appointment-modal input[type="date"]:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(31, 167, 160, 0.14);
+}
+
+.appointment-modal input[type="date"]::-webkit-calendar-picker-indicator {
+  padding: 4px;
+  border-radius: 5px;
+  background-color: #e8f7f5;
+  cursor: pointer;
+}
+
 .appointment-modal textarea {
   min-height: 80px;
   resize: vertical;
-}
-
-.amount-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 5px;
-}
-
-.amount-row input[type="number"] {
-  flex: 1;
-}
-
-.checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: #617088;
-  font-size: 10px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.checkbox-row input {
-  width: auto;
-  margin: 0;
 }
 
 .appointment-modal .new-button {
@@ -1313,32 +1917,286 @@ main {
   margin-top: 8px;
 }
 
-.modal-close {
+.appointment-form-actions {
+  position: sticky;
+  bottom: -28px;
+  z-index: 2;
+  justify-content: stretch;
+  margin: 16px -28px -28px;
+  padding: 14px 28px 28px;
+  border-top: 1px solid #edf1f5;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.appointment-form-actions button {
+  flex: 1 1 0;
+}
+
+.visually-hidden {
   position: absolute;
-  top: 8px;
-  right: 14px;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
   border: 0;
-  background: transparent;
-  color: #8d98aa;
-  font-size: 25px;
+}
+
+.appointment-time-field {
+  min-width: 0;
+  margin: 15px 0 12px;
+  padding: 0;
+  border: 0;
+}
+
+.appointment-time-field legend {
+  margin-bottom: 8px;
+  color: #617088;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.appointment-time-period + .appointment-time-period {
+  margin-top: 12px;
+}
+
+.appointment-time-period h3 {
+  margin: 0 0 7px;
+  color: #8491a5;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.appointment-time-slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.appointment-time-slot {
+  display: grid;
+  min-height: 54px;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  border: 1px solid #e2e9ef;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.appointment-time-slot:not(:disabled):hover {
+  border-color: #8bd4ce;
+  background: #f3fbfa;
+}
+
+.appointment-time-slot[aria-pressed="true"] {
+  border-color: var(--teal);
+  background: #eaf8f7;
+  color: #147f7a;
+  box-shadow: 0 0 0 1px var(--teal);
+}
+
+.appointment-time-slot:focus-visible {
+  outline: 3px solid rgba(31, 167, 160, 0.3);
+  outline-offset: 2px;
+}
+
+.appointment-time-slot:disabled {
+  border-color: #edf0f4;
+  background: #f6f7f9;
+  color: #a4adba;
+  cursor: not-allowed;
+}
+
+.appointment-time-value {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.appointment-time-availability {
+  color: #7b899d;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.appointment-time-slot[aria-pressed="true"] .appointment-time-availability {
+  color: #147f7a;
+}
+
+.appointment-time-slot:disabled .appointment-time-availability {
+  color: #a4adba;
+}
+
+.appointment-time-field .field-help {
+  display: block;
+  margin-top: 9px;
+  color: #7b899d;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.appointment-notes-backdrop {
+  z-index: 24;
+}
+
+.appointment-notes-modal {
+  width: min(820px, 100%);
+  min-height: 440px;
+  max-height: calc(100vh - 48px);
+  padding: 36px;
+}
+
+.appointment-notes-modal .modal-copy {
+  margin: 9px 40px 24px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.appointment-notes-history {
+  display: grid;
+  gap: 14px;
+  max-height: min(40vh, 340px);
+  margin-bottom: 22px;
+  overflow-y: auto;
+}
+
+.appointment-notes-history .empty-state {
+  padding: 18px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+.appointment-observation {
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fbfc;
+}
+
+.appointment-observation small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.appointment-observation p {
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.appointment-notes-modal label {
+  margin: 0;
+  font-size: 14px;
+}
+
+.appointment-notes-modal #appointment-notes-text {
+  min-height: 210px;
+  margin-top: 9px;
+  padding: 14px 16px;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.appointment-notes-modal.is-viewing-observation {
+  min-height: 0;
+}
+
+.appointment-notes-modal.is-viewing-observation .modal-copy {
+  margin-bottom: 18px;
+}
+
+.appointment-notes-modal.is-viewing-observation .appointment-notes-history {
+  max-height: none;
+  margin: 0;
+  overflow: visible;
+}
+
+.appointment-notes-modal.is-viewing-observation .appointment-observation {
+  padding: 26px 28px;
+}
+
+.appointment-notes-modal [hidden] {
+  display: none;
+}
+
+.appointment-notes-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.appointment-notes-actions .modal-secondary-button,
+.appointment-notes-actions .modal-primary-button {
+  min-height: 40px;
+  padding: 9px 15px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
 }
 
+.appointment-notes-actions .modal-secondary-button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #65738a;
+}
 
-/* =========================================================
-   TOAST
-   ========================================================= */
+.appointment-notes-actions .modal-primary-button {
+  border: 0;
+  background: var(--teal);
+  color: #fff;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  border: 0;
+  background: transparent;
+  color: #8d98aa;
+  font-size: 26px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 10;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+}
+
+.modal-close:hover {
+  color: var(--ink);
+}
 
 .toast {
   position: fixed;
   z-index: 30;
   right: 25px;
   bottom: 25px;
-  padding: 12px 16px;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 16px 20px;
   border-radius: 9px;
   background: #27334f;
   color: #fff;
-  font-size: 11px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
   opacity: 0;
   pointer-events: none;
   transform: translateY(12px);
@@ -1350,1323 +2208,195 @@ main {
   transform: none;
 }
 
-
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (max-width: 1100px) {
-  main {
-    padding: 22px;
-  }
-
-  .appointment-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .expanded .managed-appointment {
-    grid-template-columns: 100px minmax(150px, 1fr) 90px auto;
-    gap: 12px;
-  }
-
-  .full-calendar-card .week-head,
-  .full-calendar-card .calendar-grid {
-    min-width: 650px;
-  }
-
-  .full-calendar-card {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .dashboard-calendar .week-head,
-  .dashboard-calendar .calendar-grid {
-    min-width: 560px;
-  }
-
-  .dashboard-calendar {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .users-card {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .users-card > table {
-    min-width: 680px;
-  }
-}
-
-
-/* =========================================================
-   TABLET PEQUEÑA
-   ========================================================= */
-
-@media (max-width: 900px) {
-  main {
-    width: calc(100% - 235px);
-    padding: 20px;
-  }
-
-  .topbar {
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .top-actions {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .search {
-    width: 210px;
-  }
-
-  .stats {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .expanded .managed-appointment {
-    grid-template-columns: 90px minmax(0, 1fr) 90px;
-    gap: 12px;
-  }
-
-  .managed-appointment-actions {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
-  }
-
-  .patient-directory-layout {
-    grid-template-columns: 240px minmax(0, 1fr);
-  }
-
-  .full-calendar-card .week-head,
-  .full-calendar-card .calendar-grid {
-    min-width: 680px;
-  }
-
-  .large .day {
-    height: 105px;
-  }
-}
-
-
-/* =========================================================
-   MÓVIL
-   ========================================================= */
-
-@media (max-width: 760px) {
-  .sidebar {
-    display: none;
-  }
-
-  main {
-    margin: 0;
-    width: 100%;
-    max-width: none;
-    padding: 16px 12px 30px;
-  }
-
-  .topbar {
-    flex-direction: column;
-    align-items: stretch;
-    margin-bottom: 20px;
-    gap: 14px;
-  }
-
-  .topbar h1 {
-    font-size: 22px;
-  }
-
-  .top-actions {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .top-actions .new-button {
-    min-height: 42px;
-    padding: 10px 12px;
-  }
-
-  .search {
-    display: none;
-  }
-
-  .stats {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .stat-card {
-    min-height: 76px;
-    padding: 14px;
-  }
-
-  .stat-card strong {
-    font-size: 23px;
-  }
-
-  .stat-icon {
-    width: 42px;
-    height: 42px;
-  }
-
-  .card {
-    padding: 15px;
-    border-radius: 12px;
-  }
-
-  .card-head {
-    align-items: center;
-  }
-
-  .card-head h2 {
-    font-size: 16px;
-  }
-
-  .card-head p {
-    font-size: 11px;
-  }
-
-
-  /* =======================================================
-     CITAS DEL CENTRO DE MANDO
-     ======================================================= */
-
-  .appointment-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .today-table-head {
-    display: none;
-  }
-
-  .appointment-list,
-  .tomorrow-list {
-    max-height: none;
-    overflow: visible;
-  }
-
-  .appointment-card .appointment-row {
-    grid-template-columns: 40px minmax(0, 1fr) auto;
-    gap: 8px;
-    padding: 12px 2px;
-    align-items: center;
-  }
-
-  .appointment-card .person {
-    min-width: 0;
-  }
-
-  .appointment-card .person-avatar {
-    width: 32px;
-    height: 32px;
-  }
-
-  .appointment-card .person strong {
-    font-size: 12px;
-  }
-
-  .appointment-card .person small {
-    font-size: 10px;
-  }
-
-  .appointment-card .charge {
-    grid-column: 3;
-    grid-row: 1;
-    font-size: 12px;
-  }
-
-  .appointment-card .status-dots {
-    grid-column: 2;
-    grid-row: 2;
-    justify-content: flex-start;
-    margin-top: 2px;
-  }
-
-  .appointment-card .new-followup {
-    grid-column: 3;
-    grid-row: 2;
-    padding: 7px 6px;
-  }
-
-  .appointment-card .status-dot {
-    width: 14px;
-    height: 14px;
-  }
-
-
-  /* =======================================================
-     CITAS DE MAÑANA
-     ======================================================= */
-
-  .tomorrow-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px;
-    padding: 12px 2px;
-  }
-
-  .tomorrow-row strong {
-    font-size: 12px;
-  }
-
-  .tomorrow-row small {
-    font-size: 10px;
-  }
-
-  .whatsapp {
-    width: 38px;
-    height: 38px;
-  }
-
-
-  /* =======================================================
-     CALENDARIO
-     ======================================================= */
-
-  .dashboard-calendar,
-  .full-calendar-card {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-
-  .dashboard-calendar .week-head,
-  .dashboard-calendar .calendar-grid {
-    min-width: 560px;
-  }
-
-  .full-calendar-card .week-head,
-  .full-calendar-card .calendar-grid {
-    min-width: 680px;
-  }
-
-  .week-head {
-    margin-top: 14px;
-    font-size: 10px;
-  }
-
-  .calendar-grid {
-    margin-top: 6px;
-  }
-
-  .day {
-    height: 82px;
-    padding: 6px;
-    font-size: 11px;
-  }
-
-  .large .day {
-    height: 100px;
-  }
-
-  .event {
-    margin-top: 4px;
-    padding: 4px;
-    font-size: 9px;
-  }
-
-  .calendar-controls {
-    gap: 6px;
-  }
-
-  .calendar-controls strong {
-    font-size: 12px;
-    white-space: nowrap;
-  }
-
-  .calendar-controls button {
-    width: 34px;
-    height: 34px;
-    padding: 0;
-    flex-shrink: 0;
-  }
-
-  .full-calendar-card {
-    min-height: auto;
-  }
-
-
-  /* =======================================================
-     LISTA GENERAL DE CITAS
-     ======================================================= */
-
-  .filter-row {
-    margin: 14px 0;
-    gap: 6px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 3px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .filter {
-    min-height: 36px;
-    padding: 8px 11px;
-    flex: 0 0 auto;
-    white-space: nowrap;
-  }
-
-  .expanded {
-    max-height: none;
-    overflow: visible;
-  }
-
-  .expanded .managed-appointment {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px 12px;
-    padding: 15px 4px;
-  }
-
-  .managed-appointment-person {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .managed-appointment-person strong {
-    font-size: 13px;
-  }
-
-  .managed-appointment-person small {
-    font-size: 10px;
-  }
-
-  .managed-appointment-time {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .managed-appointment-time strong {
-    font-size: 12px;
-  }
-
-  .managed-appointment-time small {
-    font-size: 10px;
-  }
-
-  .managed-appointment-charge {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    min-width: 72px;
-  }
-
-  .managed-appointment-charge strong {
-    font-size: 13px;
-  }
-
-  .managed-appointment-charge span {
-    font-size: 10px;
-  }
-
-  .managed-appointment-actions {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    justify-content: flex-start;
-    padding-top: 3px;
-  }
-
-  .managed-appointment-actions button {
-    min-height: 34px;
-  }
-
-  .patient-info-button,
-  .row-action {
-    padding: 8px 10px;
-    font-size: 10px;
-  }
-
-  .managed-appointment .status-dots {
-    justify-content: flex-start;
-    margin-top: 4px;
-  }
-
-  .managed-appointment .status-dot {
-    width: 14px;
-    height: 14px;
-  }
-
-
-  /* =======================================================
-     PACIENTES
-     ======================================================= */
-
-  .patient-directory {
-    min-height: 0;
-  }
-
-  .patient-directory-head {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .patient-directory-search {
-    width: 100%;
-  }
-
-  .patient-directory-search input {
-    min-height: 38px;
-  }
-
-  .patient-directory-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .patient-list {
-    max-height: 280px;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .patient-list-item {
-    min-height: 56px;
-    padding: 11px 12px;
-  }
-
-  .patient-details {
-    padding: 18px 12px;
-  }
-
-  .patient-details-heading {
-    align-items: flex-start;
-  }
-
-  .patient-details-heading h2 {
-    font-size: 18px;
-  }
-
-  .patient-detail-stats {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin: 18px 0;
-  }
-
-  .patient-detail-stats > div {
-    padding: 11px;
-  }
-
-  .patient-detail-stats strong {
-    font-size: 15px;
-  }
-
-
-  /* =======================================================
-     ADMINISTRACIÓN
-     ======================================================= */
-
-  .admin-header {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .admin-header h2 {
-    font-size: 18px;
-  }
-
-  .users-card {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-
-  .users-card > table {
-    width: max-content;
-    min-width: 720px;
-  }
-
-  .users-card th {
-    padding: 0 14px 11px 0;
-    font-size: 9px;
-  }
-
-  .users-card td {
-    padding: 12px 14px 12px 0;
-    font-size: 11px;
-    white-space: nowrap;
-  }
-
-  .users-card th:first-child,
-  .users-card td:first-child {
-    padding-left: 2px;
-  }
-
-
-  /* =======================================================
-     MODALES GENERALES
-     ======================================================= */
-
-  .modal-backdrop {
-    padding: 10px;
-    align-items: flex-end;
-  }
-
-  .appointment-modal {
-    width: 100%;
-    max-width: 100%;
-    max-height: calc(100vh - 20px);
-    padding: 21px 17px;
-    border-radius: 15px 15px 10px 10px;
-  }
-
-  .appointment-modal h2 {
-    font-size: 18px;
-    padding-right: 25px;
-  }
-
-  .appointment-modal input,
-  .appointment-modal select,
-  .appointment-modal textarea {
-    min-height: 40px;
-    font-size: 14px;
-  }
-
-  .appointment-modal textarea {
-    min-height: 90px;
-  }
-
-  .appointment-modal .new-button {
-    min-height: 42px;
-  }
-
-  .modal-close {
-    top: 7px;
-    right: 11px;
-  }
-
-
-  /* =======================================================
-     GENERAL
-     ======================================================= */
-
-  .module-placeholder {
-    min-height: 350px;
-    padding: 25px 10px;
-  }
-
-  .toast {
-    right: 12px;
-    left: 12px;
-    bottom: 12px;
-    text-align: center;
-  }
-}
-
-
-/* =========================================================
-   MÓVILES MUY PEQUEÑOS
-   ========================================================= */
-
-@media (max-width: 420px) {
-  main {
-    padding: 13px 9px 25px;
-  }
-
-  .topbar h1 {
-    font-size: 20px;
-  }
-
-  .top-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .top-actions .new-button {
-    width: 100%;
-  }
-
-  .card {
-    padding: 13px;
-  }
-
-  .card-head {
-    gap: 8px;
-  }
-
-  .card-head h2 {
-    font-size: 15px;
-  }
-
-  .outline-button {
-    padding: 7px 8px;
-    font-size: 10px;
-  }
-
-  .appointment-card .appointment-row {
-    grid-template-columns: 36px minmax(0, 1fr) auto;
-    gap: 6px;
-  }
-
-  .appointment-card .person-avatar {
-    width: 29px;
-    height: 29px;
-  }
-
-  .appointment-card .person strong {
-    font-size: 11px;
-  }
-
-  .appointment-card .person small {
-    font-size: 9px;
-  }
-
-  .appointment-card .charge {
-    font-size: 11px;
-  }
-
-  .new-followup {
-    font-size: 9px;
-    padding: 7px 5px;
-  }
-
-  .patient-detail-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .full-calendar-card .week-head,
-  .full-calendar-card .calendar-grid {
-    min-width: 640px;
-  }
-
-  .dashboard-calendar .week-head,
-  .dashboard-calendar .calendar-grid {
-    min-width: 540px;
-  }
-
-  .day {
-    height: 78px;
-  }
-
-  .large .day {
-    height: 94px;
-  }
-
-  .event {
-    font-size: 8px;
-  }
-
-  .expanded .managed-appointment {
-    padding: 13px 2px;
-  }
-
-  .managed-appointment-actions {
-    gap: 5px;
-  }
-
-  .patient-info-button,
-  .row-action {
-    padding: 7px 8px;
-    font-size: 9px;
-  }
-}
-
-
-/* =========================================================
-   MEJORA DE SCROLL EN DISPOSITIVOS TÁCTILES
-   ========================================================= */
-
-@media (hover: none) and (pointer: coarse) {
-  .calendar-controls button,
-  .filter,
-  .patient-info-button,
-  .row-action,
-  .new-followup,
-  .new-button,
-  .whatsapp,
-  .status-dot {
-    touch-action: manipulation;
-  }
-
-  .calendar-controls button {
-    min-width: 36px;
-    min-height: 36px;
-  }
-
-  .status-dot {
-    width: 15px;
-    height: 15px;
-  }
-}
-
-
-/* =========================================================
-   MODAL NUEVO PACIENTE
-   Mismo estilo visual que NUEVA CITA
-   ========================================================= */
-
-/*
-   IMPORTANTE:
-   Este modal controla su propio scroll.
-   El contenido que está detrás queda bloqueado.
-*/
-
-#patient-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-
-  display: none;
-  align-items: center;
-  justify-content: center;
-
-  padding: 24px;
-
-  background: rgba(32, 43, 69, 0.42);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-
-  /*
-     Evita que el scroll se propague hacia
-     la aplicación que está detrás.
-  */
-  overscroll-behavior: contain;
-
-  /*
-     El propio backdrop no debe desplazarse.
-  */
-  overflow: hidden;
-
-  /*
-     Evita problemas de interacción táctil
-     con el contenido inferior.
-  */
-  touch-action: none;
-}
-
-#patient-modal.is-open,
-#patient-modal.active,
-#patient-modal[aria-hidden="false"] {
-  display: flex;
-}
-
-
-/* =========================================================
-   CONTENEDOR PRINCIPAL DEL FORMULARIO
-   ========================================================= */
-
-#patient-modal .modal,
-#patient-modal .modal-card,
-#patient-modal .modal-content {
-  position: relative;
-
-  width: min(920px, 100%);
-  max-height: calc(100vh - 48px);
-
-  /*
-     EL SCROLL PRINCIPAL DEL FORMULARIO
-  */
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  /*
-     Impide que al llegar arriba/abajo
-     el navegador continúe desplazando
-     la aplicación de fondo.
-  */
-  overscroll-behavior: contain;
-
-  /*
-     Scroll suave en dispositivos táctiles.
-  */
-  -webkit-overflow-scrolling: touch;
-
-  /*
-     Permite interacción táctil vertical
-     dentro del formulario.
-  */
-  touch-action: pan-y;
-
-  background: #ffffff !important;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-
-  box-shadow:
-    0 24px 60px rgba(32, 43, 69, 0.18),
-    0 8px 24px rgba(32, 43, 69, 0.08);
-
-  padding: 0;
-
-  /*
-     Hace que el scrollbar pertenezca
-     visualmente al modal.
-  */
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5df transparent;
-}
-
-
-/* =========================================================
-   ENCABEZADO
-   ========================================================= */
-
-#patient-modal .patient-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-
-  padding: 24px 28px 20px;
-
-  background: var(--teal) !important;
-  color: #ffffff;
-  border: 0;
-  border-radius: 20px 20px 0 0;
-}
-
-#patient-modal .patient-modal-header .patient-modal-heading {
-  min-width: 0;
-}
-
-#patient-modal .patient-modal-header .eyebrow {
-  margin: 0 0 5px;
-  color: rgba(255, 255, 255, 0.88);
-}
-
-#patient-modal .patient-modal-header h2,
-#patient-modal .patient-modal-header h3 {
-  margin: 0;
-  color: #ffffff;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-#patient-modal .patient-modal-header p,
-#patient-modal .patient-modal-header .modal-copy {
-  margin: 6px 0 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-
-/* =========================================================
-   BOTÓN CERRAR
-   ========================================================= */
-
-#patient-modal .modal-close,
-#patient-modal #patient-modal-close {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid var(--line);
-  border-radius: 10px;
-
-  background: #ffffff;
-  color: var(--muted);
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
-}
-
-#patient-modal .modal-close:hover,
-#patient-modal #patient-modal-close:hover {
-  background: var(--bg);
-  color: var(--ink);
-  border-color: #d9e0e9;
-}
-
-/* Botón cerrar dentro del encabezado verde azulado */
-#patient-modal .patient-modal-header .modal-close,
-#patient-modal .patient-modal-header #patient-modal-close {
-  flex: 0 0 38px;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-}
-
-#patient-modal .patient-modal-header .modal-close:hover,
-#patient-modal .patient-modal-header #patient-modal-close:hover {
-  background: rgba(255, 255, 255, 0.24);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.48);
-}
-
-
-/* =========================================================
-   CUERPO DEL FORMULARIO
-   ========================================================= */
-
-#patient-modal .modal-body,
-#patient-modal .modal-form,
-#patient-modal form {
-  background: #ffffff !important;
-  border-radius: 15px;
-
-}
-
-#patient-modal form {
-  padding: 26px 28px 28px;
-}
-
-
-/* =========================================================
-   SECCIONES DEL FORMULARIO
-   ========================================================= */
-
-#patient-modal .form-section,
-#patient-modal .patient-section {
-  margin-bottom: 24px;
-  padding-bottom: 22px;
-  border-bottom: 1px solid var(--line);
-}
-
-#patient-modal .form-section:last-child,
-#patient-modal .patient-section:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-#patient-modal .form-section-title,
-#patient-modal .section-title {
-  margin: 0 0 16px;
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-
-/* =========================================================
-   CAMPOS
-   ========================================================= */
-
-#patient-modal label {
-  display: block;
-  margin-bottom: 7px;
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-#patient-modal input,
-#patient-modal select,
-#patient-modal textarea {
+.calendar-header-content {
   width: 100%;
-  min-height: 44px;
+}
 
-  padding: 11px 13px;
-
-  border: 1px solid var(--line);
-  border-radius: 10px;
-
-  background: #ffffff !important;
+.calendar-header-content h2 {
+  margin: 0 0 8px;
   color: var(--ink);
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+}
 
+.calendar-navigation {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 28px auto 28px;
+  align-items: center;
+  justify-content: center;
+  column-gap: 4px;
+  margin-top: 2px;
+}
+
+.calendar-navigation #dashboard-calendar-title {
+  grid-column: 2;
+  margin: 0;
+  color: var(--ink);
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.calendar-nav-button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--teal);
+  font-family: Arial, sans-serif;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+#previous-month {
+  grid-column: 1;
+  justify-self: center;
+}
+
+#next-month {
+  grid-column: 3;
+  justify-self: center;
+}
+
+.calendar-nav-button:hover {
+  background: #E7F7F5;
+  color: #1FA7A0;
+  transform: scale(1.08);
+}
+
+.calendar-nav-button:active {
+  transform: scale(0.94);
+}
+
+.calendar-nav-button:focus-visible {
+  outline: 2px solid #1FA7A0;
+  outline-offset: 2px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 22px 0 14px;
+}
+
+.appointment-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.appointment-filter select {
+  min-height: 32px;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid #d8dee8;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4b5568;
   font-family: inherit;
-  font-size: 14px;
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-#patient-modal textarea {
-  min-height: 100px;
-  resize: vertical;
+.appointment-filter select:hover {
+  border-color: #aeb8c7;
+  background: #f7f8fa;
 }
 
-#patient-modal input:focus,
-#patient-modal select:focus,
-#patient-modal textarea:focus {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(53, 197, 185, 0.12);
+.appointment-filter select:focus-visible {
+  outline: 2px solid #7b8798;
+  outline-offset: 2px;
 }
 
-#patient-modal input::placeholder,
-#patient-modal textarea::placeholder {
-  color: #b1bac7;
-}
-
-
-/* =========================================================
-   GRID DE CAMPOS
-   ========================================================= */
-
-#patient-modal .form-grid {
+.form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
-#patient-modal .form-group {
-  min-width: 0;
-}
-
-#patient-modal .form-group.full,
-#patient-modal .full-width {
+.form-group.full,
+.full-width {
   grid-column: 1 / -1;
 }
 
+#patient-modal {
+  padding: 18px;
+  background: rgba(27, 37, 62, 0.38);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  touch-action: auto;
+}
 
-/* =========================================================
-   PIE DEL FORMULARIO / BOTONES
-   ========================================================= */
-
-#patient-modal .modal-footer,
-#patient-modal .form-actions {
+#patient-modal .patient-modal {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-
-  padding: 20px 28px 24px;
-
-  background: #ffffff !important;
-  border-top: 1px solid var(--line);
+  flex-direction: column;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 18px 55px rgba(21, 32, 57, 0.24);
+  touch-action: pan-y;
 }
 
-#patient-modal button {
-  font-family: inherit;
-}
-
-#patient-modal .btn,
-#patient-modal button[type="submit"],
-#patient-modal #patient-cancel {
-  min-height: 42px;
-  padding: 10px 18px;
-
-  border-radius: 10px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-
-/* =========================================================
-   BOTÓN CANCELAR
-   ========================================================= */
-
-#patient-modal #patient-cancel {
-  border: 1px solid var(--line);
-  background: #ffffff;
+#patient-modal .patient-modal-header {
+  flex: 0 0 auto;
+  padding: 25px 55px 8px 25px;
+  border-radius: 15px 15px 0 0;
+  background: #fff !important;
   color: var(--ink);
 }
 
-#patient-modal #patient-cancel:hover {
-  background: var(--bg);
+#patient-modal .patient-modal-header h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 800 20px "Nunito Sans", sans-serif;
 }
 
-
-/* =========================================================
-   BOTÓN GUARDAR
-   ========================================================= */
-
-#patient-modal button[type="submit"] {
-  border: 1px solid var(--teal);
-  background: var(--teal);
-  color: #ffffff;
+#patient-modal .patient-modal-header .modal-copy {
+  margin: 6px 0 0;
+  color: #8e9aae;
+  font-size: 12px;
 }
-
-#patient-modal button[type="submit"]:hover {
-  filter: brightness(0.96);
-  transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   SCROLLBAR DEL MODAL NUEVO PACIENTE
-   ========================================================= */
-
-#patient-modal .modal::-webkit-scrollbar,
-#patient-modal .modal-card::-webkit-scrollbar,
-#patient-modal .modal-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-#patient-modal .modal::-webkit-scrollbar-track,
-#patient-modal .modal-card::-webkit-scrollbar-track,
-#patient-modal .modal-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-#patient-modal .modal::-webkit-scrollbar-thumb,
-#patient-modal .modal-card::-webkit-scrollbar-thumb,
-#patient-modal .modal-content::-webkit-scrollbar-thumb {
-  background: #cbd5df;
-  border-radius: 10px;
-}
-
-#patient-modal .modal::-webkit-scrollbar-thumb:hover,
-#patient-modal .modal-card::-webkit-scrollbar-thumb:hover,
-#patient-modal .modal-content::-webkit-scrollbar-thumb:hover {
-  background: #aeb9c7;
-}
-
-
-/* =========================================================
-   RESPONSIVE DEL MODAL NUEVO PACIENTE
-   ========================================================= */
-
-@media (max-width: 760px) {
-
-  #patient-modal {
-    padding: 14px;
-  }
-
-  #patient-modal .modal,
-  #patient-modal .modal-card,
-  #patient-modal .modal-content {
-    width: 100%;
-    max-width: 100%;
-    max-height: calc(100vh - 28px);
-    border-radius: 16px;
-  }
-
-  #patient-modal .patient-modal-header {
-    padding: 20px;
-  }
-
-  #patient-modal form {
-    padding: 20px;
-  }
-
-  #patient-modal .form-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  #patient-modal .form-group.full,
-  #patient-modal .full-width {
-    grid-column: auto;
-  }
-
-  #patient-modal .modal-footer,
-  #patient-modal .form-actions {
-    padding: 16px 20px 20px;
-  }
-}
-
-
-@media (max-width: 420px) {
-
-  #patient-modal {
-    padding: 8px;
-  }
-
-  #patient-modal .modal,
-  #patient-modal .modal-card,
-  #patient-modal .modal-content {
-    width: 100%;
-    max-height: calc(100vh - 16px);
-    border-radius: 14px;
-  }
-
-  #patient-modal .patient-modal-header {
-    padding: 18px 16px;
-  }
-
-  #patient-modal .patient-modal-header h2,
-  #patient-modal .patient-modal-header h3 {
-    font-size: 19px;
-  }
-
-  #patient-modal form {
-    padding: 18px 16px;
-  }
-
-  #patient-modal .modal-footer,
-  #patient-modal .form-actions {
-    flex-direction: column-reverse;
-    align-items: stretch;
-    padding: 14px 16px 16px;
-  }
-
-  #patient-modal .modal-footer button,
-  #patient-modal .form-actions button {
-    width: 100%;
-  }
-}
-
-
-/* =========================================================
-   BLOQUEO EXTRA DEL CONTENIDO DE FONDO
-   ========================================================= */
-
-/*
-   Si el modal está abierto mediante aria-hidden,
-   evitamos interacción accidental con el contenido
-   que está detrás.
-*/
-
-body:has(#patient-modal.is-open),
-body:has(#patient-modal.active),
-body:has(#patient-modal[aria-hidden="false"]) {
-  overflow: hidden;
-  height: 100vh;
-  overscroll-behavior: none;
-}
-
-
-/* =========================================================
-   TOUCH / SCROLL DEL MODAL
-   ========================================================= */
-
-@media (hover: none) and (pointer: coarse) {
-
-  #patient-modal {
-    touch-action: none;
-  }
-
-  #patient-modal .modal,
-  #patient-modal .modal-card,
-  #patient-modal .modal-content {
-    touch-action: pan-y;
-    overscroll-behavior: contain;
-  }
-}
-/* =========================================================
-   SCROLL INTERNO DEL FORMULARIO "NUEVO PACIENTE"
-   ========================================================= */
 
 #patient-modal .patient-form-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
   max-height: 55vh;
+  padding: 0 25px;
+  touch-action: pan-y;
   overflow-y: auto;
   overflow-x: hidden;
-
-  padding-right: 8px;
-
-  /* Permite desplazamiento con mouse y touch */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-
-  /* Firefox */
   scrollbar-width: thin;
   scrollbar-color: #cbd5df transparent;
 }
 
-/* Chrome / Edge / Safari */
 #patient-modal .patient-form-scroll::-webkit-scrollbar {
   width: 8px;
 }
@@ -2684,31 +2414,128 @@ body:has(#patient-modal[aria-hidden="false"]) {
   background: #aeb9c7;
 }
 
-/* =========================================================
-   RECIBO DE PAGO
-   Mismo estilo visual que los formularios existentes
-   ========================================================= */
+#patient-modal .patient-modal label {
+  margin: 10px 0;
+  color: #617088;
+  font-size: 11px;
+  font-weight: 700;
+}
 
-/* ---------------------------------------------------------
-   CONTENEDOR PRINCIPAL
-   --------------------------------------------------------- */
+#patient-modal .patient-modal input,
+#patient-modal .patient-modal select,
+#patient-modal .patient-modal textarea {
+  width: 100%;
+  min-height: 0;
+  margin-top: 5px;
+  padding: 9px;
+  border: 1px solid #e0e6ed;
+  border-radius: 7px;
+  background: #fff !important;
+  font-size: 13px;
+  outline: none;
+}
+
+#patient-modal .patient-modal textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+#patient-modal .clinical-services-field {
+  min-width: 0;
+}
+
+
+#patient-modal .clinical-services-list {
+  display: grid;
+  gap: 12px;
+}
+
+#patient-modal .clinical-service-row {
+  min-width: 0;
+  padding: 0;
+  background: #fff;
+}
+
+#patient-modal .clinical-service-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+#patient-modal .clinical-service-controls label {
+  flex: 1 1 auto;
+}
+
+#patient-modal .clinical-service-remove {
+  flex: 0 0 auto;
+  min-height: 36px;
+  margin: 10px 0;
+  padding: 0 12px;
+  color: #a43c43;
+}
+
+#patient-modal #add-clinical-service {
+  margin-top: 8px;
+}
+
+#patient-modal .clinical-service-custom[hidden] {
+  display: none;
+}
+
+#patient-modal .selected-file,
+.patient-file-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+#patient-modal .selected-file .clinical-file-name,
+.patient-file-item .clinical-file-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#patient-modal .clinical-file-view,
+.patient-file-item .clinical-file-view {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 5px 10px;
+}
+
+#patient-modal .selected-file small,
+.patient-file-item small {
+  flex: 1 0 100%;
+}
+
+#patient-modal .patient-form-actions {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 25px 20px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+#patient-modal .patient-form-actions button {
+  min-height: 38px;
+  margin: 0;
+}
 
 #payment-receipt-modal {
   position: fixed;
   inset: 0;
   z-index: 1001;
-
   display: none;
   align-items: center;
   justify-content: center;
-
   padding: 24px;
-
   background: rgba(32, 43, 69, 0.42);
-
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-
   overflow: hidden;
   overscroll-behavior: contain;
 }
@@ -2717,400 +2544,193 @@ body:has(#patient-modal[aria-hidden="false"]) {
   display: flex;
 }
 
-
-/* ---------------------------------------------------------
-   TARJETA DEL RECIBO
-   --------------------------------------------------------- */
-
 #payment-receipt-modal .payment-receipt-card {
   position: relative;
-
   width: min(760px, 100%);
-  max-height: calc(100vh - 48px);
-
+  max-height: calc(100vh - 36px);
   overflow-y: auto;
   overflow-x: hidden;
-
   background: #ffffff;
-
-  border: 1px solid var(--line);
-  border-radius: 20px;
-
-  box-shadow:
-    0 24px 60px rgba(32, 43, 69, 0.18),
-    0 8px 24px rgba(32, 43, 69, 0.08);
-
+  border: 0;
+  border-radius: 15px;
+  box-shadow: 0 18px 55px rgba(21, 32, 57, 0.24);
   padding: 0;
-
   -webkit-overflow-scrolling: touch;
-
   scrollbar-width: thin;
   scrollbar-color: #cbd5df transparent;
 }
-
-
-/* ---------------------------------------------------------
-   ENCABEZADO VERDE AZULADO
-   --------------------------------------------------------- */
 
 #payment-receipt-modal .payment-receipt-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
   gap: 20px;
-
-  padding: 24px 28px 20px;
-
-  background: var(--teal) !important;
-  color: #ffffff;
-
+  padding: 25px 55px 8px 25px;
+  background: #fff !important;
+  color: var(--ink);
   border: 0;
-
-  border-radius: 20px 20px 0 0;
+  border-radius: 15px 15px 0 0;
 }
-
-
-/* Contenido del encabezado */
 
 #payment-receipt-modal .payment-receipt-header > div:first-child {
   min-width: 0;
 }
 
-
-/* Texto pequeño superior */
-
-#payment-receipt-modal .payment-receipt-header .eyebrow {
-  display: block;
-
-  margin: 0 0 5px;
-
-  color: rgba(255, 255, 255, 0.88);
-
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-}
-
-
-/* Título */
-
 #payment-receipt-modal .payment-receipt-header h2 {
   margin: 0;
-
-  color: #ffffff;
-
+  color: var(--ink);
   font-family: "Nunito Sans", sans-serif;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
-
   line-height: 1.25;
 }
 
-
-/* Descripción */
-
 #payment-receipt-modal .payment-receipt-header .modal-copy {
   margin: 6px 0 0;
-
-  color: rgba(255, 255, 255, 0.90);
-
-  font-size: 13px;
+  color: #8e9aae;
+  font-size: 12px;
   line-height: 1.5;
 }
 
-
-/* ---------------------------------------------------------
-   BOTÓN CERRAR
-   --------------------------------------------------------- */
-
-#payment-receipt-modal .payment-receipt-header .modal-close {
-  position: static;
-
-  flex: 0 0 38px;
-
-  width: 38px;
-  height: 38px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid rgba(255, 255, 255, 0.32);
-
-  border-radius: 10px;
-
-  background: rgba(255, 255, 255, 0.14);
-
-  color: #ffffff;
-
-  font-size: 24px;
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-
-#payment-receipt-modal .payment-receipt-header .modal-close:hover {
-  background: rgba(255, 255, 255, 0.24);
-
-  border-color: rgba(255, 255, 255, 0.48);
-}
-
-
-/* ---------------------------------------------------------
-   CUERPO DEL FORMULARIO
-   --------------------------------------------------------- */
-
 #payment-receipt-modal #payment-receipt-form {
-  padding: 26px 28px 28px;
-
+  padding: 12px 25px 20px;
   background: #ffffff;
 }
-
-
-/* ---------------------------------------------------------
-   CAMPOS
-   --------------------------------------------------------- */
 
 #payment-receipt-modal .payment-receipt-grid,
 #payment-receipt-modal .payment-receipt-fields {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
-
 
 #payment-receipt-modal #payment-receipt-form label {
   display: flex;
   flex-direction: column;
-
   gap: 7px;
-
   margin: 0;
-
   color: var(--ink);
-
   font-size: 13px;
   font-weight: 600;
 }
 
-
 #payment-receipt-modal #payment-receipt-form label > span {
   color: var(--ink);
-
   font-size: 13px;
   font-weight: 700;
 }
-
 
 #payment-receipt-modal input,
 #payment-receipt-modal select,
 #payment-receipt-modal textarea {
   width: 100%;
-
   min-height: 44px;
-
   box-sizing: border-box;
-
   padding: 11px 13px;
-
   border: 1px solid var(--line);
-
   border-radius: 10px;
-
   background: #ffffff;
-
   color: var(--ink);
-
   font-family: inherit;
   font-size: 14px;
-
   outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
 
 #payment-receipt-modal textarea {
   min-height: 100px;
-
   resize: vertical;
 }
 
-
-/* Campos que solamente muestran información */
-
 #payment-receipt-modal input[readonly] {
   background: #f8f9fb;
-
   color: #66748a;
 }
-
-
-/* Estado de enfoque */
 
 #payment-receipt-modal input:focus,
 #payment-receipt-modal select:focus,
 #payment-receipt-modal textarea:focus {
   border-color: var(--teal);
-
-  box-shadow:
-    0 0 0 3px rgba(31, 167, 160, 0.10);
+  box-shadow: 0 0 0 3px rgba(31, 167, 160, 0.10);
 }
-
-
-/* ---------------------------------------------------------
-   RESUMEN FINANCIERO
-   --------------------------------------------------------- */
 
 #payment-receipt-modal .payment-summary {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-
   margin: 20px 0;
 }
 
-
 #payment-receipt-modal .payment-summary > div {
   padding: 16px;
-
   border: 1px solid var(--line);
-
   border-radius: 12px;
-
   background: #f8f9fb;
 }
 
-
 #payment-receipt-modal .payment-summary small {
   display: block;
-
   margin-bottom: 5px;
-
   color: var(--muted);
-
   font-size: 11px;
   font-weight: 600;
 }
 
-
 #payment-receipt-modal .payment-summary strong {
   display: block;
-
   color: var(--teal);
-
   font-family: "Nunito Sans", sans-serif;
-
   font-size: 22px;
   font-weight: 800;
 }
-
-
-/* ---------------------------------------------------------
-   NOTAS
-   --------------------------------------------------------- */
 
 #payment-receipt-modal #receipt-notes {
   margin-top: 7px;
 }
 
-
-/* ---------------------------------------------------------
-   BOTONES
-   --------------------------------------------------------- */
-
 #payment-receipt-modal .payment-receipt-actions {
   display: flex;
-
   justify-content: flex-end;
   align-items: center;
-
   gap: 10px;
-
   margin-top: 24px;
 }
 
-
-/* Cancelar */
-
 #payment-receipt-modal .modal-secondary-button {
   min-height: 42px;
-
   padding: 10px 16px;
-
   border: 1px solid var(--line);
-
   border-radius: 8px;
-
   background: #ffffff;
-
   color: #65738a;
-
   font-size: 12px;
   font-weight: 700;
-
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 #payment-receipt-modal .modal-secondary-button:hover {
   background: var(--bg);
-
   border-color: #d5dce5;
 }
 
-
-/* Guardar */
-
 #payment-receipt-modal .modal-primary-button {
   min-height: 42px;
-
   padding: 10px 17px;
-
   border: 0;
-
   border-radius: 8px;
-
   background: var(--teal);
-
   color: #ffffff;
-
   font-size: 12px;
   font-weight: 700;
-
   cursor: pointer;
-
-  transition:
-    filter 0.2s ease,
-    transform 0.2s ease;
+  transition: filter 0.2s ease, transform 0.2s ease;
 }
 
 #payment-receipt-modal .modal-primary-button:hover {
   filter: brightness(0.96);
-
   transform: translateY(-1px);
 }
-
-
-/* ---------------------------------------------------------
-   SCROLLBAR
-   --------------------------------------------------------- */
 
 #payment-receipt-modal .payment-receipt-card::-webkit-scrollbar {
   width: 8px;
@@ -3122,7 +2742,6 @@ body:has(#patient-modal[aria-hidden="false"]) {
 
 #payment-receipt-modal .payment-receipt-card::-webkit-scrollbar-thumb {
   background: #cbd5df;
-
   border-radius: 10px;
 }
 
@@ -3130,76 +2749,598 @@ body:has(#patient-modal[aria-hidden="false"]) {
   background: #aeb9c7;
 }
 
+@media (max-width: 1100px) {
+  main {
+    padding: 22px;
+  }
+  .appointment-grid {
+    grid-template-columns: 1fr;
+  }
+  .expanded .managed-appointment {
+    grid-template-columns: 100px minmax(150px, 1fr) 90px auto;
+    gap: 12px;
+  }
+  .dashboard-calendar .week-head,
+  .dashboard-calendar .calendar-grid {
+    min-width: 560px;
+  }
+  .dashboard-calendar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .users-card {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .users-card > table {
+    min-width: 680px;
+  }
+}
 
-/* ---------------------------------------------------------
-   RESPONSIVE
-   --------------------------------------------------------- */
+@media (max-width: 900px) {
+  main {
+    width: calc(100% - 235px);
+    padding: 20px;
+  }
+  .topbar {
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .top-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .search {
+    width: 210px;
+  }
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .expanded .managed-appointment {
+    grid-template-columns: 90px minmax(0, 1fr) 90px;
+    gap: 12px;
+  }
+  .managed-appointment-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+  .patient-directory-layout {
+    grid-template-columns: minmax(180px, 0.65fr) minmax(0, 1.75fr);
+  }
+  .large .day {
+    height: 105px;
+  }
+}
 
 @media (max-width: 760px) {
-
+  .sidebar {
+    display: none;
+  }
+  main {
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    padding: 16px 12px 30px;
+  }
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 20px;
+    gap: 14px;
+  }
+  .topbar h1 {
+    font-size: 22px;
+  }
+  .top-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .top-actions .new-button {
+    min-height: 42px;
+    padding: 10px 12px;
+  }
+  .search {
+    display: none;
+  }
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .stat-card {
+    min-height: 76px;
+    padding: 14px;
+  }
+  .stat-card strong {
+    font-size: 23px;
+  }
+  .stat-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .card {
+    padding: 15px;
+    border-radius: 12px;
+  }
+  .card-head {
+    align-items: center;
+  }
+  .card-head h2 {
+    font-size: 16px;
+  }
+  .card-head p {
+    font-size: 11px;
+  }
+  .appointment-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .today-table-head {
+    display: none;
+  }
+  .appointment-list,
+  .tomorrow-list {
+    max-height: none;
+    overflow: visible;
+  }
+  .appointment-card .appointment-row {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 12px 2px;
+    align-items: center;
+  }
+  .appointment-card .person {
+    min-width: 0;
+  }
+  .appointment-card .person-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .appointment-card .person strong {
+    font-size: 12px;
+  }
+  .appointment-card .person small {
+    font-size: 10px;
+  }
+  .appointment-card .charge {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 12px;
+  }
+  .appointment-card .appointment-status {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 2px;
+  }
+  .appointment-card .appointment-status-current {
+    margin-left: 0;
+  }
+  .appointment-card .status-actions {
+    justify-content: flex-start;
+  }
+  .appointment-card .status-action {
+    flex: 0 1 110px;
+    min-height: 34px;
+    font-size: 11px;
+  }
+  .tomorrow-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 12px 2px;
+  }
+  .tomorrow-row strong {
+    font-size: 12px;
+  }
+  .tomorrow-row small {
+    font-size: 10px;
+  }
+  .whatsapp {
+    min-height: 34px;
+    padding: 0 10px;
+  }
+  .filter-row {
+    margin: 18px 0 14px;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .appointment-filter {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .appointment-filter select {
+    min-height: 30px;
+    max-width: 100%;
+    padding: 5px 26px 5px 9px;
+  }
+  .expanded {
+    max-height: none;
+    overflow: visible;
+  }
+  .expanded .managed-appointment {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    padding: 15px 4px;
+  }
+  .managed-appointment-person {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .managed-appointment-person strong {
+    font-size: 13px;
+  }
+  .managed-appointment-person small {
+    font-size: 10px;
+  }
+  .managed-appointment-time {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .managed-appointment-time strong {
+    font-size: 12px;
+  }
+  .managed-appointment-time small {
+    font-size: 10px;
+  }
+  .managed-appointment-charge {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 72px;
+  }
+  .managed-appointment-charge strong {
+    font-size: 13px;
+  }
+  .managed-appointment-charge span {
+    font-size: 10px;
+  }
+  .managed-appointment-actions {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-content: flex-start;
+    padding-top: 3px;
+  }
+  .managed-appointment-actions button {
+    min-height: 34px;
+  }
+  .patient-info-button,
+  .row-action {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+  .patient-directory {
+    min-height: 0;
+  }
+  .patient-directory-head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .patient-directory-search {
+    width: 100%;
+  }
+  .patient-directory-search input {
+    min-height: 38px;
+  }
+  .patient-directory-layout {
+    grid-template-columns: 1fr;
+  }
+  .patient-list {
+    max-height: none;
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .patient-list-item {
+    min-height: 56px;
+    padding: 11px 12px;
+  }
+  .patient-details {
+    padding: 18px 12px;
+  }
+  .patient-details-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .patient-details-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+  .patient-details-heading h2 {
+    font-size: 18px;
+  }
+  .patient-detail-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 18px 0;
+  }
+  .patient-detail-stats > div {
+    padding: 11px;
+  }
+  .patient-detail-stats strong {
+    font-size: 15px;
+  }
+  .admin-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .admin-header h2 {
+    font-size: 18px;
+  }
+  .users-card {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .users-card > table {
+    width: max-content;
+    min-width: 720px;
+  }
+  .users-card th {
+    padding: 0 14px 11px 0;
+    font-size: 9px;
+  }
+  .users-card td {
+    padding: 12px 14px 12px 0;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .users-card th:first-child,
+  .users-card td:first-child {
+    padding-left: 2px;
+  }
+  .modal-backdrop {
+    padding: 10px;
+    align-items: flex-end;
+  }
+  .daily-agenda-modal {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    padding: 21px 17px;
+    border-radius: 15px 15px 10px 10px;
+  }
+  .daily-agenda-list {
+    max-height: calc(100vh - 145px);
+  }
+  .daily-agenda-slot {
+    grid-template-columns: 68px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .appointment-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 20px);
+    padding: 21px 17px;
+    border-radius: 15px 15px 10px 10px;
+  }
+  .appointment-modal h2 {
+    font-size: 18px;
+    padding-right: 25px;
+  }
+  .appointment-modal input,
+  .appointment-modal select,
+  .appointment-modal textarea {
+    min-height: 40px;
+    font-size: 14px;
+  }
+  .appointment-modal textarea {
+    min-height: 90px;
+  }
+  .appointment-modal .new-button {
+    min-height: 42px;
+  }
+  .appointment-time-slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .appointment-time-slot {
+    min-height: 49px;
+  }
+  .module-placeholder {
+    min-height: 350px;
+    padding: 25px 10px;
+  }
+  .toast {
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+    max-width: none;
+    padding: 15px 18px;
+    text-align: center;
+    font-size: 14px;
+  }
+  #patient-modal .patient-modal {
+    width: 100%;
+    max-height: calc(100vh - 28px);
+  }
+  #patient-modal .patient-form-scroll {
+    padding: 0 20px;
+  }
+  #patient-modal .patient-form-actions {
+    padding: 14px 20px 18px;
+  }
   #payment-receipt-modal {
     padding: 14px;
   }
-
   #payment-receipt-modal .payment-receipt-card {
     width: 100%;
-
     max-width: 100%;
-
     max-height: calc(100vh - 28px);
-
     border-radius: 16px;
   }
-
   #payment-receipt-modal .payment-receipt-header {
-    padding: 20px;
+    padding: 20px 55px 8px 20px;
   }
-
   #payment-receipt-modal #payment-receipt-form {
     padding: 20px;
   }
-
   #payment-receipt-modal .payment-receipt-grid,
   #payment-receipt-modal .payment-receipt-fields,
   #payment-receipt-modal .payment-summary {
     grid-template-columns: 1fr;
   }
-
+  .calendar-header-content h2 {
+    font-size: 16px;
+    margin-bottom: 7px;
+  }
+  .calendar-navigation {
+    grid-template-columns: 38px minmax(130px, 1fr) 38px;
+  }
+  .calendar-navigation #dashboard-calendar-title {
+    font-size: 18px;
+  }
+  .calendar-nav-button {
+    width: 32px;
+    height: 32px;
+    font-size: 25px;
+  }
 }
 
+@media (max-width: 480px) {
+  #patient-modal .patient-form-actions {
+    justify-content: stretch;
+  }
+  #patient-modal .patient-form-actions button {
+    flex: 1 1 100%;
+  }
+  .patient-general-appointment-action {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .patient-general-appointment-action .patient-general-add-advance {
+    width: 100%;
+  }
+}
 
 @media (max-width: 420px) {
-
+  main {
+    padding: 13px 9px 25px;
+  }
+  .topbar h1 {
+    font-size: 20px;
+  }
+  .top-actions {
+    grid-template-columns: 1fr;
+  }
+  .top-actions .new-button {
+    width: 100%;
+  }
+  .card {
+    padding: 13px;
+  }
+  .card-head {
+    gap: 8px;
+  }
+  .card-head h2 {
+    font-size: 15px;
+  }
+  .outline-button {
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+  .appointment-card .appointment-row {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 6px;
+  }
+  .appointment-card .person-avatar {
+    width: 29px;
+    height: 29px;
+  }
+  .appointment-card .person strong {
+    font-size: 11px;
+  }
+  .appointment-card .person small {
+    font-size: 9px;
+  }
+  .appointment-card .charge {
+    font-size: 11px;
+  }
+  .patient-detail-stats {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-calendar .week-head,
+  .dashboard-calendar .calendar-grid {
+    min-width: 540px;
+  }
+  .day {
+    height: 78px;
+  }
+  .large .day {
+    height: 94px;
+  }
+  .event {
+    font-size: 8px;
+  }
+  .expanded .managed-appointment {
+    padding: 13px 2px;
+  }
+  .managed-appointment-actions {
+    gap: 5px;
+  }
+  .patient-info-button,
+  .row-action {
+    padding: 7px 8px;
+    font-size: 9px;
+  }
   #payment-receipt-modal {
     padding: 8px;
   }
-
   #payment-receipt-modal .payment-receipt-card {
     max-height: calc(100vh - 16px);
-
     border-radius: 14px;
   }
-
   #payment-receipt-modal .payment-receipt-header {
-    padding: 18px 16px;
+    padding: 18px 48px 8px 16px;
   }
-
   #payment-receipt-modal .payment-receipt-header h2 {
     font-size: 19px;
   }
-
   #payment-receipt-modal #payment-receipt-form {
     padding: 18px 16px;
   }
-
   #payment-receipt-modal .payment-receipt-actions {
     flex-direction: column-reverse;
-
     align-items: stretch;
   }
-
   #payment-receipt-modal .payment-receipt-actions button {
     width: 100%;
   }
+  .calendar-header-content h2 {
+    font-size: 15px;
+  }
+  .calendar-navigation {
+    grid-template-columns: 34px minmax(110px, 1fr) 34px;
+  }
+  .calendar-navigation #dashboard-calendar-title {
+    font-size: 17px;
+  }
+  .calendar-nav-button {
+    width: 30px;
+    height: 30px;
+    font-size: 23px;
+  }
+}
 
+@media (hover: none) and (pointer: coarse) {
+  .calendar-controls button,
+  .filter,
+  .patient-info-button,
+  .row-action,
+  .new-button,
+  .whatsapp,
+  .status-action {
+    touch-action: manipulation;
+  }
+  .calendar-controls button {
+    min-width: 36px;
+    min-height: 36px;
+  }
 }
