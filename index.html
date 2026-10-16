@@ -285,7 +285,7 @@
           <div class="form-grid">
             <label>Tipo de sangre<select id="patient-blood" name="tipoSangre"><option value="">Seleccionar</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></label>
             <label class="full-width">Antecedentes médicos<textarea id="medical-history" name="antecedentesMedicos" rows="4" placeholder="Enfermedades, cirugías, antecedentes relevantes..."></textarea></label>
-            <label class="full-width">Alergias<textarea id="patient-allergies" name="alergias" rows="3" placeholder="Medicamentos, alimentos u otras alergias..."></textarea></label>
+            <label class="full-width">Alergias*<textarea id="patient-allergies" name="alergias" rows="3" placeholder="Medicamentos, alimentos u otras alergias..." required></textarea></label>
             <label class="full-width">Medicamentos actuales<textarea id="patient-medications" name="medicamentos" rows="3" placeholder="Medicamentos que consume actualmente..."></textarea></label>
             <label class="full-width">Observaciones médicas<textarea id="medical-notes" name="observacionesMedicas" rows="4" placeholder="Información adicional que deba conocer el odontólogo..."></textarea></label>
           </div>
@@ -314,6 +314,21 @@
         <button type="submit" class="new-button" id="patient-save-appointment">Guardar y generar cita</button>
       </div>
     </form>
+  </div>
+  <div class="modal-backdrop confirmation-backdrop" id="confirmation-modal" aria-hidden="true">
+    <section class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-title" aria-describedby="confirmation-message">
+      <span class="confirmation-icon" aria-hidden="true">!</span>
+      <h2 id="confirmation-title"></h2>
+      <p class="confirmation-message" id="confirmation-message"></p>
+      <label class="confirmation-input-label" id="confirmation-input-label" hidden>
+        <span id="confirmation-input-caption"></span>
+        <input id="confirmation-input" type="number">
+      </label>
+      <div class="appointment-notes-actions confirmation-actions">
+        <button class="modal-secondary-button" id="confirmation-cancel" type="button">Cancelar</button>
+        <button class="modal-primary-button" id="confirmation-accept" type="button">Continuar</button>
+      </div>
+    </section>
   </div>
   <div class="toast" id="toast" role="status"></div>
   <script src="app.js"></script>

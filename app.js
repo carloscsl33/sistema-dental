@@ -78,8 +78,9 @@ function updatePageScrollLock() {
   const patientAppointmentsOpen = document.querySelector('#patient-appointments-modal')?.classList.contains('open');
   const patientOpen = document.querySelector('#patient-modal')?.classList.contains('open');
   const dailyAgendaOpen = document.querySelector('#daily-agenda-modal')?.classList.contains('open');
+  const confirmationOpen = document.querySelector('#confirmation-modal')?.classList.contains('open');
   
-  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen) {
+  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || confirmationOpen) {
     lockPageScroll();
   } else {
     unlockPageScroll();
@@ -559,6 +560,87 @@ function showToast(message) {
   toast.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', input = null }) {
+  const modal = document.querySelector('#confirmation-modal');
+  const titleElement = document.querySelector('#confirmation-title');
+  const messageElement = document.querySelector('#confirmation-message');
+  const inputLabel = document.querySelector('#confirmation-input-label');
+  const inputCaption = document.querySelector('#confirmation-input-caption');
+  const inputElement = document.querySelector('#confirmation-input');
+  const cancelButton = document.querySelector('#confirmation-cancel');
+  const acceptButton = document.querySelector('#confirmation-accept');
+  if (!modal || !titleElement || !messageElement || !inputLabel || !inputCaption || !inputElement || !cancelButton || !acceptButton) {
+    return Promise.reject(new Error('No se pudo abrir el diálogo de confirmación.'));
+  }
+
+  titleElement.textContent = title;
+  messageElement.textContent = message;
+  acceptButton.textContent = confirmLabel;
+  inputLabel.hidden = !input;
+  inputElement.required = Boolean(input);
+  inputElement.value = input ? String(input.value) : '';
+  inputElement.setCustomValidity('');
+  if (input) {
+    inputCaption.textContent = input.label;
+    inputElement.min = String(input.min);
+    inputElement.max = String(input.max);
+    inputElement.step = '1';
+  } else {
+    inputElement.removeAttribute('min');
+    inputElement.removeAttribute('max');
+  }
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  lockPageScroll();
+
+  return new Promise(resolve => {
+    const previouslyFocused = document.activeElement;
+    const finish = confirmed => {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      cancelButton.removeEventListener('click', cancel);
+      acceptButton.removeEventListener('click', accept);
+      modal.removeEventListener('click', handleBackdropClick);
+      document.removeEventListener('keydown', handleKeydown);
+      updatePageScrollLock();
+      if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) previouslyFocused.focus();
+      resolve({ confirmed, value: input ? Number(inputElement.value) : null });
+    };
+    const cancel = () => finish(false);
+    const accept = () => {
+      if (input) {
+        inputElement.setCustomValidity('');
+        const value = Number(inputElement.value);
+        if (!Number.isInteger(value) || value < input.min || value > input.max) {
+          inputElement.setCustomValidity(`Ingresa un número del ${input.min} al ${input.max}.`);
+          inputElement.reportValidity();
+          return;
+        }
+      }
+      finish(true);
+    };
+    const handleBackdropClick = event => {
+      if (event.target === modal) cancel();
+    };
+    const handleKeydown = event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        cancel();
+      } else if (event.key === 'Enter' && event.target === inputElement) {
+        event.preventDefault();
+        accept();
+      }
+    };
+
+    cancelButton.addEventListener('click', cancel);
+    acceptButton.addEventListener('click', accept);
+    modal.addEventListener('click', handleBackdropClick);
+    document.addEventListener('keydown', handleKeydown);
+    (input ? inputElement : cancelButton).focus();
+  });
 }
 
 function getPatientFullName(patient) {
@@ -2277,13 +2359,18 @@ function closeModal() {
   updatePageScrollLock();
 }
 
-function deleteAppointment(source, index) {
+async function deleteAppointment(source, index) {
   const list = getAppointmentList(source);
   const appointment = list[index];
   if (!appointment) return;
   
   const patientName = appointment[1];
-  if (!window.confirm(`¿Deseas eliminar la cita de ${patientName}?\n\nEsta acción no se puede deshacer.`)) return;
+  const { confirmed } = await showConfirmationDialog({
+    title: '¿Eliminar esta cita?',
+    message: `Se eliminará la cita de ${patientName}. Esta acción no se puede deshacer.`,
+    confirmLabel: 'Eliminar cita'
+  });
+  if (!confirmed) return;
   
   const patient = resolveAppointmentPatient(appointment);
   list.splice(index, 1);
@@ -2293,7 +2380,7 @@ function deleteAppointment(source, index) {
   showToast(`Cita de ${patientName} eliminada.`);
 }
 
-function deletePatient(patientId) {
+async function deletePatient(patientId) {
   const patientIndex = patients.findIndex(patient => patient.id === patientId);
   if (patientIndex === -1) {
     showToast('No se encontró el paciente para eliminar.');
@@ -2304,14 +2391,21 @@ function deletePatient(patientId) {
   const patientName = getPatientFullName(patient);
   const patientAppointments = getPatientAppointments(patient);
   const appointmentsCount = patientAppointments.length;
-  const confirmation = `¿Deseas eliminar el expediente de ${patientName}?` +
-    `${appointmentsCount ? `\n\nTambién se eliminarán ${appointmentsCount} ${appointmentsCount === 1 ? 'cita relacionada' : 'citas relacionadas'}.` : ''}` +
-    '\n\nEsta acción no se puede deshacer.';
-  if (!window.confirm(confirmation)) return;
+  const { confirmed } = await showConfirmationDialog({
+    title: '¿Eliminar expediente?',
+    message: `Se eliminará el expediente de ${patientName}.${appointmentsCount ? ` También se ${appointmentsCount === 1 ? 'eliminará 1 cita relacionada' : `eliminarán ${appointmentsCount} citas relacionadas`}.` : ''} Esta acción no se puede deshacer.`,
+    confirmLabel: 'Eliminar paciente'
+  });
+  if (!confirmed) return;
 
   const fileIds = (patient.archivosClinicos || []).map(file => file.id).filter(Boolean);
   const normalizedPatientName = normalizeName(patientName);
-  patients.splice(patientIndex, 1);
+  const currentPatientIndex = patients.findIndex(item => item.id === patientId);
+  if (currentPatientIndex === -1) {
+    showToast('No se encontró el paciente para eliminar.');
+    return;
+  }
+  patients.splice(currentPatientIndex, 1);
   rebuildAppointmentCollections(getAppointments()
     .map(({ appointment }) => appointment)
     .filter(appointment =>
@@ -2580,7 +2674,7 @@ function openPatientRecordFromSearch(patientId) {
   });
 }
 
-document.addEventListener('click', event => {
+document.addEventListener('click', async event => {
   const patientFolderTab = event.target.closest('[data-patient-tab]');
   if (patientFolderTab) {
     const details = patientFolderTab.closest('#patient-details');
@@ -2626,16 +2720,18 @@ document.addEventListener('click', event => {
     const appointmentCount = getCalendarAppointments(date).filter(appointment => toInputTime(appointment[0]) === time && appointment[5] !== 'Cancelada').length;
     const remainingPlaces = Math.max(3 - appointmentCount - getBlockedAppointmentSlotCount(date, time), 0);
     if (!remainingPlaces) return;
-    let placesToBlock = 1;
-    if (remainingPlaces > 1) {
-      const answer = window.prompt(`Este horario tiene ${remainingPlaces} lugares disponibles. ¿Cuántos deseas cancelar y marcar como no disponibles? (1-${remainingPlaces})`, '1');
-      if (answer === null) return;
-      placesToBlock = Number(answer);
-      if (!Number.isInteger(placesToBlock) || placesToBlock < 1 || placesToBlock > remainingPlaces) {
-        showToast(`Ingresa un número del 1 al ${remainingPlaces}.`);
-        return;
+    const { confirmed, value: placesToBlock } = await showConfirmationDialog({
+      title: 'Marcar horario como no disponible',
+      message: `El horario de las ${formatTimeFromInput(time)} tiene ${remainingPlaces} ${remainingPlaces === 1 ? 'lugar disponible' : 'lugares disponibles'}.`,
+      confirmLabel: 'Marcar como ocupado',
+      input: {
+        label: `¿Cuántos lugares deseas bloquear? (1-${remainingPlaces})`,
+        min: 1,
+        max: remainingPlaces,
+        value: 1
       }
-    }
+    });
+    if (!confirmed) return;
     const existingBlockedSlot = blockedAppointmentSlots.find(slot => slot.date === date && slot.time === time);
     if (existingBlockedSlot) existingBlockedSlot.count = getBlockedAppointmentSlotCount(date, time) + placesToBlock;
     else blockedAppointmentSlots.push({ date, time, count: placesToBlock });
@@ -2775,7 +2871,7 @@ document.addEventListener('click', event => {
   const deleteBtn = event.target.closest('[data-delete-appointment]');
   if (deleteBtn) {
     const [source, index] = deleteBtn.dataset.deleteAppointment.split(':');
-    deleteAppointment(source, Number(index));
+    await deleteAppointment(source, Number(index));
     return;
   }
   
@@ -2873,7 +2969,7 @@ document.addEventListener('click', event => {
 
   const deletePatientBtn = event.target.closest('[data-delete-patient]');
   if (deletePatientBtn) {
-    deletePatient(deletePatientBtn.dataset.deletePatient);
+    await deletePatient(deletePatientBtn.dataset.deletePatient);
     return;
   }
   
