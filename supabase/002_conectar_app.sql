@@ -23,6 +23,4 @@ end $$;
 grant insert (patient_id, appointment_id, amount, method, paid_on, concept, reference, notes)
   on public.payments to authenticated;
 
-alter table public.payments alter column created_by set default auth.uid();
-
 grant update (paid) on public.appointments to authenticated;
