@@ -5,6 +5,9 @@
 --  para no complicar la integración. register_payment queda disponible para usarla más adelante
 --  si se requiere bloqueo a nivel de base de datos contra condiciones de carrera en los pagos.)
 
+-- schema.sql ya puede incluir esta política; hacerla idempotente permite
+-- ejecutar esta migración tanto en instalaciones nuevas como existentes.
+drop policy if exists payments_insert on public.payments;
 create policy payments_insert on public.payments
   for insert to authenticated with check ((select public.is_approved()));
 
