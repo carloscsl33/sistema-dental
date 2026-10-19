@@ -5,11 +5,20 @@
 --  para no complicar la integración. register_payment queda disponible para usarla más adelante
 --  si se requiere bloqueo a nivel de base de datos contra condiciones de carrera en los pagos.)
 
--- schema.sql ya puede incluir esta política; hacerla idempotente permite
--- ejecutar esta migración tanto en instalaciones nuevas como existentes.
-drop policy if exists payments_insert on public.payments;
-create policy payments_insert on public.payments
-  for insert to authenticated with check ((select public.is_approved()));
+-- schema.sql ya puede incluir esta política; crearla solo cuando falte
+-- permite ejecutar esta migración tanto en instalaciones nuevas como existentes.
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename = 'payments'
+      and policyname = 'payments_insert'
+  ) then
+    create policy payments_insert on public.payments
+      for insert to authenticated with check ((select public.is_approved()));
+  end if;
+end $$;
 
 grant insert (patient_id, appointment_id, amount, method, paid_on, concept, reference, notes)
   on public.payments to authenticated;
