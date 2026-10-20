@@ -72,7 +72,7 @@
     <div class="sidebar-footer">
       <div class="profile">
         <span class="profile-avatar">CD</span>
-        <div><strong>Clínica Dental</strong><small>Sesión no iniciada</small></div>
+        <div><strong>Clínica Dental</strong><small id="session-status">Sesión no iniciada</small></div>
         <button class="logout-button" id="logout-button" aria-label="Cerrar sesión" title="Cerrar sesión" hidden>↪</button>
       </div>
     </div>
@@ -270,7 +270,7 @@
             <label>Nombre(s)*<input id="patient-name" name="nombre" type="text" placeholder="Nombre(s)" pattern="[\p{L}\p{M}'’. \-]+" required></label>
             <label>Apellidos*<input id="patient-lastname" name="apellidos" type="text" placeholder="Apellidos" pattern="[\p{L}\p{M}'’. \-]+" required></label>
             <label>Fecha de nacimiento*<input id="patient-birthdate" name="fechaNacimiento" type="date" required></label>
-            <label>Sexo*<select id="patient-sex" name="sexo" required><option value="">Seleccionar</option><option value="femenino">Femenino</option><option value="masculino">Masculino</option><option value="otro">Otro</option><option value="no-especificado">Prefiero no especificar</option></select></label>
+              <label>Sexo*<select id="patient-sex" name="sexo" required><option value="">Seleccionar</option><option value="Femenino">Femenino</option><option value="Masculino">Masculino</option><option value="Prefiero no especificar">Prefiero no especificar</option></select></label>
             <label>Teléfono*<input id="patient-phone" name="telefono" type="tel" placeholder="Teléfono" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" required></label>
             <label>Correo electrónico<input id="patient-email" name="correo" type="email" placeholder="correo@ejemplo.com"></label>
             <label class="full-width">Dirección<input id="patient-address" name="direccion" type="text" placeholder="Calle, número, colonia, ciudad"></label>

@@ -33,6 +33,8 @@ function applyAuthState(session) {
   document.querySelector('#auth-overlay')?.toggleAttribute('hidden', !showOverlay);
   document.body.classList.toggle('auth-locked', showOverlay);
   document.querySelector('#logout-button')?.toggleAttribute('hidden', !session);
+  const sessionStatus = document.querySelector('#session-status');
+  if (sessionStatus) sessionStatus.textContent = session ? 'Sesión activa' : 'Sesión no iniciada';
 }
 
 let cloudSessionReady = false;

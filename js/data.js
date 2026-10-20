@@ -513,6 +513,12 @@ function mimeFromExtension(fileName, fallbackType) {
 
 const APPOINTMENT_STATUS_TO_DB = { 'En espera': 'en_espera', 'Finalizada': 'finalizada', 'Cancelada': 'cancelada' };
 const APPOINTMENT_STATUS_FROM_DB = { en_espera: 'En espera', finalizada: 'Finalizada', cancelada: 'Cancelada' };
+const PATIENT_SEX_TO_DB = {
+  femenino: 'Femenino',
+  masculino: 'Masculino',
+  otro: 'Prefiero no especificar',
+  'no-especificado': 'Prefiero no especificar'
+};
 
 let lastSyncedPatients = new Map();
 let lastSyncedAppointments = new Map();
@@ -527,7 +533,8 @@ function patientToRow(patient) {
     first_name: patient.nombre,
     last_name: patient.apellidos,
     birth_date: patient.fechaNacimiento || null,
-    sex: patient.sexo || null,
+    // Mantiene compatibilidad con registros locales anteriores y respeta el CHECK de la base.
+    sex: PATIENT_SEX_TO_DB[patient.sexo] || patient.sexo || null,
     phone: patient.telefono,
     email: patient.correo || null,
     address: patient.direccion || null,
