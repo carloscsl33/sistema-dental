@@ -1,7 +1,7 @@
 {
   "headers": [
     { "source": "/(.*)", "headers": [
-      { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'self' blob:; frame-src blob:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" },
+      { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'self' blob:; frame-src blob:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" },
       { "key": "X-Content-Type-Options", "value": "nosniff" },
       { "key": "Referrer-Policy", "value": "no-referrer" },
       { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },

@@ -14,14 +14,57 @@
 </head>
 <body>
   <div id="auth-overlay" hidden>
-    <form class="auth-card" id="auth-form">
-      <h1>Clínica Dental</h1>
-      <p>Inicia sesión para continuar</p>
-      <label>Correo<input id="auth-email" type="email" autocomplete="username" required></label>
-      <label>Contraseña<input id="auth-password" type="password" autocomplete="current-password" required></label>
-      <p class="auth-message" id="auth-message" role="alert"></p>
-      <button class="modal-primary-button" type="submit">Entrar</button>
-    </form>
+    <section class="auth-card" aria-labelledby="auth-title">
+      <div class="auth-brand"><span class="auth-brand-icon" aria-hidden="true">D</span><span>Clínica Dental</span></div>
+
+      <form id="auth-form" class="auth-view">
+        <p class="auth-kicker">Acceso protegido</p>
+        <h1 id="auth-title">Bienvenido de nuevo</h1>
+        <p class="auth-copy">Ingresa tus datos para acceder al sistema clínico.</p>
+        <label for="auth-email">Correo electrónico</label>
+        <input id="auth-email" type="email" autocomplete="username" inputmode="email" spellcheck="false" placeholder="nombre@clinica.com" required>
+        <label for="auth-password">Contraseña</label>
+        <div class="password-field">
+          <input id="auth-password" type="password" autocomplete="current-password" spellcheck="false" minlength="8" maxlength="128" required>
+          <button class="password-toggle" id="auth-password-toggle" type="button" aria-label="Mostrar contraseña" aria-controls="auth-password" aria-pressed="false">Mostrar</button>
+        </div>
+        <div class="auth-actions-row">
+          <button class="auth-link" id="show-recovery" type="button">¿Olvidaste tu contraseña?</button>
+        </div>
+        <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
+        <button class="modal-primary-button auth-submit" type="submit">Iniciar sesión</button>
+        <p class="auth-security-note"><span aria-hidden="true">⌁</span> Tu sesión y datos se protegen con conexión cifrada.</p>
+      </form>
+
+      <form id="recovery-request-form" class="auth-view" hidden>
+        <p class="auth-kicker">Recuperar acceso</p>
+        <h1>Restablece tu contraseña</h1>
+        <p class="auth-copy">Te enviaremos un enlace seguro para crear una contraseña nueva.</p>
+        <label for="recovery-email">Correo electrónico</label>
+        <input id="recovery-email" type="email" autocomplete="email" inputmode="email" spellcheck="false" placeholder="nombre@clinica.com" required>
+        <p class="auth-message" id="recovery-message" role="status" aria-live="polite"></p>
+        <button class="modal-primary-button auth-submit" type="submit">Enviar enlace seguro</button>
+        <button class="auth-link auth-back" type="button" data-auth-back>Volver al inicio de sesión</button>
+      </form>
+
+      <form id="reset-password-form" class="auth-view" hidden>
+        <p class="auth-kicker">Contraseña nueva</p>
+        <h1>Crea una contraseña segura</h1>
+        <p class="auth-copy">Usa al menos 12 caracteres y combina letras, números y símbolos.</p>
+        <label for="new-password">Nueva contraseña</label>
+        <div class="password-field">
+          <input id="new-password" type="password" autocomplete="new-password" spellcheck="false" minlength="12" maxlength="128" required>
+          <button class="password-toggle" type="button" data-password-toggle="new-password" aria-label="Mostrar contraseña" aria-controls="new-password" aria-pressed="false">Mostrar</button>
+        </div>
+        <label for="confirm-password">Confirmar contraseña</label>
+        <div class="password-field">
+          <input id="confirm-password" type="password" autocomplete="new-password" spellcheck="false" minlength="12" maxlength="128" required>
+          <button class="password-toggle" type="button" data-password-toggle="confirm-password" aria-label="Mostrar contraseña" aria-controls="confirm-password" aria-pressed="false">Mostrar</button>
+        </div>
+        <p class="auth-message" id="reset-message" role="status" aria-live="polite"></p>
+        <button class="modal-primary-button auth-submit" type="submit">Guardar contraseña</button>
+      </form>
+    </section>
   </div>
   <aside class="sidebar">
     <a class="brand" href="#centro" data-page-link="centro"><span class="brand-icon">D</span><span>Clínica Dental</span></a>
