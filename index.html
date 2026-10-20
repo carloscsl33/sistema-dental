@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clínica Dental | Gestión</title>
+  <title>Sistema clínica dental</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@700;800&display=swap" rel="stylesheet">
@@ -18,8 +18,7 @@
       <div class="auth-brand"><span class="auth-brand-icon" aria-hidden="true">D</span><span>Clínica Dental</span></div>
 
       <form id="auth-form" class="auth-view">
-        <h1 id="auth-title">Bienvenido de nuevo</h1>
-        <p class="auth-copy">Ingresa tus datos para acceder al sistema clínico.</p>
+        <h1 id="auth-title">Bienvenido</h1>
         <label for="auth-email">Correo electrónico</label>
         <input id="auth-email" type="email" autocomplete="username" inputmode="email" spellcheck="false" placeholder="nombre@clinica.com" required>
         <label for="auth-password">Contraseña</label>
@@ -36,7 +35,7 @@
 
       <form id="recovery-request-form" class="auth-view" hidden>
         <h1>Restablece tu contraseña</h1>
-        <p class="auth-copy">Te enviaremos un enlace seguro para crear una contraseña nueva.</p>
+        <p class="auth-copy">Te enviaremos un enlace seguro para crear una contraseña nueva</p>
         <label for="recovery-email">Correo electrónico</label>
         <input id="recovery-email" type="email" autocomplete="email" inputmode="email" spellcheck="false" placeholder="nombre@clinica.com" required>
         <button class="auth-link auth-back" type="button" data-auth-back>Volver al inicio de sesión</button>
@@ -72,7 +71,7 @@
     </nav>
     <div class="sidebar-footer">
       <div class="profile">
-        <div><strong>Clínica Dental</strong><small>Sesión no iniciada</small></div>
+        <div><strong>Clínica Dental</strong><small id="session-status">Sesión no iniciada</small></div>
         <button class="logout-button" id="logout-button" type="button" aria-label="Cerrar sesión" title="Cerrar sesión" hidden>
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7M13 3v5m0 8v5m-4-9h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -274,7 +273,7 @@
             <label>Nombre(s)*<input id="patient-name" name="nombre" type="text" placeholder="Nombre(s)" pattern="[\p{L}\p{M}'’. \-]+" required></label>
             <label>Apellidos*<input id="patient-lastname" name="apellidos" type="text" placeholder="Apellidos" pattern="[\p{L}\p{M}'’. \-]+" required></label>
             <label>Fecha de nacimiento*<input id="patient-birthdate" name="fechaNacimiento" type="date" required></label>
-            <label>Sexo*<select id="patient-sex" name="sexo" required><option value="">Seleccionar</option><option value="femenino">Femenino</option><option value="masculino">Masculino</option><option value="otro">Otro</option><option value="no-especificado">Prefiero no especificar</option></select></label>
+              <label>Sexo*<select id="patient-sex" name="sexo" required><option value="">Seleccionar</option><option value="Femenino">Femenino</option><option value="Masculino">Masculino</option><option value="Prefiero no especificar">Prefiero no especificar</option></select></label>
             <label>Teléfono*<input id="patient-phone" name="telefono" type="tel" placeholder="Teléfono" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" required></label>
             <label>Correo electrónico<input id="patient-email" name="correo" type="email" placeholder="correo@ejemplo.com"></label>
             <label class="full-width">Dirección<input id="patient-address" name="direccion" type="text" placeholder="Calle, número, colonia, ciudad"></label>
@@ -339,19 +338,19 @@
     </section>
   </div>
   <div class="toast" id="toast" role="status"></div>
-  <script src="js/supabase.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/appointments.js"></script>
-  <script src="js/calendar.js"></script>
-  <script src="js/payments.js"></script>
-  <script src="js/patients.js"></script>
-  <script src="js/events.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/pwa.js"></script>
+  <script src="js/supabase.js?v=20261020-2"></script>
+  <script src="js/config.js?v=20261020-2"></script>
+  <script src="js/supabase-client.js?v=20261020-2"></script>
+  <script src="js/state.js?v=20261020-2"></script>
+  <script src="js/utils.js?v=20261020-2"></script>
+  <script src="js/data.js?v=20261020-2"></script>
+  <script src="js/appointments.js?v=20261020-2"></script>
+  <script src="js/calendar.js?v=20261020-2"></script>
+  <script src="js/payments.js?v=20261020-2"></script>
+  <script src="js/patients.js?v=20261020-2"></script>
+  <script src="js/events.js?v=20261020-2"></script>
+  <script src="js/main.js?v=20261020-2"></script>
+  <script src="js/auth.js?v=20261020-4"></script>
+  <script src="js/pwa.js?v=20261020-2"></script>
 </body>
 </html>

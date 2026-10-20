@@ -33,6 +33,8 @@ function applyAuthState(session) {
   document.querySelector('#auth-overlay')?.toggleAttribute('hidden', !showOverlay);
   document.body.classList.toggle('auth-locked', showOverlay);
   document.querySelector('#logout-button')?.toggleAttribute('hidden', !session);
+  const sessionStatus = document.querySelector('#session-status');
+  if (sessionStatus) sessionStatus.textContent = session ? 'Sesión activa' : 'Sesión no iniciada';
 }
 
 let cloudSessionReady = false;
@@ -42,8 +44,10 @@ async function handleSession(session) {
   if (session) {
     if (!cloudSessionReady) {
       cloudSessionReady = true;
-      setAuthMessage('#auth-message', 'Cargando tus datos…', true);
+      // La sesión ya es válida: liberar la interfaz antes de cualquier diálogo de sincronización.
+      applyAuthState(session);
       await connectToCloud();
+      return;
     }
     applyAuthState(session);
   } else {
@@ -71,8 +75,10 @@ function passwordIsStrong(password) {
 }
 
 async function initializeAuth() {
+  // Mantiene el contenido clínico bloqueado hasta conocer el estado real de la sesión.
+  applyAuthState(null);
+
   if (!supabaseClient) {
-    applyAuthState(null);
     setAuthMessage('#auth-message', 'No se pudo iniciar el acceso seguro. Recarga la página e inténtalo de nuevo.');
     return;
   }
