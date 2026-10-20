@@ -288,7 +288,7 @@ grant insert (id, patient_id, appt_date, appt_time, motive, total, paid, status)
 grant update (patient_id, appt_date, appt_time, motive, total, status, paid) on public.appointments to authenticated;
 grant delete on public.appointments, public.patient_files to authenticated;
 grant insert on public.patient_files to authenticated;
-grant insert (patient_id, appointment_id, amount, method, paid_on, concept, reference, notes) on public.payments to authenticated;
+grant insert (id, patient_id, appointment_id, amount, method, paid_on, concept, reference, notes) on public.payments to authenticated;
 
 -- Tiempo real para que 3-4 personas vean los cambios al instante (respeta RLS)
 alter publication supabase_realtime add table public.appointments, public.blocked_slots;
