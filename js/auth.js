@@ -44,8 +44,10 @@ async function handleSession(session) {
   if (session) {
     if (!cloudSessionReady) {
       cloudSessionReady = true;
-      setAuthMessage('#auth-message', 'Cargando tus datos…', true);
+      // La sesión ya es válida: liberar la interfaz antes de cualquier diálogo de sincronización.
+      applyAuthState(session);
       await connectToCloud();
+      return;
     }
     applyAuthState(session);
   } else {
