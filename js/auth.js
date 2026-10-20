@@ -73,8 +73,10 @@ function passwordIsStrong(password) {
 }
 
 async function initializeAuth() {
+  // Mantiene el contenido clínico bloqueado hasta conocer el estado real de la sesión.
+  applyAuthState(null);
+
   if (!supabaseClient) {
-    applyAuthState(null);
     setAuthMessage('#auth-message', 'No se pudo iniciar el acceso seguro. Recarga la página e inténtalo de nuevo.');
     return;
   }
