@@ -1,5 +1,5 @@
 // Datos de tu proyecto (Supabase > Project Settings > API). Son públicos por diseño: la seguridad la da RLS.
 window.SUPABASE_CONFIG = {
-  url: 'https://sggvcbmnvivekzhzllnu.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnZ3ZjYm1udml2ZWt6aHpsbG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTAyNjUsImV4cCI6MjEwNzg2NjI2NX0.X3plUnEBMShu9_V0I3gaD2atAnTQu_B68vQg_7OzqIs'
+  url: 'https://hthkcminvwemgvnzpwxi.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aGtkbWludndlbWd2bnpwd3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0NDMwNTIsImV4cCI6MjEwODAxOTA1Mn0.WBVih0amNclZqjE3CyuzC3e3_g0dnDcRz3s2ccf5iuw'
 };
