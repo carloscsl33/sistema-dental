@@ -305,13 +305,11 @@ function appointmentCardMarkup(appointment, index, source) {
 }
 
 function renderAppointmentTable() {
-  const oldestVisibleDate = getISODate(-2);
+  const today = getISODate(0);
   const appointments = getAppointments()
     .filter(({ appointment }) =>
-      (activeAppointmentFilter === 'past'
-        ? appointment.date < getISODate(0)
-        : appointment.date >= oldestVisibleDate &&
-          (activeAppointmentFilter === 'all' || appointment.date === getISODate(activeAppointmentFilter === 'today' ? 0 : 1))) &&
+      appointment.date >= today &&
+      (activeAppointmentFilter === 'all' || appointment.date === getISODate(activeAppointmentFilter === 'today' ? 0 : 1)) &&
       appointmentMatchesSearch(appointment)
     )
     .sort((a, b) => {
