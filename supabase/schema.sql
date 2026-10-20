@@ -284,7 +284,7 @@ grant select on public.profiles, public.patients, public.treatments, public.bloc
                 public.appointment_notes, public.payments, public.patient_files to authenticated;
 grant select on public.audit_log to authenticated;
 grant insert, update, delete on public.patients, public.treatments, public.blocked_slots, public.appointment_notes to authenticated;
-grant insert (patient_id, appt_date, appt_time, motive, total, status) on public.appointments to authenticated;
+grant insert (id, patient_id, appt_date, appt_time, motive, total, paid, status) on public.appointments to authenticated;
 grant update (appt_date, appt_time, motive, total, status, paid)       on public.appointments to authenticated;
 grant delete on public.appointments, public.patient_files to authenticated;
 grant insert on public.patient_files to authenticated;
