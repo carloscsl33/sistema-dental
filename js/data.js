@@ -593,6 +593,11 @@ function appointmentToRow(appointment) {
   };
 }
 
+function appointmentToUpdateRow(appointment) {
+  const { id, ...row } = appointmentToRow(appointment);
+  return row;
+}
+
 function rowToAppointment(row, patientsById, note) {
   const patient = patientsById.get(row.patient_id);
   return normalizeAppointment({
@@ -719,7 +724,10 @@ async function syncAppointmentsToCloud() {
 
     for (const appointment of toUpsert) {
       if (!appointment.patientId) continue;
-      const { error } = await supabaseClient.from('appointments').upsert(appointmentToRow(appointment));
+      const previous = lastSyncedAppointments.get(appointment.id);
+      const { error } = previous
+        ? await supabaseClient.from('appointments').update(appointmentToUpdateRow(appointment)).eq('id', appointment.id)
+        : await supabaseClient.from('appointments').insert(appointmentToRow(appointment));
       if (error) throw error;
 
       const note = appointment.observations && appointment.observations[0];
