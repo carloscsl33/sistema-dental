@@ -132,6 +132,23 @@ end $$;
 create trigger appointments_capacity before insert or update of appt_date, appt_time, status on public.appointments
   for each row execute function public.enforce_slot_capacity();
 
+create function public.enforce_blocked_slot_capacity() returns trigger
+language plpgsql set search_path = '' as $$
+declare
+  capacity constant int := 3;
+  used int;
+begin
+  perform pg_advisory_xact_lock(hashtextextended(new.slot_date::text || ' ' || new.slot_time::text, 0));
+  select count(*) into used from public.appointments
+   where appt_date = new.slot_date and appt_time = new.slot_time and status <> 'cancelada';
+  if used + new.places > capacity then
+    raise exception 'slot_full' using errcode = 'P0001';
+  end if;
+  return new;
+end $$;
+create trigger blocked_slots_capacity before insert or update of slot_date, slot_time, places on public.blocked_slots
+  for each row execute function public.enforce_blocked_slot_capacity();
+
 create table public.appointment_notes (
   appointment_id uuid primary key references public.appointments (id) on delete cascade,
   body           text not null check (char_length(btrim(body)) between 1 and 3000),
@@ -295,7 +312,8 @@ grant insert on public.patient_files to authenticated;
 grant insert (id, patient_id, appointment_id, amount, method, paid_on, concept, reference, notes) on public.payments to authenticated;
 
 -- Tiempo real para que 3-4 personas vean los cambios al instante (respeta RLS)
-alter publication supabase_realtime add table public.appointments, public.blocked_slots;
+alter publication supabase_realtime add table public.patients, public.treatments, public.blocked_slots,
+  public.appointments, public.appointment_notes, public.payments, public.patient_files;
 
 -- ---------- Quitar acceso a alguien ----------
 -- update public.profiles set status = 'blocked' where id = (select id from auth.users where email = 'correo@ejemplo.com');

@@ -522,6 +522,7 @@ const PATIENT_SEX_TO_DB = {
 
 let lastSyncedPatients = new Map();
 let lastSyncedAppointments = new Map();
+let lastSyncedBlockedSlots = new Map();
 let cloudSyncedPaymentIds = new Set();
 let realtimeChannel = null;
 let realtimeRefreshTimer = null;
@@ -749,13 +750,32 @@ async function syncAppointmentsToCloud() {
 
 async function syncBlockedSlotsToCloud() {
   if (!isCloudConnected()) return;
+  const currentSlots = new Map(blockedAppointmentSlots.map(slot => [`${slot.date}|${slot.time}`, slot]));
+  const slotsToDelete = Array.from(lastSyncedBlockedSlots.entries())
+    .filter(([key]) => !currentSlots.has(key))
+    .map(([, slot]) => slot);
+  const slotsToSave = Array.from(currentSlots.entries())
+    .filter(([key, slot]) => JSON.stringify(lastSyncedBlockedSlots.get(key)) !== JSON.stringify(slot))
+    .map(([, slot]) => slot);
+  if (!slotsToDelete.length && !slotsToSave.length) return;
+
   try {
-    const { error: deleteError } = await supabaseClient.from('blocked_slots').delete().not('slot_date', 'is', null);
-    if (deleteError) throw deleteError;
-    if (blockedAppointmentSlots.length) {
-      const rows = blockedAppointmentSlots.map(slot => ({ slot_date: slot.date, slot_time: slot.time, places: slot.count }));
-      const { error: insertError } = await supabaseClient.from('blocked_slots').insert(rows);
-      if (insertError) throw insertError;
+    for (const slot of slotsToDelete) {
+      const { error } = await supabaseClient.from('blocked_slots')
+        .delete()
+        .eq('slot_date', slot.date)
+        .eq('slot_time', slot.time);
+      if (error) throw error;
+      lastSyncedBlockedSlots.delete(`${slot.date}|${slot.time}`);
+    }
+    for (const slot of slotsToSave) {
+      const { error } = await supabaseClient.from('blocked_slots').upsert({
+        slot_date: slot.date,
+        slot_time: slot.time,
+        places: slot.count
+      }, { onConflict: 'slot_date,slot_time' });
+      if (error) throw error;
+      lastSyncedBlockedSlots.set(`${slot.date}|${slot.time}`, cloneDeep(slot));
     }
   } catch (error) {
     console.error('No se pudo sincronizar con Supabase (horarios bloqueados):', error);
@@ -850,6 +870,7 @@ async function connectToCloud() {
 
     lastSyncedPatients = new Map(patients.map(patient => [patient.id, cloneDeep(patient)]));
     lastSyncedAppointments = new Map(getAppointments().map(({ appointment }) => [appointment.id, cloneDeep(appointment)]));
+    lastSyncedBlockedSlots = new Map(blockedAppointmentSlots.map(slot => [`${slot.date}|${slot.time}`, cloneDeep(slot)]));
     cloudSyncedPaymentIds = new Set((paymentsResult.data || []).map(payment => payment.id));
 
     finishCloudRefresh();
@@ -878,6 +899,7 @@ function disconnectFromCloud() {
   blockedAppointmentSlots = [];
   lastSyncedPatients = new Map();
   lastSyncedAppointments = new Map();
+  lastSyncedBlockedSlots = new Map();
   cloudSyncedPaymentIds = new Set();
   localStorage.removeItem(PATIENTS_STORAGE_KEY);
   localStorage.removeItem(APPOINTMENTS_STORAGE_KEY);
@@ -897,6 +919,10 @@ function subscribeRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'blocked_slots' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'patients' }, scheduleRealtimeRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'treatments' }, scheduleRealtimeRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'appointment_notes' }, scheduleRealtimeRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, scheduleRealtimeRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'patient_files' }, scheduleRealtimeRefresh)
     .subscribe();
 }
 
