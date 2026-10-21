@@ -5,7 +5,10 @@
 -- (los usuarios se crean con "Invite user"; así nadie ajeno puede registrarse).
 -- Todos los usuarios invitados tienen los mismos permisos.
 -- =====================================================================
-create extension if not exists pg_trgm;
+create schema if not exists extensions;
+create schema if not exists private;
+revoke all on schema private from public;
+create extension if not exists pg_trgm with schema extensions;
 
 create type public.profile_status as enum ('pending', 'approved', 'blocked');
 create type public.appt_status    as enum ('en_espera', 'finalizada', 'cancelada');
@@ -19,7 +22,7 @@ create table public.profiles (
   approved_at timestamptz default now()
 );
 
-create function public.is_approved() returns boolean
+create function private.is_approved() returns boolean
 language sql stable security definer set search_path = '' as $$
   select exists (select 1 from public.profiles where id = (select auth.uid()) and status = 'approved');
 $$;
@@ -63,7 +66,7 @@ create table public.patients (
 );
 -- Homónimos permitidos si cambia la fecha de nacimiento
 create unique index patients_identity_uq on public.patients (lower(first_name), lower(last_name), birth_date);
-create index patients_full_name_trgm on public.patients using gin (full_name gin_trgm_ops);
+create index patients_full_name_trgm on public.patients using gin (full_name extensions.gin_trgm_ops);
 create trigger patients_touch before update on public.patients for each row execute function public.touch_updated_at();
 
 create table public.treatments (
@@ -157,7 +160,7 @@ create index payments_day_idx     on public.payments (paid_on);
 create index payments_appt_idx    on public.payments (appointment_id);
 
 -- Aplica el pago a la cita actual y el resto al saldo más antiguo del paciente. Todo en una transacción.
-create function public.register_payment(
+create function private.register_payment(
   p_appointment_id uuid, p_amount numeric, p_method text,
   p_paid_on date default null, p_reference text default null, p_notes text default null,
   p_finalize boolean default false
@@ -167,7 +170,7 @@ declare
   remaining numeric(10,2); pending numeric(10,2); applied numeric(10,2);
   day date := coalesce(p_paid_on, (now() at time zone 'America/Mexico_City')::date);
 begin
-  if not public.is_approved() then raise exception 'forbidden' using errcode = '42501'; end if;
+  if not private.is_approved() then raise exception 'forbidden' using errcode = '42501'; end if;
   if p_amount is null or p_amount < 0 then raise exception 'invalid_amount' using errcode = 'P0001'; end if;
 
   perform 1 from public.appointments
@@ -216,9 +219,9 @@ values ('clinical-files', 'clinical-files', false, 10485760,
   array['image/jpeg','image/png','image/webp','application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
 on conflict (id) do update set public = false, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 
-create policy clinical_files_select on storage.objects for select to authenticated using (bucket_id = 'clinical-files' and (select public.is_approved()));
-create policy clinical_files_insert on storage.objects for insert to authenticated with check (bucket_id = 'clinical-files' and (select public.is_approved()));
-create policy clinical_files_delete on storage.objects for delete to authenticated using (bucket_id = 'clinical-files' and (select public.is_approved()));
+create policy clinical_files_select on storage.objects for select to authenticated using (bucket_id = 'clinical-files' and (select private.is_approved()));
+create policy clinical_files_insert on storage.objects for insert to authenticated with check (bucket_id = 'clinical-files' and (select private.is_approved()));
+create policy clinical_files_delete on storage.objects for delete to authenticated using (bucket_id = 'clinical-files' and (select private.is_approved()));
 
 -- ---------- Bitácora de auditoría ----------
 create table public.audit_log (
@@ -255,30 +258,31 @@ $$;
 revoke all on all tables    in schema public from anon, authenticated;
 revoke all on all functions in schema public from public, anon, authenticated;
 revoke all on all sequences in schema public from anon, authenticated;
-grant execute on function public.is_approved(), public.register_payment(uuid, numeric, text, date, text, text, boolean),
-                          public.dashboard_summary(date) to authenticated;
+grant usage on schema private to authenticated;
+grant execute on function private.is_approved() to authenticated;
+grant execute on function public.dashboard_summary(date) to authenticated;
 
 do $$ declare t text; begin
   foreach t in array array['profiles','patients','treatments','blocked_slots','appointments','appointment_notes','payments','patient_files','audit_log'] loop
     execute format('alter table public.%I enable row level security', t);
   end loop;
   foreach t in array array['patients','treatments','blocked_slots','appointments','appointment_notes','payments','patient_files'] loop
-    execute format('create policy %I on public.%I for select to authenticated using ((select public.is_approved()))', t || '_select', t);
+    execute format('create policy %I on public.%I for select to authenticated using ((select private.is_approved()))', t || '_select', t);
   end loop;
   foreach t in array array['patients','treatments','blocked_slots','appointments','appointment_notes'] loop
-    execute format('create policy %I on public.%I for insert to authenticated with check ((select public.is_approved()))', t || '_insert', t);
-    execute format('create policy %I on public.%I for update to authenticated using ((select public.is_approved())) with check ((select public.is_approved()))', t || '_update', t);
+    execute format('create policy %I on public.%I for insert to authenticated with check ((select private.is_approved()))', t || '_insert', t);
+    execute format('create policy %I on public.%I for update to authenticated using ((select private.is_approved())) with check ((select private.is_approved()))', t || '_update', t);
   end loop;
   foreach t in array array['treatments','blocked_slots','appointment_notes','patient_files'] loop
-    execute format('create policy %I on public.%I for delete to authenticated using ((select public.is_approved()))', t || '_delete', t);
+    execute format('create policy %I on public.%I for delete to authenticated using ((select private.is_approved()))', t || '_delete', t);
   end loop;
 end $$;
-create policy patient_files_insert on public.patient_files for insert to authenticated with check ((select public.is_approved()));
-create policy patients_delete      on public.patients      for delete to authenticated using ((select public.is_approved()));
-create policy appointments_delete  on public.appointments  for delete to authenticated using ((select public.is_approved()) and status <> 'finalizada');
+create policy patient_files_insert on public.patient_files for insert to authenticated with check ((select private.is_approved()));
+create policy patients_delete      on public.patients      for delete to authenticated using ((select private.is_approved()));
+create policy appointments_delete  on public.appointments  for delete to authenticated using ((select private.is_approved()) and status <> 'finalizada');
 create policy profiles_select      on public.profiles      for select to authenticated using (id = (select auth.uid()));
-create policy audit_select         on public.audit_log     for select to authenticated using ((select public.is_approved()));
-create policy payments_insert      on public.payments      for insert to authenticated with check ((select public.is_approved()));
+create policy audit_select         on public.audit_log     for select to authenticated using ((select private.is_approved()));
+create policy payments_insert      on public.payments      for insert to authenticated with check ((select private.is_approved()));
 
 grant select on public.profiles, public.patients, public.treatments, public.blocked_slots, public.appointments,
                 public.appointment_notes, public.payments, public.patient_files to authenticated;
