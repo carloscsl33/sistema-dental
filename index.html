@@ -45,15 +45,15 @@
 
       <form id="reset-password-form" class="auth-view" hidden>
         <h1>Crea una contraseña segura</h1>
-        <p class="auth-copy">Usa al menos 12 caracteres y combina letras, números y símbolos.</p>
+        <p class="auth-copy">Usa al menos 8 caracteres y combina letras, números y símbolos.</p>
         <label for="new-password">Nueva contraseña*</label>
         <div class="password-field">
-          <input id="new-password" type="password" autocomplete="new-password" spellcheck="false" minlength="12" maxlength="128" required>
+          <input id="new-password" type="password" autocomplete="new-password" spellcheck="false" minlength="8" maxlength="128" required>
           <button class="password-toggle" type="button" data-password-toggle="new-password" aria-label="Mostrar contraseña" aria-controls="new-password" aria-pressed="false">Mostrar</button>
         </div>
         <label for="confirm-password">Confirmar contraseña*</label>
         <div class="password-field">
-          <input id="confirm-password" type="password" autocomplete="new-password" spellcheck="false" minlength="12" maxlength="128" required>
+          <input id="confirm-password" type="password" autocomplete="new-password" spellcheck="false" minlength="8" maxlength="128" required>
           <button class="password-toggle" type="button" data-password-toggle="confirm-password" aria-label="Mostrar contraseña" aria-controls="confirm-password" aria-pressed="false">Mostrar</button>
         </div>
         <p class="auth-message" id="reset-message" role="status" aria-live="polite"></p>
