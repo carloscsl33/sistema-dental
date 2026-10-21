@@ -331,19 +331,25 @@ function renderLists() {
   rebuildAppointmentCollections(getAppointments().map(({ appointment }) => appointment));
   const todayList = document.querySelector('#today-list');
   const tomorrowList = document.querySelector('#tomorrow-list');
+  const visibleTodayAppointments = todayAppointments
+    .filter(appointment =>
+      (appointment.status !== 'Finalizada' || appointment.id === followUpAppointmentId) &&
+      (appointment.status !== 'Cancelada' || appointment.id === rescheduleAppointmentId)
+    )
+    .filter(appointmentMatchesSearch);
+  const visibleTomorrowAppointments = tomorrowAppointments
+    .filter(appointment => appointment.status !== 'Cancelada')
+    .filter(appointmentMatchesSearch);
   
   if (todayList) {
-    todayList.innerHTML = todayAppointments
-      .filter(appointment =>
-        (appointment.status !== 'Finalizada' || appointment.id === followUpAppointmentId) &&
-        (appointment.status !== 'Cancelada' || appointment.id === rescheduleAppointmentId)
-      )
-      .filter(appointmentMatchesSearch)
-      .map(todayMarkup)
-      .join('');
+    todayList.innerHTML = visibleTodayAppointments.length
+      ? visibleTodayAppointments.map(todayMarkup).join('')
+      : '<p class="dashboard-empty-state" role="status">No hay citas para hoy.</p>';
   }
   if (tomorrowList) {
-    tomorrowList.innerHTML = tomorrowAppointments.filter(appointment => appointment.status !== 'Cancelada').filter(appointmentMatchesSearch).map(tomorrowMarkup).join('');
+    tomorrowList.innerHTML = visibleTomorrowAppointments.length
+      ? visibleTomorrowAppointments.map(tomorrowMarkup).join('')
+      : '<p class="dashboard-empty-state" role="status">No hay citas para mañana.</p>';
   }
   
   renderAppointmentTable();

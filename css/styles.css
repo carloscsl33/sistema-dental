@@ -484,6 +484,19 @@ main {
   -webkit-overflow-scrolling: touch;
 }
 
+.dashboard-empty-state {
+  display: grid;
+  min-height: 112px;
+  place-items: center;
+  margin: 0;
+  padding: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .tomorrow-list {
   max-height: 390px;
 }
