@@ -377,9 +377,9 @@ function renderPatientHistory(patient) {
   return patient.historialClinico.map((record, index) => ({ record, index })).reverse().map(({ record, index }) => `
     <article class="patient-history-entry">
       <div class="patient-history-entry-heading">
-        <div>
+        <div class="patient-history-title-row">
           <strong>${escapeHTML(record.tratamiento || 'Registro clínico')}</strong>
-          <small><strong>Fecha:</strong> ${formatDisplayDate(record.fecha)}</small>
+          <small class="patient-history-date"><strong>Fecha:</strong> ${formatDisplayDate(record.fecha)}</small>
         </div>
         ${patient.id ? `<button type="button" class="row-action delete-action clinical-service-record-remove" data-remove-patient-service="${escapeHTML(patient.id)}" data-clinical-record-index="${index}">Quitar</button>` : ''}
       </div>
@@ -604,7 +604,7 @@ function showPatientDetails(ref) {
     </section>
     <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="clinico" hidden>
       <div class="patient-record-heading"><h2>Historial clínico</h2></div>
-      <div class="patient-current-treatment"><span><strong>Tratamientos actuales:</strong> ${escapeHTML((patient.tratamientoServicios || []).map(service => service.tratamiento).filter(Boolean).join(', ') || patient.tratamientoActual || 'No registrado')}</span></div>
+      <div class="patient-current-treatment"><strong>Tratamientos actuales</strong></div>
       <div class="patient-clinical-history">${renderPatientHistory(patient)}</div>
       <div class="patient-files"><h4>Documentos y fotografías</h4>${renderPatientFiles(patient)}</div>
     </section>

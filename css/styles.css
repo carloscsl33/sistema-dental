@@ -1320,11 +1320,35 @@ main {
   gap: 12px;
 }
 
+.patient-clinical-history {
+  display: grid;
+  gap: 8px;
+}
+
+.patient-history-entry {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
 .patient-history-entry-heading > div {
   display: flex;
   min-width: 0;
-  flex-direction: column;
-  gap: 3px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.patient-history-entry-heading .patient-history-date {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.patient-history-entry > p {
+  margin: 4px 0 0;
+  color: #536176;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .patient-history-entry-heading .clinical-service-record-remove {

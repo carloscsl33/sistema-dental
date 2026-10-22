@@ -56,7 +56,11 @@ function calendarDayMarkup(year, month, day, muted = false) {
   return `
     <button type="button" class="day ${muted ? 'muted' : ''} ${isToday ? 'today' : ''}" data-calendar-date="${isoDate}" aria-label="Ver agenda del ${day} de ${MONTH_NAMES[date.getMonth()]}">
       <span>${day}</span>
-      ${events.slice(0, 4).map((event, index) => `<span class="event ${index % 2 ? 'violet' : ''}">${escapeHTML(event[0])} ${escapeHTML(event[1])}</span>`).join('')}
+      ${events.slice(0, 4).map((event, index) => {
+        const time = formatTimeFromInput(event.time);
+        const patient = event.name || 'Paciente sin nombre';
+        return `<span class="event ${index % 2 ? 'violet' : ''}" title="${escapeHTML(`${time} · ${patient}`)}">${escapeHTML(time)} · ${escapeHTML(patient)}</span>`;
+      }).join('')}
       ${events.length > 4 ? `<span class="event">+${events.length - 4} más</span>` : ''}
     </button>
   `;
