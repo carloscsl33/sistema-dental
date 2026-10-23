@@ -118,6 +118,17 @@ a {
   box-shadow: 0 2px 9px #e9edf4;
 }
 
+.nav-item i svg,
+.large-module-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .nav-item.active {
   font-weight: 700;
   color: var(--ink);
@@ -342,9 +353,20 @@ main {
 .search input {
   width: 100%;
   border: 0;
+  background: #fff;
+  -webkit-appearance: none;
+  appearance: none;
   outline: 0;
   padding: 10px 6px;
   font-size: 13px;
+}
+
+.search input:-webkit-autofill,
+.search input:-webkit-autofill:hover,
+.search input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink);
+  -webkit-box-shadow: 0 0 0 1000px #fff inset;
+  box-shadow: 0 0 0 1000px #fff inset;
 }
 
 .new-button {
@@ -2707,6 +2729,11 @@ main {
     width: 100%;
     min-height: 44px;
   }
+  .search input {
+    min-height: 44px;
+    padding: 10px 6px;
+    font-size: 16px;
+  }
   .stats {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -2739,6 +2766,13 @@ main {
   .appointment-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+  .dashboard-calendar {
+    overflow: visible;
+  }
+  .dashboard-calendar .week-head,
+  .dashboard-calendar .calendar-grid {
+    min-width: 0;
   }
   .today-table-head {
     display: none;
@@ -2919,8 +2953,9 @@ main {
     font-size: 15px;
   }
   .modal-backdrop {
-    padding: 10px;
-    align-items: flex-end;
+    min-height: 100dvh;
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    align-items: center;
   }
   .confirmation-backdrop {
     align-items: center;
@@ -2941,7 +2976,7 @@ main {
   .appointment-modal {
     width: 100%;
     max-width: 100%;
-    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 24px);
     padding: 21px 17px;
     border-radius: 15px 15px 10px 10px;
   }
@@ -2953,7 +2988,7 @@ main {
   .appointment-modal select,
   .appointment-modal textarea {
     min-height: 40px;
-    font-size: 14px;
+    font-size: 16px;
   }
   .appointment-modal textarea {
     min-height: 90px;
@@ -2979,7 +3014,15 @@ main {
   }
   #patient-modal .patient-modal {
     width: 100%;
-    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 24px);
+  }
+  #patient-modal .patient-modal input,
+  #patient-modal .patient-modal select,
+  #patient-modal .patient-modal textarea,
+  #payment-receipt-modal input,
+  #payment-receipt-modal select,
+  #payment-receipt-modal textarea {
+    font-size: 16px;
   }
   #patient-modal .patient-form-scroll {
     padding: 0 20px;
@@ -3084,13 +3127,17 @@ main {
   }
   .dashboard-calendar .week-head,
   .dashboard-calendar .calendar-grid {
-    min-width: 540px;
+    min-width: 0;
   }
   .day {
-    height: 78px;
+    height: 68px;
+    padding: 4px 3px;
+    font-size: 11px;
   }
   .event {
-    font-size: 8px;
+    margin-top: 4px;
+    padding: 3px 2px;
+    font-size: 7px;
   }
   .expanded .managed-appointment {
     padding: 13px 2px;
