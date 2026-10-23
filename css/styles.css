@@ -2978,7 +2978,7 @@ main {
   .daily-agenda-slot-actions { grid-column: 1 / -1; justify-content: flex-end; flex-wrap: wrap; }
   .daily-agenda-free-label { line-height: 1.35; }
   .appointment-modal {
-    width: 100%;
+    width: calc(100vw - 24px);
     max-width: 100%;
     max-height: calc(100dvh - 24px);
     padding: 21px 17px;
@@ -2996,7 +2996,15 @@ main {
     min-height: 40px;
     font-size: 16px;
   }
-  .appointment-modal input[type="date"] { min-width: 0; max-width: 100%; }
+  .appointment-modal input[type="date"],
+  #modal-date {
+    display: block;
+    inline-size: 100%;
+    min-inline-size: 0 !important;
+    max-inline-size: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
   .appointment-modal textarea {
     min-height: 90px;
   }
@@ -3031,10 +3039,17 @@ main {
   #payment-receipt-modal textarea {
     font-size: 16px;
   }
-  #patient-modal .form-grid { gap: 12px; }
+  #patient-modal .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
   #patient-modal .form-grid > label,
   #patient-modal .patient-modal input[type="date"],
-  #patient-modal .patient-modal select { min-width: 0; }
+  #patient-modal .patient-modal select {
+    min-width: 0;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
   #patient-modal .patient-form-scroll {
     padding: 0 20px;
   }
