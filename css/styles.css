@@ -549,18 +549,32 @@ main {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 14px;
 }
 
 .today-person-heading strong {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
 }
 
 .today-expedient-button {
   flex: 0 0 auto;
   min-height: 28px;
+  border-color: #bfe8e3;
+  background: #e7f7f5;
+  color: #0f766e;
   white-space: nowrap;
+}
+
+.today-expedient-button:hover {
+  background: #d9f2ef;
+  border-color: #8dd6cf;
+}
+
+.today-expedient-button:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
 }
 
 .charge {
