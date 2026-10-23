@@ -503,7 +503,7 @@ main {
 
 /* Compensa el encabezado de columnas exclusivo de “Citas de Hoy”. */
 #tomorrow-list .dashboard-empty-state {
-  margin-top: 50px;
+  margin-top: 42px;
 }
 
 .appointment-card .appointment-row {
