@@ -236,14 +236,19 @@ function statusActions(name, appointmentId) {
 }
 
 function todayMarkup(item) {
-  const { time, name, reason: treatment, balance, date, status, id: appointmentId } = item;
+  const { time, name, reason: treatment, balance, status, id: appointmentId } = item;
   ensureAppointmentId(item);
+  const patient = resolveAppointmentPatient(item);
+  const patientReference = patient ? `id:${patient.id}` : `name:${name}`;
   return `
     <div class="appointment-row is-today-appointment" data-type="today">
       <div class="time">${escapeHTML(time)}</div>
       <div class="person">
         <div>
-          <strong>${escapeHTML(name)} <span class="today-appointment-badge">HOY</span></strong>
+          <div class="today-person-heading">
+            <strong>${escapeHTML(name)}</strong>
+            <button type="button" class="patient-info-button today-expedient-button" data-patient-info="${escapeHTML(patientReference)}" aria-label="Abrir expediente de ${escapeHTML(name)}">Expediente</button>
+          </div>
           <small>${escapeHTML(treatment)}</small>
         </div>
       </div>

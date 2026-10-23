@@ -506,18 +506,6 @@ main {
   padding: 10px 2px;
 }
 
-.today-appointment-badge {
-  display: inline-block;
-  margin-left: 4px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: #d6f2ed;
-  color: #13857e;
-  font-size: 9px;
-  font-weight: 800;
-  vertical-align: middle;
-}
-
 .time {
   font-size: 13px;
   font-weight: 700;
@@ -555,6 +543,24 @@ main {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.today-person-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.today-person-heading strong {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.today-expedient-button {
+  flex: 0 0 auto;
+  min-height: 28px;
+  white-space: nowrap;
 }
 
 .charge {
