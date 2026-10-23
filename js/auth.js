@@ -32,9 +32,10 @@ function applyAuthState(session) {
   const showOverlay = !session || passwordRecoveryActive;
   document.querySelector('#auth-overlay')?.toggleAttribute('hidden', !showOverlay);
   document.body.classList.toggle('auth-locked', showOverlay);
-  document.querySelector('#logout-button')?.toggleAttribute('hidden', !session);
-  const sessionStatus = document.querySelector('#session-status');
-  if (sessionStatus) sessionStatus.textContent = session ? 'Sesión activa' : 'Sesión no iniciada';
+  document.querySelectorAll('[data-logout-button]').forEach(button => button.toggleAttribute('hidden', !session));
+  document.querySelectorAll('.session-status').forEach(status => {
+    status.textContent = session ? 'Sesión activa' : 'Sesión no iniciada';
+  });
 }
 
 let cloudSessionReady = false;
@@ -120,7 +121,7 @@ document.addEventListener('click', event => {
 
   if (event.target.closest('#show-recovery')) return showAuthView('recovery');
   if (event.target.closest('[data-auth-back]')) return showAuthView('login');
-  if (event.target.closest('#logout-button') && supabaseClient) supabaseClient.auth.signOut();
+  if (event.target.closest('[data-logout-button]') && supabaseClient) supabaseClient.auth.signOut();
 });
 
 document.addEventListener('submit', async event => {

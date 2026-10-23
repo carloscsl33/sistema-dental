@@ -70,8 +70,8 @@
     </nav>
     <div class="sidebar-footer">
       <div class="profile">
-        <div><strong>Clínica Dental</strong><small id="session-status">Sesión no iniciada</small></div>
-        <button class="logout-button" id="logout-button" type="button" aria-label="Cerrar sesión" title="Cerrar sesión" hidden>
+        <div><strong>Clínica Dental</strong><small id="session-status" class="session-status">Sesión no iniciada</small></div>
+        <button class="logout-button" id="logout-button" data-logout-button type="button" aria-label="Cerrar sesión" title="Cerrar sesión" hidden>
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7M13 3v5m0 8v5m-4-9h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -90,7 +90,10 @@
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
       <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></i>Pacientes</a>
     </div>
-    <p class="mobile-navigation-status">Sesión activa</p>
+    <div class="mobile-navigation-footer">
+      <small class="mobile-navigation-status session-status" id="mobile-session-status">Sesión no iniciada</small>
+      <button class="mobile-logout-button" data-logout-button type="button" hidden>Cerrar sesión</button>
+    </div>
   </nav>
   <main>
     <header class="topbar">
@@ -369,7 +372,7 @@
   <script src="js/patients.js?v=20261020-2"></script>
   <script src="js/events.js?v=20261023-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
-  <script src="js/auth.js?v=20261020-4"></script>
+  <script src="js/auth.js?v=20261023-1"></script>
   <script src="js/pwa.js?v=20261020-2"></script>
 </body>
 </html>
