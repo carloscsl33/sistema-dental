@@ -501,6 +501,11 @@ main {
   max-height: 390px;
 }
 
+/* Compensa el encabezado de columnas exclusivo de “Citas de Hoy”. */
+#tomorrow-list .dashboard-empty-state {
+  margin-top: 50px;
+}
+
 .appointment-card .appointment-row {
   border-top: 1px solid var(--line);
   padding: 10px 2px;
@@ -2714,6 +2719,9 @@ main {
   .tomorrow-list {
     max-height: none;
     overflow: visible;
+  }
+  #tomorrow-list .dashboard-empty-state {
+    margin-top: 0;
   }
   .appointment-card .appointment-row {
     grid-template-columns: 40px minmax(0, 1fr) auto;
