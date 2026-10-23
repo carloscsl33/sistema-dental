@@ -2850,9 +2850,22 @@ main {
     gap: 5px;
   }
   .appointment-filter select {
-    min-height: 30px;
+    min-height: 44px;
     max-width: 100%;
-    padding: 5px 26px 5px 9px;
+    padding: 8px 32px 8px 12px;
+    font-size: 16px;
+  }
+  .daily-agenda-book,
+  .daily-agenda-block,
+  .daily-agenda-unblock {
+    min-height: 44px;
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+  .patient-details-actions .row-action {
+    min-height: 44px;
+    padding: 9px 12px;
+    font-size: 12px;
   }
   .expanded {
     max-height: none;
