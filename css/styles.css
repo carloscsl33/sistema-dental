@@ -2850,10 +2850,9 @@ main {
     gap: 5px;
   }
   .appointment-filter select {
-    min-height: 44px;
+    min-height: 30px;
     max-width: 100%;
-    padding: 8px 32px 8px 12px;
-    font-size: 16px;
+    padding: 5px 26px 5px 9px;
   }
   .daily-agenda-book,
   .daily-agenda-block,
