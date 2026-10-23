@@ -1,5 +1,23 @@
 // Eventos de la interfaz
 
+function setMobileNavigation(open) {
+  const navigation = document.querySelector('#mobile-navigation');
+  const toggle = document.querySelector('#mobile-nav-toggle');
+  const scrim = document.querySelector('#mobile-nav-scrim');
+  if (!navigation || !toggle || !scrim) return;
+  document.body.classList.toggle('mobile-nav-open', open);
+  navigation.setAttribute('aria-hidden', String(!open));
+  toggle.setAttribute('aria-expanded', String(open));
+  scrim.setAttribute('aria-hidden', String(!open));
+  scrim.tabIndex = open ? 0 : -1;
+  if (open) document.querySelector('#mobile-nav-close')?.focus();
+  else toggle.focus();
+}
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && document.body.classList.contains('mobile-nav-open')) setMobileNavigation(false);
+});
+
 document.addEventListener('submit', event => {
   if (event.target.matches('#payment-receipt-form')) {
     event.preventDefault();
@@ -112,6 +130,9 @@ document.addEventListener('change', event => {
 });
 
 document.addEventListener('click', async event => {
+  if (event.target.closest('#mobile-nav-toggle')) { setMobileNavigation(true); return; }
+  if (event.target.closest('#mobile-nav-close') || event.target.closest('#mobile-nav-scrim')) { setMobileNavigation(false); return; }
+
   const patientFolderTab = event.target.closest('[data-patient-tab]');
   if (patientFolderTab) {
     const details = patientFolderTab.closest('#patient-details');
@@ -501,6 +522,7 @@ document.addEventListener('click', async event => {
   if (link) {
     event.preventDefault();
     changePage(link.dataset.pageLink, link.dataset.appointmentFilter || null);
+    if (document.body.classList.contains('mobile-nav-open')) setMobileNavigation(false);
     return;
   }
 });

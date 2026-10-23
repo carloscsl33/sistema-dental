@@ -79,9 +79,30 @@
       </div>
     </div>
   </aside>
+  <button class="mobile-nav-scrim" id="mobile-nav-scrim" type="button" aria-label="Cerrar menú" aria-hidden="true" tabindex="-1"></button>
+  <nav class="mobile-navigation" id="mobile-navigation" aria-label="Navegación principal" aria-hidden="true">
+    <div class="mobile-navigation-head">
+      <a class="brand" href="#centro" data-page-link="centro"><span class="brand-icon">D</span><span>Clínica Dental</span></a>
+      <button class="mobile-nav-close" id="mobile-nav-close" type="button" aria-label="Cerrar menú">×</button>
+    </div>
+    <div class="mobile-navigation-links">
+      <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
+      <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
+      <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i>♟</i>Pacientes</a>
+    </div>
+    <p class="mobile-navigation-status">Sesión activa</p>
+  </nav>
   <main>
     <header class="topbar">
-      <div><h1 id="page-title">Centro de Mando</h1></div>
+      <div class="topbar-heading">
+        <div class="mobile-appbar">
+          <a class="mobile-brand" href="#centro" data-page-link="centro"><span class="brand-icon">D</span><span>Clínica Dental</span></a>
+          <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-controls="mobile-navigation" aria-expanded="false" aria-label="Abrir menú de navegación">
+            <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+          </button>
+        </div>
+        <h1 id="page-title">Centro de Mando</h1>
+      </div>
       <div class="top-actions">
         <div class="search" role="search">
           <span aria-hidden="true">⌕</span>
@@ -346,7 +367,7 @@
   <script src="js/calendar.js?v=20261021-1"></script>
   <script src="js/payments.js?v=20261020-2"></script>
   <script src="js/patients.js?v=20261020-2"></script>
-  <script src="js/events.js?v=20261020-2"></script>
+  <script src="js/events.js?v=20261023-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
   <script src="js/auth.js?v=20261020-4"></script>
   <script src="js/pwa.js?v=20261020-2"></script>
