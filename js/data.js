@@ -595,7 +595,8 @@ function appointmentToRow(appointment) {
 }
 
 function appointmentToUpdateRow(appointment) {
-  const { id, ...row } = appointmentToRow(appointment);
+  // `paid` solo cambia dentro de record_payment(), nunca desde una edición de cita.
+  const { id, paid, ...row } = appointmentToRow(appointment);
   return row;
 }
 
