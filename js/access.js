@@ -16,7 +16,9 @@ function hasRole(...roles) {
 }
 
 function canAccessPage(page) {
-  return page !== 'administrar' || hasRole('admin');
+  if (page === 'administrar' || page === 'configuracion') return hasRole('admin');
+  if (page === 'cobros') return hasRole('admin', 'receptionist');
+  return true;
 }
 
 function applyRoleAccess() {

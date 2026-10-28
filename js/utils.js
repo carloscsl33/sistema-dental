@@ -83,10 +83,22 @@ function toInputTime(timeValue) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
-function createAppointmentTimeSlots() {
+function createAppointmentTimeSlots(dateValue = getISODate(0)) {
+  const date = new Date(`${dateValue}T12:00:00`);
+  const weekday = date.getDay();
+  const dateClosed = clinicClosures.some(closure => closure.closed_on === dateValue || closure.date === dateValue);
+  const dayHours = businessHours.find(row => Number(row.day_of_week) === weekday);
+  if (dateClosed || dayHours && !dayHours.is_open) return [];
+  const opensAt = dayHours?.opens_at || '09:00';
+  const closesAt = dayHours?.closes_at || '19:00';
+  const start = toMinutes(opensAt);
+  const end = toMinutes(closesAt);
+  const interval = Number(clinicSettings.slot_minutes) || 30;
   const slots = [];
-  for (let minutes = 9 * 60; minutes <= 19 * 60; minutes += 30) {
-    slots.push(`${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`);
+  for (let minutes = start; minutes <= end; minutes += interval) {
+    const time = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+    const inBreak = dayHours?.break_starts_at && dayHours?.break_ends_at && toMinutes(time) >= toMinutes(dayHours.break_starts_at) && toMinutes(time) < toMinutes(dayHours.break_ends_at);
+    if (!inBreak) slots.push(time);
   }
   return slots;
 }

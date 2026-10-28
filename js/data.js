@@ -678,24 +678,6 @@ async function syncPatientsToCloud() {
         if (filesInsertError) throw filesInsertError;
       }
 
-      const newPayments = (patient.historialFinanciero || []).filter(payment => payment.id && !cloudSyncedPaymentIds.has(payment.id));
-      if (newPayments.length) {
-        const paymentRows = newPayments.map(payment => ({
-          id: payment.id,
-          patient_id: patient.id,
-          appointment_id: payment.citaId || null,
-          amount: getNumericAmount(payment.monto),
-          method: payment.metodo,
-          paid_on: payment.fecha,
-          concept: payment.concepto || null,
-          reference: payment.referencia || null,
-          notes: payment.notas || null
-        }));
-        const { error: paymentsError } = await supabaseClient.from('payments').insert(paymentRows);
-        if (paymentsError) throw paymentsError;
-        newPayments.forEach(payment => cloudSyncedPaymentIds.add(payment.id));
-      }
-
       lastSyncedPatients.set(patient.id, cloneDeep(patient));
     }
   } catch (error) {
@@ -786,18 +768,24 @@ async function syncBlockedSlotsToCloud() {
 async function connectToCloud() {
   if (!isCloudConnected()) return;
   try {
-    const [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult] = await Promise.all([
+    const [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult, settingsResult, hoursResult, closuresResult, reasonsResult, catalogResult] = await Promise.all([
       supabaseClient.from('patients').select('*'),
       supabaseClient.from('treatments').select('*').order('recorded_on'),
       supabaseClient.from('patient_files').select('*'),
       supabaseClient.from('payments').select('*'),
       supabaseClient.from('appointments').select('*'),
       supabaseClient.from('appointment_notes').select('*'),
-      supabaseClient.from('blocked_slots').select('*')
+      supabaseClient.from('blocked_slots').select('*'),
+      supabaseClient.from('clinic_settings').select('*').eq('id', true).maybeSingle(),
+      supabaseClient.from('business_hours').select('*').order('day_of_week'),
+      supabaseClient.from('clinic_closures').select('*'),
+      supabaseClient.from('appointment_reasons').select('*').order('sort_order'),
+      supabaseClient.from('treatment_catalog').select('*').order('sort_order')
     ]);
-    const firstError = [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult]
+    const firstError = [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult, settingsResult, hoursResult, closuresResult, reasonsResult, catalogResult]
       .map(result => result.error).find(Boolean);
     if (firstError) throw firstError;
+    applyClinicConfiguration(settingsResult.data, hoursResult.data || [], closuresResult.data || [], reasonsResult.data || [], catalogResult.data || []);
 
     const patientRows = patientsResult.data || [];
     const appointmentRows = appointmentsResult.data || [];
@@ -887,6 +875,8 @@ function finishCloudRefresh() {
   subscribeRealtime();
   renderLists();
   renderDashboardCalendar();
+  renderConfigurationModule?.();
+  renderFinanceModule?.();
   updateAttendedCount();
   updateDashboardIncome();
   if (document.querySelector('#page-pacientes')?.classList.contains('active')) renderPatientDirectory(globalSearchQuery);

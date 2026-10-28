@@ -65,7 +65,7 @@ function refreshAppointmentTimeSlots(preferredTime = '') {
 
   const date = dateInput.value;
   dateInput.min = getISODate(0);
-  const slots = createAppointmentTimeSlots().map(time => {
+  const slots = createAppointmentTimeSlots(date).map(time => {
     const count = getAppointmentTimeSlotCount(date, time);
     const isPast = isAppointmentTimeInPast(date, time);
     const available = isPast ? 0 : Math.max(MAX_PATIENTS_PER_SLOT - count, 0);
@@ -371,6 +371,7 @@ function renderLists() {
   updateDashboardIncome();
   updateAttendedCount();
   renderDashboardCalendar();
+  renderFinanceModule?.();
 }
 
 function updateDashboardIncome() {
@@ -603,6 +604,8 @@ function changePage(page, appointmentFilter = null) {
   if (page === 'pacientes') renderPatientDirectory();
   if (page === 'citas') renderAppointmentTable();
   if (page === 'administrar') loadManagedUsers();
+  if (page === 'configuracion') renderConfigurationModule?.();
+  if (page === 'cobros') renderFinanceModule?.();
   
   if (!document.querySelector('#patient-modal.open') && !document.querySelector('#appointment-modal.open')) {
     window.scrollTo({ top: 0, behavior: 'smooth' });

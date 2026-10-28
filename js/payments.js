@@ -166,6 +166,22 @@ function allocatePatientPayment(patient, appointment, amount) {
   return allocations;
 }
 
+async function recordPaymentSafely({ appointmentId, amount, method, paidOn, reference, notes, finalize }) {
+  if (!isCloudConnected()) return false;
+  const { error } = await supabaseClient.rpc('record_payment', {
+    p_appointment_id: appointmentId,
+    p_amount: amount,
+    p_method: method,
+    p_paid_on: paidOn || null,
+    p_reference: reference || null,
+    p_notes: notes || null,
+    p_finalize: Boolean(finalize)
+  });
+  if (error) throw error;
+  await connectToCloud();
+  return true;
+}
+
 function updatePaymentReceiptSummary() {
   const total = document.querySelector('#receipt-total');
   const totalDisplay = document.querySelector('#receipt-total-display');
