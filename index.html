@@ -45,7 +45,7 @@
 
       <form id="reset-password-form" class="auth-view" hidden>
         <h1>Crea una contraseña segura</h1>
-        <p class="auth-copy">Usa al menos 8 caracteres y combina letras, números y símbolos.</p>
+        <p class="auth-copy">Usa al menos 12 caracteres y combina mayúsculas, minúsculas, números o símbolos.</p>
         <label for="new-password">Nueva contraseña*</label>
         <div class="password-field">
           <input id="new-password" type="password" autocomplete="new-password" spellcheck="false" minlength="8" maxlength="128" required>
@@ -67,6 +67,7 @@
       <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
       <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></i>Pacientes</a>
+      <a class="nav-item" href="#administrar" data-page-link="administrar" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Administrar</a>
     </nav>
     <div class="sidebar-footer">
       <div class="profile">
@@ -89,6 +90,7 @@
       <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
       <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></i>Pacientes</a>
+      <a class="nav-item" href="#administrar" data-page-link="administrar" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Administrar</a>
     </div>
     <div class="mobile-navigation-footer">
       <small class="mobile-navigation-status session-status" id="mobile-session-status">Sesión no iniciada</small>
@@ -183,6 +185,26 @@
           <section class="patient-details" id="patient-details" aria-live="polite">
             <span class="large-module-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></span><h2>Selecciona un paciente</h2><p>Su expediente, información y próximas citas aparecerán aquí.</p>
           </section>
+        </div>
+      </section>
+    </section>
+    <section class="app-page" id="page-administrar" data-roles="admin" hidden>
+      <section class="card admin-card">
+        <header class="admin-header">
+          <div>
+            <span class="eyebrow">ACCESO DE THERA-DENT</span>
+            <h2>Usuarios del sistema</h2>
+            <p>Administra el acceso, los roles y las cuentas activas de la clínica.</p>
+          </div>
+          <button class="new-button" id="admin-add-user" type="button">+ Agregar usuario</button>
+        </header>
+        <div class="admin-users-loading" id="admin-users-loading" hidden>Cargando usuarios…</div>
+        <div class="admin-users-table-wrap">
+          <table class="admin-users-table">
+            <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th><th>Último acceso</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+            <tbody id="admin-users-body"></tbody>
+          </table>
+          <p class="empty-history" id="admin-users-empty" hidden>No hay usuarios registrados.</p>
         </div>
       </section>
     </section>
@@ -359,18 +381,35 @@
       </div>
     </section>
   </div>
+  <div class="modal-backdrop" id="admin-user-modal" aria-hidden="true">
+    <form class="appointment-modal admin-user-modal" id="admin-user-form" role="dialog" aria-modal="true" aria-labelledby="admin-user-title">
+      <button type="button" class="modal-close" id="admin-user-close" aria-label="Cerrar">×</button>
+      <h2 id="admin-user-title">Agregar usuario</h2>
+      <p class="modal-copy" id="admin-user-copy">El usuario recibirá un correo seguro para crear su contraseña.</p>
+      <label>Correo electrónico*<input id="admin-user-email" type="email" autocomplete="email" inputmode="email" maxlength="254" required></label>
+      <label>Nombre para identificarlo<input id="admin-user-name" type="text" autocomplete="name" maxlength="120" placeholder="Opcional"></label>
+      <label>Rol*<select id="admin-user-role" required><option value="receptionist">Recepcionista</option><option value="doctor">Doctor/a</option><option value="admin">Administrador</option></select></label>
+      <label>Estado*<select id="admin-user-status" required><option value="approved">Activa</option><option value="blocked">Suspendida</option></select></label>
+      <div class="appointment-notes-actions admin-user-actions">
+        <button class="modal-secondary-button" id="admin-user-cancel" type="button">Cancelar</button>
+        <button class="modal-primary-button" type="submit">Guardar usuario</button>
+      </div>
+    </form>
+  </div>
   <div class="toast" id="toast" role="status"></div>
   <script src="js/supabase.js?v=20261020-2"></script>
   <script src="js/config.js?v=20261020-2"></script>
   <script src="js/supabase-client.js?v=20261020-2"></script>
   <script src="js/state.js?v=20261020-2"></script>
   <script src="js/utils.js?v=20261020-2"></script>
+  <script src="js/access.js?v=20261027-1"></script>
   <script src="js/data.js?v=20261020-3"></script>
   <script src="js/appointments.js?v=20261022-1"></script>
   <script src="js/calendar.js?v=20261021-1"></script>
   <script src="js/payments.js?v=20261020-2"></script>
   <script src="js/patients.js?v=20261020-2"></script>
   <script src="js/events.js?v=20261023-1"></script>
+  <script src="js/admin.js?v=20261027-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
   <script src="js/auth.js?v=20261023-1"></script>
   <script src="js/pwa.js?v=20261020-2"></script>

@@ -5,7 +5,8 @@ const MAX_REASON_LENGTH = 32;
 const pages = {
   centro: ['Centro de Mando'],
   citas: ['Citas'],
-  pacientes: ['Pacientes']
+  pacientes: ['Pacientes'],
+  administrar: ['Administrar usuarios']
 };
 
 const MONTH_NAMES = [

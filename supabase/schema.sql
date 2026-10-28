@@ -12,12 +12,14 @@ create extension if not exists pg_trgm with schema extensions;
 
 create type public.profile_status as enum ('pending', 'approved', 'blocked');
 create type public.appt_status    as enum ('en_espera', 'finalizada', 'cancelada');
+create type public.app_role       as enum ('admin', 'receptionist', 'doctor');
 
 -- ---------- Perfiles y acceso ----------
 create table public.profiles (
   id          uuid primary key references auth.users (id) on delete cascade,
   full_name   text not null default '',
   status      public.profile_status not null default 'approved',
+  role        public.app_role not null default 'receptionist',
   created_at  timestamptz not null default now(),
   approved_at timestamptz default now()
 );
@@ -25,6 +27,17 @@ create table public.profiles (
 create function private.is_approved() returns boolean
 language sql stable security definer set search_path = '' as $$
   select exists (select 1 from public.profiles where id = (select auth.uid()) and status = 'approved');
+$$;
+
+create function private.current_role() returns public.app_role
+language sql stable security definer set search_path = '' as $$
+  select role from public.profiles
+  where id = (select auth.uid()) and status = 'approved'
+$$;
+
+create function private.is_admin() returns boolean
+language sql stable security definer set search_path = '' as $$
+  select (select private.current_role()) = 'admin'::public.app_role
 $$;
 
 create function public.handle_new_user() returns trigger
@@ -277,6 +290,8 @@ revoke all on all functions in schema public from public, anon, authenticated;
 revoke all on all sequences in schema public from anon, authenticated;
 grant usage on schema private to authenticated;
 grant execute on function private.is_approved() to authenticated;
+grant execute on function private.current_role() to authenticated;
+grant execute on function private.is_admin() to authenticated;
 grant execute on function public.dashboard_summary(date) to authenticated;
 
 do $$ declare t text; begin
@@ -297,7 +312,7 @@ end $$;
 create policy patient_files_insert on public.patient_files for insert to authenticated with check ((select private.is_approved()));
 create policy patients_delete      on public.patients      for delete to authenticated using ((select private.is_approved()));
 create policy appointments_delete  on public.appointments  for delete to authenticated using ((select private.is_approved()) and status <> 'finalizada');
-create policy profiles_select      on public.profiles      for select to authenticated using (id = (select auth.uid()));
+create policy profiles_select_self_or_admin on public.profiles for select to authenticated using (id = (select auth.uid()) or (select private.is_admin()));
 create policy audit_select         on public.audit_log     for select to authenticated using ((select private.is_approved()));
 create policy payments_insert      on public.payments      for insert to authenticated with check ((select private.is_approved()));
 
