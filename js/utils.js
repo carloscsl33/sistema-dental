@@ -18,8 +18,10 @@ function updatePageScrollLock() {
   const patientOpen = document.querySelector('#patient-modal')?.classList.contains('open');
   const dailyAgendaOpen = document.querySelector('#daily-agenda-modal')?.classList.contains('open');
   const confirmationOpen = document.querySelector('#confirmation-modal')?.classList.contains('open');
+  const qrCardOpen = document.querySelector('#patient-qr-modal')?.classList.contains('open');
+  const qrScannerOpen = document.querySelector('#patient-qr-scanner')?.classList.contains('open');
   
-  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || confirmationOpen) {
+  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || confirmationOpen || qrCardOpen || qrScannerOpen) {
     lockPageScroll();
   } else {
     unlockPageScroll();
@@ -136,8 +138,9 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
   const inputCaption = document.querySelector('#confirmation-input-caption');
   const inputElement = document.querySelector('#confirmation-input');
   const cancelButton = document.querySelector('#confirmation-cancel');
+  const closeButton = document.querySelector('#confirmation-close');
   const acceptButton = document.querySelector('#confirmation-accept');
-  if (!modal || !titleElement || !messageElement || !inputLabel || !inputCaption || !inputElement || !cancelButton || !acceptButton) {
+  if (!modal || !titleElement || !messageElement || !inputLabel || !inputCaption || !inputElement || !cancelButton || !closeButton || !acceptButton) {
     return Promise.reject(new Error('No se pudo abrir el diálogo de confirmación.'));
   }
 
@@ -146,6 +149,7 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
   acceptButton.textContent = confirmLabel;
   inputLabel.hidden = !input;
   inputElement.required = Boolean(input);
+  inputElement.type = input?.type || 'number';
   inputElement.value = input ? String(input.value) : '';
   inputElement.setCustomValidity('');
   if (input) {
@@ -168,22 +172,31 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       cancelButton.removeEventListener('click', cancel);
+      closeButton.removeEventListener('click', cancel);
       acceptButton.removeEventListener('click', accept);
       modal.removeEventListener('click', handleBackdropClick);
       document.removeEventListener('keydown', handleKeydown);
       updatePageScrollLock();
       if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) previouslyFocused.focus();
-      resolve({ confirmed, value: input ? Number(inputElement.value) : null });
+      resolve({ confirmed, value: input ? (input?.type === 'text' ? inputElement.value : Number(inputElement.value)) : null });
     };
     const cancel = () => finish(false);
     const accept = () => {
       if (input) {
         inputElement.setCustomValidity('');
-        const value = Number(inputElement.value);
-        if (!Number.isInteger(value) || value < input.min || value > input.max) {
-          inputElement.setCustomValidity(`Ingresa un número del ${input.min} al ${input.max}.`);
-          inputElement.reportValidity();
-          return;
+        if (input.type === 'text') {
+          if (input.match && inputElement.value !== input.match) {
+            inputElement.setCustomValidity(`Escribe exactamente: ${input.match}`);
+            inputElement.reportValidity();
+            return;
+          }
+        } else {
+          const value = Number(inputElement.value);
+          if (!Number.isInteger(value) || value < input.min || value > input.max) {
+            inputElement.setCustomValidity(`Ingresa un número del ${input.min} al ${input.max}.`);
+            inputElement.reportValidity();
+            return;
+          }
         }
       }
       finish(true);
@@ -202,6 +215,7 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
     };
 
     cancelButton.addEventListener('click', cancel);
+    closeButton.addEventListener('click', cancel);
     acceptButton.addEventListener('click', accept);
     modal.addEventListener('click', handleBackdropClick);
     document.addEventListener('keydown', handleKeydown);

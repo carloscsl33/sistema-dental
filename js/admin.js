@@ -26,9 +26,9 @@ function renderManagedUsers() {
       <td><span class="status-chip ${user.status === 'approved' ? 'is-active' : 'is-blocked'}">${escapeHTML(statusLabel(user.status))}</span></td>
       <td>${escapeHTML(formatAdminDate(user.lastSignInAt))}</td>
       <td class="admin-table-actions">
-        <button class="icon-action" type="button" data-admin-edit="${escapeHTML(user.id)}" aria-label="Editar ${escapeHTML(user.email)}" title="Editar usuario">✎</button>
-        <button class="icon-action" type="button" data-admin-reset="${escapeHTML(user.id)}" aria-label="Restablecer contraseña de ${escapeHTML(user.email)}" title="Enviar restablecimiento">⌁</button>
-        <button class="icon-action is-danger" type="button" data-admin-delete="${escapeHTML(user.id)}" aria-label="Eliminar ${escapeHTML(user.email)}" title="Eliminar usuario" ${user.isCurrentUser ? 'disabled' : ''}>⌫</button>
+        <button class="admin-action-button" type="button" data-admin-edit="${escapeHTML(user.id)}">Editar</button>
+        <button class="admin-action-button" type="button" data-admin-reset="${escapeHTML(user.id)}">Restablecer</button>
+        <button class="admin-action-button is-danger" type="button" data-admin-delete="${escapeHTML(user.id)}" ${user.isCurrentUser ? 'disabled' : ''}>Eliminar</button>
       </td>
     </tr>`).join('');
   empty.hidden = managedUsers.length > 0;

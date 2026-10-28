@@ -463,7 +463,7 @@ document.addEventListener('click', async event => {
   const qrButton = event.target.closest('[data-patient-qr]');
   if (qrButton) { await openPatientQr(qrButton.dataset.patientQr); return; }
   if (event.target.closest('#patient-qr-scan-open')) { openPatientQrScanner(); return; }
-  if (event.target.closest('#patient-qr-close')) { const modal = document.querySelector('#patient-qr-modal'); modal?.classList.remove('open'); updatePageScrollLock(); return; }
+  if (event.target.closest('#patient-qr-close')) { const modal = document.querySelector('#patient-qr-modal'); modal?.classList.remove('open'); modal?.setAttribute('aria-hidden', 'true'); updatePageScrollLock(); return; }
   if (event.target.closest('#patient-qr-download')) { downloadPatientQr(); return; }
   if (event.target.closest('#patient-qr-scanner-close')) { closePatientQrScanner(); return; }
   if (event.target.closest('#patient-qr-camera')) { await startPatientQrCamera(); return; }
