@@ -1348,6 +1348,35 @@ main {
   overflow: hidden;
 }
 
+.patient-directory-layout.is-detail-open {
+  display: block;
+}
+
+.patient-directory-layout.is-detail-open .patient-list {
+  display: none;
+}
+
+.patient-directory-layout.is-detail-open .patient-details {
+  min-height: 430px;
+}
+
+.patient-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  margin: 0 12px 0 0;
+  padding: 6px 9px;
+  border: 1px solid #bfe8e3;
+  border-radius: 8px;
+  background: #f2fbfa;
+  color: #147e78;
+  font: 700 12px inherit;
+  cursor: pointer;
+}
+
+.patient-back-button:hover { background: #e3f7f4; }
+
 .patient-list {
   min-width: 0;
   overflow: visible;

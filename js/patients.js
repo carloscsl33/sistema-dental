@@ -33,12 +33,12 @@ function getSearchablePatientText(patient) {
     getPatientFullName(patient),
     patient.telefono,
     patient.correo,
-    patient.tratamientoActual,
-    patient.diagnostico,
-    patient.antecedentesMedicos,
-    patient.alergias,
-    patient.medicamentos,
-    patient.observacionesMedicas,
+    canAccessClinicalRecords() ? patient.tratamientoActual : '',
+    canAccessClinicalRecords() ? patient.diagnostico : '',
+    canAccessClinicalRecords() ? patient.antecedentesMedicos : '',
+    canAccessClinicalRecords() ? patient.alergias : '',
+    canAccessClinicalRecords() ? patient.medicamentos : '',
+    canAccessClinicalRecords() ? patient.observacionesMedicas : '',
     aptText
   ].filter(Boolean).join(' '));
 }
@@ -362,7 +362,7 @@ function renderPatientDirectory(query = '') {
       <span class="patient-list-avatar">${escapeHTML(getInitials(item.name))}</span>
       <span class="patient-list-copy">
         <strong>${escapeHTML(item.name)}</strong>
-        <small>${item.appointments.length} ${item.appointments.length === 1 ? 'cita' : 'citas'}</small>
+        <small>${escapeHTML(item.patient?.telefono || `${item.appointments.length} ${item.appointments.length === 1 ? 'cita' : 'citas'}`)}</small>
       </span>
       <span class="patient-list-arrow" aria-hidden="true">›</span>
     </button>
@@ -531,7 +531,10 @@ function showPatientDetails(ref) {
     patient = { id: null, nombre: name, apellidos: '', fechaNacimiento: '', sexo: '', telefono: '', correo: '', direccion: '', contactoEmergencia: '', parentescoEmergencia: '', telefonoEmergencia: '', antecedentesMedicos: '', alergias: '', medicamentos: '', tipoSangre: '', observacionesMedicas: '', tratamientoActual: '', diagnostico: '', fechaRegistroClinico: '', historialClinico: [], historialFinanciero: [], archivosClinicos: [] };
   }
   selectedPatientId = patient.id || null;
+  document.querySelector('.patient-directory-layout')?.classList.add('is-detail-open');
   const fullName = getPatientFullName(patient) || name;
+  const clinicalAccess = canAccessClinicalRecords();
+  const financialAccess = canAccessFinancialRecords();
   const outstandingBalance = appointments.reduce((sum, appointment) => {
     if (appointment.status === 'Cancelada') return sum;
     const totalAmount = getNumericAmount(appointment.total ?? appointment.balance);
@@ -551,24 +554,23 @@ function showPatientDetails(ref) {
   
   details.innerHTML = `
     <div class="patient-details-heading">
+      <button type="button" class="patient-back-button" data-patient-back aria-label="Volver al directorio">← <span>Pacientes</span></button>
       <span class="patient-details-avatar">${escapeHTML(getInitials(fullName))}</span>
       <div><span class="eyebrow">EXPEDIENTE</span><h2>${escapeHTML(fullName)}</h2></div>
       ${patient.id ? `<div class="patient-details-actions">
-        <button type="button" class="row-action" data-edit-patient="${escapeHTML(patient.id)}">Editar expediente</button>
-        <button type="button" class="row-action delete-action" data-delete-patient="${escapeHTML(patient.id)}">Eliminar paciente</button>
+        ${canEditGeneralPatientData() || clinicalAccess ? `<button type="button" class="row-action" data-edit-patient="${escapeHTML(patient.id)}">${canEditGeneralPatientData() ? 'Editar expediente' : 'Actualizar expediente clínico'}</button>` : ''}
+        ${hasRole('admin') ? `<button type="button" class="row-action delete-action" data-delete-patient="${escapeHTML(patient.id)}">Eliminar paciente</button>` : ''}
       </div>` : ''}
     </div>
     <div class="patient-detail-stats">
       <div><span>Citas registradas</span><strong>${appointments.length}</strong></div>
-      <div><span>Saldo adeudado</span><strong>${formatCurrency(patientOutstandingBalance)}</strong></div>
-      <div><span>Total pagado</span><strong>${formatCurrency(financialTotal)}</strong></div>
+      ${financialAccess ? `<div><span>Saldo adeudado</span><strong>${formatCurrency(patientOutstandingBalance)}</strong></div><div><span>Total pagado</span><strong>${formatCurrency(financialTotal)}</strong></div>` : ''}
     </div>
     <nav class="patient-folder-tabs" role="tablist" aria-label="Secciones del expediente">
       <button type="button" class="patient-folder-tab active" role="tab" aria-selected="true" data-patient-tab="generales"><span aria-hidden="true">▤</span>Datos generales</button>
-      <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="medico"><span aria-hidden="true">✚</span>Expediente médico</button>
-      <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="clinico"><span aria-hidden="true">◉</span>Historial clínico</button>
+      ${clinicalAccess ? `<button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="medico"><span aria-hidden="true">✚</span>Expediente médico</button><button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="clinico"><span aria-hidden="true">◉</span>Historial clínico</button>` : ''}
       <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="citas"><span aria-hidden="true">◷</span>Historial de citas</button>
-      <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="financiero"><span aria-hidden="true">$</span>Historial financiero</button>
+      ${financialAccess ? `<button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="financiero"><span aria-hidden="true">$</span>Historial financiero</button>` : ''}
     </nav>
     <section class="patient-record-section patient-folder-panel active" role="tabpanel" data-patient-panel="generales">
       <div class="patient-record-heading"><h2>Datos generales</h2></div>
@@ -584,7 +586,7 @@ function showPatientDetails(ref) {
         <h4>Contacto de emergencia</h4>
         <p><strong>Nombre:</strong> ${escapeHTML(patient.contactoEmergencia || 'No registrado')} <span>· <strong>Parentesco:</strong> ${escapeHTML(patient.parentescoEmergencia || 'No registrado')} · <strong>Teléfono:</strong> ${escapeHTML(patient.telefonoEmergencia || 'No registrado')}</span></p>
       </div>
-      ${appointmentForToday ? `<div class="patient-general-appointment-action">
+      ${appointmentForToday && clinicalAccess ? `<div class="patient-general-appointment-action">
         <div class="patient-general-appointment-details">
           <span>Cita de hoy · ${escapeHTML(appointmentForToday.time)}</span>
           <strong>${escapeHTML(appointmentForToday.reason || 'Cita')}</strong>
@@ -592,7 +594,7 @@ function showPatientDetails(ref) {
         <button type="button" class="patient-info-button patient-general-add-advance" data-appointment-notes="${escapeHTML(ensureAppointmentId(appointmentForToday))}">${Array.isArray(appointmentForToday.observations) && appointmentForToday.observations.length ? 'Ver avance' : 'Agregar avance'}</button>
       </div>` : ''}
     </section>
-    <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="medico" hidden>
+    ${clinicalAccess ? `<section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="medico" hidden>
       <div class="patient-record-heading"><h2>Expediente médico</h2></div>
       <div class="patient-record-grid">
         <div><span>Tipo de sangre: </span><strong>${escapeHTML(patient.tipoSangre || 'No registrado')}</strong></div>
@@ -607,7 +609,7 @@ function showPatientDetails(ref) {
       <div class="patient-current-treatment"><strong>Tratamientos actuales</strong></div>
       <div class="patient-clinical-history">${renderPatientHistory(patient)}</div>
       <div class="patient-files"><h4>Documentos y fotografías</h4>${renderPatientFiles(patient)}</div>
-    </section>
+    </section>` : ''}
     <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="citas" hidden>
       <div class="patient-record-heading"><span class="eyebrow">AGENDA</span><h2>Historial de citas</h2></div>
       <div class="patient-appointment-history">
@@ -619,10 +621,10 @@ function showPatientDetails(ref) {
         ? `<button type="button" class="patient-appointments-more" data-patient-appointments="${escapeHTML(patient.id)}">Ver todas las citas (${orderedAppointments.length})</button>`
         : ''}
     </section>
-    <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="financiero" hidden>
+    ${financialAccess ? `<section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="financiero" hidden>
       <div class="patient-record-heading"><h2>Historial financiero</h2></div>
       <div class="financial-history">${renderPatientFinancialHistory(patient)}</div>
-    </section>
+    </section>` : ''}
   `;
 }
 
@@ -652,6 +654,10 @@ function openPatientModal(patientId = null) {
   if (!modal || !form) return;
   
   editingPatient = patientId ? findPatientById(patientId) : null;
+  if (!editingPatient && !canEditGeneralPatientData()) {
+    showToast('Tu rol no puede registrar pacientes nuevos.');
+    return;
+  }
   pendingClinicalFiles = [];
   form.reset();
   renderClinicalServiceRows();
@@ -667,6 +673,18 @@ function openPatientModal(patientId = null) {
     if (title) title.textContent = 'Registro de paciente';
     setPatientDateDefaults();
   }
+  const generalSection = form.querySelector('[data-patient-category="generales"]');
+  if (generalSection) {
+    generalSection.querySelectorAll('input, select, textarea').forEach(field => {
+      field.disabled = !canEditGeneralPatientData();
+    });
+  }
+  form.querySelectorAll('[data-patient-category="medico"], [data-patient-category="clinico"]').forEach(section => {
+    section.hidden = !canAccessClinicalRecords();
+    section.querySelectorAll('input, select, textarea, button').forEach(field => { field.disabled = !canAccessClinicalRecords(); });
+  });
+  const createAppointment = document.querySelector('#patient-save-appointment');
+  if (createAppointment) createAppointment.hidden = !canEditGeneralPatientData();
   
   const formScroll = document.querySelector('#patient-form-scroll');
   if (formScroll) formScroll.scrollTop = 0;
@@ -777,7 +795,7 @@ function fillPatientForm(patient) {
 
 function collectPatientForm() {
   const patient = editingPatient ? JSON.parse(JSON.stringify(editingPatient)) : createEmptyPatient();
-  
+  if (canEditGeneralPatientData()) {
   patient.nombre = document.querySelector('#patient-name')?.value.trim() || '';
   patient.apellidos = document.querySelector('#patient-lastname')?.value.trim() || '';
   patient.fechaNacimiento = document.querySelector('#patient-birthdate')?.value || '';
@@ -788,6 +806,8 @@ function collectPatientForm() {
   patient.contactoEmergencia = document.querySelector('#emergency-name')?.value.trim() || '';
   patient.parentescoEmergencia = document.querySelector('#emergency-relation')?.value.trim() || '';
   patient.telefonoEmergencia = document.querySelector('#emergency-phone')?.value.trim() || '';
+  }
+  if (canAccessClinicalRecords()) {
   patient.tipoSangre = document.querySelector('#patient-blood')?.value || '';
   patient.antecedentesMedicos = document.querySelector('#medical-history')?.value.trim() || '';
   patient.alergias = document.querySelector('#patient-allergies')?.value.trim() || '';
@@ -808,6 +828,7 @@ function collectPatientForm() {
   patient.tratamientoActual = patient.tratamientoServicios[0]?.tratamiento || '';
   patient.diagnostico = patient.tratamientoServicios[0]?.diagnostico || '';
   patient.fechaRegistroClinico = document.querySelector('#clinical-date')?.value || getISODate(0);
+  }
   
   if (!Array.isArray(patient.historialClinico)) patient.historialClinico = [];
   if (!Array.isArray(patient.historialFinanciero)) patient.historialFinanciero = [];
@@ -876,9 +897,9 @@ function savePatientForm(generateAppointment = false) {
     return false;
   }
   
-  processPatientFiles(patient);
+  if (canAccessClinicalRecords()) processPatientFiles(patient);
   
-  const clinicalServices = patient.tratamientoServicios.length
+  const clinicalServices = canAccessClinicalRecords() && patient.tratamientoServicios.length
     ? patient.tratamientoServicios
     : patient.tratamientoActual || patient.diagnostico
       ? [{ tratamiento: patient.tratamientoActual, diagnostico: patient.diagnostico }]

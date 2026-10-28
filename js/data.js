@@ -541,16 +541,22 @@ function patientToRow(patient) {
     address: patient.direccion || null,
     emergency_name: patient.contactoEmergencia,
     emergency_relation: patient.parentescoEmergencia,
-    emergency_phone: patient.telefonoEmergencia,
+    emergency_phone: patient.telefonoEmergencia
+  };
+}
+
+function patientClinicalToRow(patient) {
+  return {
+    patient_id: patient.id,
     blood_type: patient.tipoSangre || null,
     medical_history: patient.antecedentesMedicos || null,
-    allergies: patient.alergias,
+    allergies: patient.alergias || null,
     medications: patient.medicamentos || null,
     medical_notes: patient.observacionesMedicas || null
   };
 }
 
-function rowToPatient(row, treatmentRows, fileRows) {
+function rowToPatient(row, treatmentRows, fileRows, clinicalRow = {}) {
   const activeTreatments = treatmentRows.filter(t => t.is_active);
   const patient = normalizePatient({
     id: row.id,
@@ -564,11 +570,11 @@ function rowToPatient(row, treatmentRows, fileRows) {
     contactoEmergencia: row.emergency_name || '',
     parentescoEmergencia: row.emergency_relation || '',
     telefonoEmergencia: row.emergency_phone || '',
-    antecedentesMedicos: row.medical_history || '',
-    alergias: row.allergies || '',
-    medicamentos: row.medications || '',
-    tipoSangre: row.blood_type || '',
-    observacionesMedicas: row.medical_notes || '',
+    antecedentesMedicos: clinicalRow.medical_history || '',
+    alergias: clinicalRow.allergies || '',
+    medicamentos: clinicalRow.medications || '',
+    tipoSangre: clinicalRow.blood_type || '',
+    observacionesMedicas: clinicalRow.medical_notes || '',
     tratamientoActual: activeTreatments[0]?.name || '',
     diagnostico: activeTreatments[0]?.diagnosis || '',
     tratamientoServicios: activeTreatments.map(t => ({ tratamiento: t.name, diagnostico: t.diagnosis })),
@@ -647,6 +653,13 @@ async function syncPatientsToCloud() {
       const { error: patientError } = await supabaseClient.from('patients').upsert(patientToRow(patient));
       if (patientError) throw patientError;
 
+      if (!canAccessClinicalRecords()) {
+        lastSyncedPatients.set(patient.id, cloneDeep(patient));
+        continue;
+      }
+
+      const { error: clinicalError } = await supabaseClient.from('patient_clinical_records').upsert(patientClinicalToRow(patient));
+      if (clinicalError) throw clinicalError;
       const { error: treatmentsDeleteError } = await supabaseClient.from('treatments').delete().eq('patient_id', patient.id);
       if (treatmentsDeleteError) throw treatmentsDeleteError;
       const activeKeys = new Set((patient.tratamientoServicios || [])
@@ -715,11 +728,11 @@ async function syncAppointmentsToCloud() {
       if (error) throw error;
 
       const note = appointment.observations && appointment.observations[0];
-      if (note && note.text) {
+      if (canAccessClinicalRecords() && note && note.text) {
         const { error: noteError } = await supabaseClient.from('appointment_notes')
           .upsert({ appointment_id: appointment.id, body: note.text });
         if (noteError) throw noteError;
-      } else {
+      } else if (canAccessClinicalRecords()) {
         await supabaseClient.from('appointment_notes').delete().eq('appointment_id', appointment.id);
       }
       lastSyncedAppointments.set(appointment.id, cloneDeep(appointment));
@@ -769,13 +782,19 @@ async function syncBlockedSlotsToCloud() {
 async function connectToCloud() {
   if (!isCloudConnected()) return;
   try {
-    const [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult, settingsResult, hoursResult, closuresResult, reasonsResult, catalogResult] = await Promise.all([
-      supabaseClient.from('patients').select('*'),
-      supabaseClient.from('treatments').select('*').order('recorded_on'),
-      supabaseClient.from('patient_files').select('*'),
+    const clinicalQueries = canAccessClinicalRecords()
+      ? [
+          supabaseClient.from('patient_clinical_records').select('*'),
+          supabaseClient.from('treatments').select('*').order('recorded_on'),
+          supabaseClient.from('patient_files').select('*'),
+          supabaseClient.from('appointment_notes').select('*')
+        ]
+      : Array.from({ length: 4 }, () => Promise.resolve({ data: [], error: null }));
+    const [patientsResult, clinicalResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult, settingsResult, hoursResult, closuresResult, reasonsResult, catalogResult] = await Promise.all([
+      supabaseClient.from('patients').select('id,first_name,last_name,birth_date,sex,phone,email,address,emergency_name,emergency_relation,emergency_phone,created_at,updated_at'),
+      ...clinicalQueries,
       supabaseClient.from('payments').select('*'),
       supabaseClient.from('appointments').select('*'),
-      supabaseClient.from('appointment_notes').select('*'),
       supabaseClient.from('blocked_slots').select('*'),
       supabaseClient.from('clinic_settings').select('*').eq('id', true).maybeSingle(),
       supabaseClient.from('business_hours').select('*').order('day_of_week'),
@@ -783,7 +802,7 @@ async function connectToCloud() {
       supabaseClient.from('appointment_reasons').select('*').order('sort_order'),
       supabaseClient.from('treatment_catalog').select('*').order('sort_order')
     ]);
-    const firstError = [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult, settingsResult, hoursResult, closuresResult, reasonsResult, catalogResult]
+    const firstError = [patientsResult, clinicalResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult, settingsResult, hoursResult, closuresResult, reasonsResult, catalogResult]
       .map(result => result.error).find(Boolean);
     if (firstError) throw firstError;
     applyClinicConfiguration(settingsResult.data, hoursResult.data || [], closuresResult.data || [], reasonsResult.data || [], catalogResult.data || []);
@@ -814,6 +833,7 @@ async function connectToCloud() {
       }
     }
 
+    const clinicalByPatient = new Map((clinicalResult.data || []).map(row => [row.patient_id, row]));
     const treatmentsByPatient = new Map();
     (treatmentsResult.data || []).forEach(row => {
       const list = treatmentsByPatient.get(row.patient_id) || [];
@@ -834,7 +854,7 @@ async function connectToCloud() {
     });
 
     patients = patientRows.map(row => {
-      const patient = rowToPatient(row, treatmentsByPatient.get(row.id) || [], filesByPatient.get(row.id) || []);
+      const patient = rowToPatient(row, treatmentsByPatient.get(row.id) || [], filesByPatient.get(row.id) || [], clinicalByPatient.get(row.id) || {});
       patient.historialFinanciero = (paymentsByPatient.get(row.id) || []).map(payment => ({
         id: payment.id,
         fecha: payment.paid_on,

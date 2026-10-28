@@ -152,6 +152,15 @@ document.addEventListener('click', async event => {
   if (event.target.closest('#mobile-nav-toggle')) { setMobileNavigation(true); return; }
   if (event.target.closest('#mobile-nav-close') || event.target.closest('#mobile-nav-scrim')) { setMobileNavigation(false); return; }
 
+  if (event.target.closest('[data-patient-back]')) {
+    selectedPatientId = null;
+    const layout = document.querySelector('.patient-directory-layout');
+    const details = document.querySelector('#patient-details');
+    layout?.classList.remove('is-detail-open');
+    if (details) details.innerHTML = '<span class="large-module-icon" aria-hidden="true">◷</span><h2>Selecciona un paciente</h2><p>Su expediente, información y próximas citas aparecerán aquí.</p>';
+    return;
+  }
+
   const patientFolderTab = event.target.closest('[data-patient-tab]');
   if (patientFolderTab) {
     const details = patientFolderTab.closest('#patient-details');

@@ -15,6 +15,18 @@ function hasRole(...roles) {
   return roles.includes(currentAccess.role);
 }
 
+function canAccessClinicalRecords() {
+  return hasRole('admin', 'doctor');
+}
+
+function canAccessFinancialRecords() {
+  return hasRole('admin', 'receptionist');
+}
+
+function canEditGeneralPatientData() {
+  return hasRole('admin', 'receptionist');
+}
+
 function canAccessPage(page) {
   if (page === 'administrar' || page === 'configuracion') return hasRole('admin');
   if (page === 'cobros') return hasRole('admin', 'receptionist');
