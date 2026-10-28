@@ -15,6 +15,20 @@ Deno.serve(async req => {
   const { data: profile } = await admin.from("profiles").select("role,status").eq("id", user.id).maybeSingle();
   if (profile?.role !== "admin" || profile.status !== "approved") return new Response(JSON.stringify({ error: "not_authorized" }), { status: 403, headers });
   const body = await req.json();
+  if (body.action === "qr_get") {
+    if (!["admin", "receptionist"].includes(profile.role)) return new Response(JSON.stringify({ error: "not_authorized" }), { status: 403, headers });
+    const { data: existing } = await admin.from("patient_qr_tokens").select("token").eq("patient_id", body.patient_id).maybeSingle();
+    if (existing?.token) return new Response(JSON.stringify({ token: existing.token }), { headers });
+    const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; const bytes = crypto.getRandomValues(new Uint8Array(8)); const token = `TD-${Array.from(bytes, byte => chars[byte % chars.length]).join("")}`;
+    const { error } = await admin.from("patient_qr_tokens").insert({ patient_id: body.patient_id, token, created_by: user.id });
+    if (error) throw error;
+    return new Response(JSON.stringify({ token }), { headers });
+  }
+  if (body.action === "qr_resolve") {
+    const token = String(body.token || "").trim().toUpperCase();
+    const { data } = await admin.from("patient_qr_tokens").select("patient_id").eq("token", token).maybeSingle();
+    return new Response(JSON.stringify({ patient_id: data?.patient_id || null }), { headers });
+  }
   if (body.action === "export") {
     const entries = await Promise.all(tables.map(async table => {
       const { data, error } = await admin.from(table).select("*"); if (error) throw error; return [table, data || []];
