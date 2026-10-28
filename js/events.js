@@ -146,11 +146,17 @@ document.addEventListener('change', event => {
   if (event.target.matches('#receipt-payment-status')) {
     updatePaymentReceiptAmountState();
   }
+  if (event.target.matches('#backup-restore-file')) {
+    restoreSystemBackup(event.target.files?.[0]);
+    event.target.value = '';
+  }
 });
 
 document.addEventListener('click', async event => {
   if (event.target.closest('#mobile-nav-toggle')) { setMobileNavigation(true); return; }
   if (event.target.closest('#mobile-nav-close') || event.target.closest('#mobile-nav-scrim')) { setMobileNavigation(false); return; }
+  if (event.target.closest('#backup-download')) { await downloadSystemBackup(); return; }
+  if (event.target.closest('#system-reset')) { await resetSystemData(); return; }
 
   if (event.target.closest('[data-patient-back]')) {
     selectedPatientId = null;

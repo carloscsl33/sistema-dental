@@ -225,6 +225,7 @@
         <h3>Horario de atención</h3><p class="field-help">Se aplica a citas nuevas o modificadas; el historial no cambia.</p><div id="business-hours-list" class="business-hours-list"></div><div class="settings-actions"><button class="new-button" type="submit">Guardar configuración</button></div>
       </form>
       <div class="settings-catalogs"><section class="card"><h3>Motivos de cita</h3><p class="field-help">Recepción puede elegir “Otro”; solo administración modifica este catálogo.</p><ul id="appointment-reasons-list" class="catalog-list"></ul><form id="catalog-reason-form" class="catalog-add"><input id="new-appointment-reason" maxlength="32" placeholder="Nuevo motivo"><button class="outline-button" type="submit">Agregar</button></form></section><section class="card"><h3>Tratamientos</h3><p class="field-help">Desactiva opciones que ya no se usen para conservar el historial.</p><ul id="treatment-catalog-list" class="catalog-list"></ul><form id="catalog-treatment-form" class="catalog-add"><input id="new-treatment-catalog" maxlength="120" placeholder="Nuevo tratamiento"><button class="outline-button" type="submit">Agregar</button></form></section></div>
+      <section class="card settings-maintenance"><h3>Copias y recuperación</h3><p class="field-help">La copia incluye la información de la base de datos, no contraseñas, sesiones ni archivos binarios. Consérvala cifrada. Restaurar o borrar datos exige una confirmación escrita.</p><div class="settings-actions"><button class="outline-button" type="button" id="backup-download">Descargar copia de seguridad</button><label class="outline-button backup-upload-label">Restaurar desde archivo<input type="file" id="backup-restore-file" accept="application/json,.json" hidden></label><button class="row-action delete-action" type="button" id="system-reset">Restablecer datos clínicos</button></div></section>
     </section>
   </main>
 
@@ -431,6 +432,7 @@
   <script src="js/patients.js?v=20261027-3"></script>
   <script src="js/qr.js?v=20261027-1"></script>
   <script src="js/patient-qr.js?v=20261027-1"></script>
+  <script src="js/backup.js?v=20261027-1"></script>
   <script src="js/events.js?v=20261027-3"></script>
   <script src="js/admin.js?v=20261027-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
