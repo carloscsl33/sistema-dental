@@ -454,6 +454,14 @@ document.addEventListener('click', async event => {
     return;
   }
 
+  const qrButton = event.target.closest('[data-patient-qr]');
+  if (qrButton) { await openPatientQr(qrButton.dataset.patientQr); return; }
+  if (event.target.closest('#patient-qr-scan-open')) { openPatientQrScanner(); return; }
+  if (event.target.closest('#patient-qr-close')) { const modal = document.querySelector('#patient-qr-modal'); modal?.classList.remove('open'); updatePageScrollLock(); return; }
+  if (event.target.closest('#patient-qr-download')) { downloadPatientQr(); return; }
+  if (event.target.closest('#patient-qr-scanner-close')) { closePatientQrScanner(); return; }
+  if (event.target.closest('#patient-qr-camera')) { await startPatientQrCamera(); return; }
+
   const deletePatientBtn = event.target.closest('[data-delete-patient]');
   if (deletePatientBtn) {
     await deletePatient(deletePatientBtn.dataset.deletePatient);
@@ -599,6 +607,12 @@ document.addEventListener('change', event => {
     return;
   }
 
+});
+
+document.addEventListener('submit', async event => {
+  if (!event.target.matches('#patient-qr-scanner-form')) return;
+  event.preventDefault();
+  await resolvePatientQr(document.querySelector('#patient-qr-manual')?.value);
 });
 
 document.addEventListener('click', event => {

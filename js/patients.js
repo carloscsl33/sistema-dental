@@ -559,6 +559,7 @@ function showPatientDetails(ref) {
       <div><span class="eyebrow">EXPEDIENTE</span><h2>${escapeHTML(fullName)}</h2></div>
       ${patient.id ? `<div class="patient-details-actions">
         ${canEditGeneralPatientData() || clinicalAccess ? `<button type="button" class="row-action" data-edit-patient="${escapeHTML(patient.id)}">${canEditGeneralPatientData() ? 'Editar expediente' : 'Actualizar expediente clínico'}</button>` : ''}
+        ${hasRole('admin', 'receptionist') ? `<button type="button" class="row-action" data-patient-qr="${escapeHTML(patient.id)}">Tarjeta QR</button>` : ''}
         ${hasRole('admin') ? `<button type="button" class="row-action delete-action" data-delete-patient="${escapeHTML(patient.id)}">Eliminar paciente</button>` : ''}
       </div>` : ''}
     </div>
