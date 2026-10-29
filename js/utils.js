@@ -154,9 +154,15 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
   inputElement.setCustomValidity('');
   if (input) {
     inputCaption.textContent = input.label;
-    inputElement.min = String(input.min);
-    inputElement.max = String(input.max);
-    inputElement.step = '1';
+    if (input.type === 'text') {
+      inputElement.removeAttribute('min');
+      inputElement.removeAttribute('max');
+      inputElement.removeAttribute('step');
+    } else {
+      inputElement.min = String(input.min);
+      inputElement.max = String(input.max);
+      inputElement.step = '1';
+    }
   } else {
     inputElement.removeAttribute('min');
     inputElement.removeAttribute('max');

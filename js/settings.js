@@ -43,7 +43,7 @@ function renderConfigurationModule() {
   const hoursHost = document.querySelector('#business-hours-list');
   if (hoursHost) hoursHost.innerHTML = WEEKDAY_NAMES.map((name, day) => {
     const row = businessHours.find(item => Number(item.day_of_week) === day) || { day_of_week: day, is_open: true, opens_at: '09:00', closes_at: '19:00' };
-    return `<div class="hours-row"><label><input type="checkbox" data-hours-open="${day}" ${row.is_open ? 'checked' : ''}> ${name}</label><input aria-label="Apertura ${name}" type="time" data-hours-open-at="${day}" value="${String(row.opens_at || '09:00').slice(0, 5)}" ${row.is_open ? '' : 'disabled'}><span>a</span><input aria-label="Cierre ${name}" type="time" data-hours-close-at="${day}" value="${String(row.closes_at || '19:00').slice(0, 5)}" ${row.is_open ? '' : 'disabled'}></div>`;
+    return `<div class="hours-row"><label class="hours-day-toggle"><input type="checkbox" data-hours-open="${day}" ${row.is_open ? 'checked' : ''}><span>${name}</span></label><label class="hours-time-field"><span class="sr-only">Apertura ${name}</span><input aria-label="Apertura ${name}" type="time" data-hours-open-at="${day}" value="${String(row.opens_at || '09:00').slice(0, 5)}" ${row.is_open ? '' : 'disabled'}></label><span class="hours-separator" aria-hidden="true">a</span><label class="hours-time-field"><span class="sr-only">Cierre ${name}</span><input aria-label="Cierre ${name}" type="time" data-hours-close-at="${day}" value="${String(row.closes_at || '19:00').slice(0, 5)}" ${row.is_open ? '' : 'disabled'}></label></div>`;
   }).join('');
   renderCatalogList('#appointment-reasons-list', appointmentReasons, 'reason');
   renderCatalogList('#treatment-catalog-list', treatmentCatalog, 'treatment');
@@ -52,7 +52,7 @@ function renderConfigurationModule() {
 function renderCatalogList(selector, rows, kind) {
   const host = document.querySelector(selector);
   if (!host) return;
-  host.innerHTML = rows.length ? rows.map(row => `<li><span>${escapeHTML(row.name)}</span><button type="button" class="icon-button" data-toggle-catalog="${kind}" data-catalog-id="${row.id}" data-active="${row.is_active}" title="${row.is_active ? 'Desactivar' : 'Activar'}">${row.is_active ? '✓ Activo' : 'Inactivo'}</button></li>`).join('') : '<li class="empty-state">Aún no hay opciones.</li>';
+  host.innerHTML = rows.length ? rows.map(row => `<li><span>${escapeHTML(row.name)}</span><button type="button" class="catalog-status-button ${row.is_active ? 'is-active' : 'is-inactive'}" data-toggle-catalog="${kind}" data-catalog-id="${row.id}" data-active="${row.is_active}" title="${row.is_active ? 'Desactivar' : 'Activar'}">${row.is_active ? 'Activo' : 'Inactivo'}</button></li>`).join('') : '<li class="empty-state">Aún no hay opciones.</li>';
 }
 
 async function saveClinicConfiguration(event) {

@@ -86,8 +86,18 @@ function closeManagedUserModal() {
 }
 
 async function requestManagedUserDelete(user) {
-  const value = window.prompt(`Para eliminar la cuenta escribe exactamente este correo:\n${user.email}`);
-  if (value === null) return;
+  const { confirmed, value } = await showConfirmationDialog({
+    title: 'Eliminar usuario',
+    message: 'Se eliminará el acceso de esta cuenta. Esta acción no se puede deshacer.',
+    confirmLabel: 'Eliminar usuario',
+    input: {
+      type: 'text',
+      label: `Escribe ${user.email} para confirmar`,
+      match: user.email,
+      value: ''
+    }
+  });
+  if (!confirmed) return;
   try {
     await invokeUserManagement('delete', { userId: user.id, confirmEmail: value });
     showToast('Usuario eliminado.');
