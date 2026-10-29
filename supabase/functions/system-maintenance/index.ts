@@ -1,11 +1,18 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
-const headers = { "Content-Type": "application/json" };
+const headers = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "https://sistema-dental-mu.vercel.app",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin"
+};
 const tables = ["clinic_settings", "business_hours", "clinic_closures", "appointment_reasons", "treatment_catalog", "patients", "patient_clinical_records", "treatments", "patient_files", "appointments", "appointment_notes", "payments", "blocked_slots", "patient_qr_tokens"] as const;
 const deleteOrder = ["payments", "appointment_notes", "appointments", "patient_qr_tokens", "patient_files", "treatments", "patient_clinical_records", "patients", "blocked_slots", "clinic_closures", "business_hours", "appointment_reasons", "treatment_catalog", "clinic_settings"] as const;
 
 Deno.serve(async req => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers });
   if (req.method !== "POST") return new Response(JSON.stringify({ error: "method_not_allowed" }), { status: 405, headers });
   const auth = req.headers.get("Authorization") || "";
   const userClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } } });
@@ -13,7 +20,7 @@ Deno.serve(async req => {
   if (!user) return new Response(JSON.stringify({ error: "not_authorized" }), { status: 401, headers });
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const { data: profile } = await admin.from("profiles").select("role,status").eq("id", user.id).maybeSingle();
-  if (profile?.role !== "admin" || profile.status !== "approved") return new Response(JSON.stringify({ error: "not_authorized" }), { status: 403, headers });
+  if (profile?.status !== "approved") return new Response(JSON.stringify({ error: "not_authorized" }), { status: 403, headers });
   const body = await req.json();
   if (body.action === "qr_get") {
     if (!["admin", "receptionist"].includes(profile.role)) return new Response(JSON.stringify({ error: "not_authorized" }), { status: 403, headers });
@@ -29,6 +36,7 @@ Deno.serve(async req => {
     const { data } = await admin.from("patient_qr_tokens").select("patient_id").eq("token", token).maybeSingle();
     return new Response(JSON.stringify({ patient_id: data?.patient_id || null }), { headers });
   }
+  if (profile.role !== "admin") return new Response(JSON.stringify({ error: "not_authorized" }), { status: 403, headers });
   if (body.action === "export") {
     const entries = await Promise.all(tables.map(async table => {
       const { data, error } = await admin.from(table).select("*"); if (error) throw error; return [table, data || []];
