@@ -700,7 +700,7 @@ function patientClinicalToRow(patient) {
     patient_id: patient.id,
     blood_type: patient.tipoSangre || null,
     medical_history: patient.antecedentesMedicos || null,
-    allergies: patient.alergias || null,
+    allergies: String(patient.alergias || ""),
     medications: patient.medicamentos || null,
     medical_notes: patient.observacionesMedicas || null,
   };
