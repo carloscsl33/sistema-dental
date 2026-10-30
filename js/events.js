@@ -201,6 +201,7 @@ document.addEventListener('click', async event => {
     const dateInput = document.querySelector('#modal-date');
     const timeInput = document.querySelector('#modal-time');
     if (dateInput) dateInput.value = date;
+    renderAppointmentCalendar(true);
     refreshAppointmentTimeSlots(time);
     if (timeInput) timeInput.value = time;
     return;
@@ -262,6 +263,32 @@ document.addEventListener('click', async event => {
 
   if (event.target.closest('#daily-agenda-close')) {
     closeDailyAgenda();
+    return;
+  }
+
+  const appointmentCalendarMonth = event.target.closest('[data-appointment-calendar-month]');
+  if (appointmentCalendarMonth) {
+    const daysHost = document.querySelector('#appointment-calendar-days');
+    const direction = Number(appointmentCalendarMonth.dataset.appointmentCalendarMonth);
+    const [year, month] = (daysHost?.dataset.month || '').split('-').map(Number);
+    if (!daysHost || !year || !month || ![-1, 1].includes(direction)) return;
+    const nextMonth = new Date(year, month - 1 + direction, 1, 12);
+    const currentDate = new Date(`${getISODate(0)}T12:00:00`);
+    const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1, 12);
+    if (nextMonth < currentMonth) return;
+    daysHost.dataset.month = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}`;
+    renderAppointmentCalendar();
+    document.querySelector(`[data-appointment-calendar-month="${direction}"]`)?.focus();
+    return;
+  }
+
+  const appointmentCalendarDay = event.target.closest('[data-appointment-date]');
+  if (appointmentCalendarDay && !appointmentCalendarDay.disabled) {
+    const dateInput = document.querySelector('#modal-date');
+    if (!dateInput) return;
+    dateInput.value = appointmentCalendarDay.dataset.appointmentDate;
+    renderAppointmentCalendar();
+    refreshAppointmentTimeSlots(document.querySelector('#modal-time')?.value || '');
     return;
   }
 
@@ -702,12 +729,12 @@ document.addEventListener('submit', event => {
 
   const appointmentDate = dateInput.value;
   if (!appointmentDate) {
-    dateInput.focus();
+    document.querySelector('#appointment-calendar-days button:not(:disabled)')?.focus();
     showToast('Selecciona la fecha de la cita.');
     return;
   }
   if (appointmentDate < getISODate(0)) {
-    dateInput.focus();
+    document.querySelector('#appointment-calendar-days button:not(:disabled)')?.focus();
     showToast('No se pueden agendar citas en fechas pasadas.');
     return;
   }

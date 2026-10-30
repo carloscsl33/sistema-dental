@@ -54,6 +54,48 @@ function getAppointmentTimeSlotCount(date, time) {
   return appointmentsCount + getBlockedAppointmentSlotCount(date, time);
 }
 
+function renderAppointmentCalendar(resetMonth = false) {
+  const dateInput = document.querySelector('#modal-date');
+  const title = document.querySelector('#appointment-calendar-title');
+  const daysHost = document.querySelector('#appointment-calendar-days');
+  const previousButton = document.querySelector('[data-appointment-calendar-month="-1"]');
+  if (!dateInput || !title || !daysHost) return;
+
+  const selectedDate = dateInput.value;
+  const selectedParts = selectedDate.split('-').map(Number);
+  if (resetMonth || !daysHost.dataset.month) {
+    daysHost.dataset.month = `${selectedParts[0]}-${String(selectedParts[1]).padStart(2, '0')}`;
+  }
+  const [year, month] = daysHost.dataset.month.split('-').map(Number);
+  if (!year || !month) return;
+
+  const monthDate = new Date(year, month - 1, 1, 12);
+  title.textContent = new Intl.DateTimeFormat('es-MX', { month: 'long', year: 'numeric' }).format(monthDate);
+  const currentDate = new Date(`${getISODate(0)}T12:00:00`);
+  const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1, 12);
+  if (previousButton) previousButton.disabled = monthDate <= currentMonth;
+
+  const firstWeekday = (monthDate.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const cells = Array.from({ length: firstWeekday }, () => '<span class="appointment-calendar-empty" aria-hidden="true"></span>');
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dateObject = new Date(year, month - 1, day, 12);
+    const isToday = date === getISODate(0);
+    const selected = date === selectedDate;
+    const label = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(dateObject);
+    cells.push(`<button type="button" class="appointment-calendar-day${selected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}" data-appointment-date="${date}" aria-label="${label}" aria-pressed="${selected}"${date < getISODate(0) ? ' disabled' : ''}>${day}</button>`);
+  }
+  daysHost.innerHTML = cells.join('');
+
+  const help = document.querySelector('#appointment-calendar-help');
+  if (help) {
+    help.textContent = selectedDate
+      ? `Fecha seleccionada: ${new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${selectedDate}T12:00:00`))}.`
+      : 'Selecciona un día para consultar sus horarios.';
+  }
+}
+
 function refreshAppointmentTimeSlots(preferredTime = '') {
   const timeSelect = document.querySelector('#modal-time');
   const dateInput = document.querySelector('#modal-date');
@@ -130,6 +172,7 @@ function refreshAppointmentTimeSlots(preferredTime = '') {
       const availableSpaces = slots.reduce((total, slot) => total + slot.available, 0);
       help.textContent = `${date === getISODate(0) ? 'Horarios desde la hora actual · ' : ''}Máximo ${MAX_PATIENTS_PER_SLOT} pacientes por horario · ${availableSpaces} ${availableSpaces === 1 ? 'lugar disponible' : 'lugares disponibles'} en total · ${fullSlots} horarios no disponibles`;
     }
+    renderAppointmentCalendar();
   }
 }
 
@@ -420,6 +463,7 @@ function openModal(index = null) {
     amountInput.value = '';
     dateInput.value = getISODate(0);
     dateInput.min = getISODate(0);
+    renderAppointmentCalendar(true);
     document.querySelector('#modal-title').textContent = 'Agendar cita';
   } else {
     const appointment = todayAppointments[index];
@@ -444,6 +488,7 @@ function openModal(index = null) {
     
     dateInput.value = getISODate(1);
     dateInput.min = getISODate(0);
+    renderAppointmentCalendar(true);
     document.querySelector('#modal-title').textContent = 'Agendar cita';
   }
   document.querySelector('#appointment-modal .modal-copy').textContent = 'Completa los datos para agendar o actualizar una cita.';
@@ -487,6 +532,7 @@ function editAppointment(source, index) {
   
   dateInput.value = appointment.date || getISODate(0);
   dateInput.min = getISODate(0);
+  renderAppointmentCalendar(true);
   refreshAppointmentTimeSlots(toInputTime(appointment.time));
   
   document.querySelector('#modal-title').textContent = 'Agendar cita';

@@ -554,8 +554,7 @@ function showPatientDetails(ref) {
   
   details.innerHTML = `
     <div class="patient-details-heading">
-      <button type="button" class="patient-back-button" data-patient-back aria-label="Volver al directorio">← <span>Pacientes</span></button>
-      <span class="patient-details-avatar">${escapeHTML(getInitials(fullName))}</span>
+      <button type="button" class="patient-back-button" data-patient-back aria-label="Volver al directorio"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"/></svg></button>
       <div><span class="eyebrow">EXPEDIENTE</span><h2>${escapeHTML(fullName)}</h2></div>
       ${patient.id ? `<div class="patient-details-actions">
         ${canEditGeneralPatientData() || clinicalAccess ? `<button type="button" class="row-action" data-edit-patient="${escapeHTML(patient.id)}">${canEditGeneralPatientData() ? 'Editar expediente' : 'Actualizar expediente clínico'}</button>` : ''}
@@ -612,7 +611,7 @@ function showPatientDetails(ref) {
       <div class="patient-files"><h4>Documentos y fotografías</h4>${renderPatientFiles(patient)}</div>
     </section>` : ''}
     <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="citas" hidden>
-      <div class="patient-record-heading"><span class="eyebrow">AGENDA</span><h2>Historial de citas</h2></div>
+      <div class="patient-record-heading"><h2>Historial de citas</h2></div>
       <div class="patient-appointment-history">
         ${orderedAppointments.length
           ? renderPatientAppointmentRows(orderedAppointments.slice(0, 3))
