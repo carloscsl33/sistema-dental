@@ -1,4 +1,3 @@
--- Evita políticas SELECT duplicadas y conserva el control de administración por operación.
 create index if not exists clinic_settings_updated_by_idx on public.clinic_settings (updated_by);
 create index if not exists clinic_closures_created_by_idx on public.clinic_closures (created_by);
 

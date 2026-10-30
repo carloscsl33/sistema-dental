@@ -1,68 +1,78 @@
-// Pagos y recibos
-
 function openPaymentReceipt(appointmentId) {
-  const appointmentData = getAppointments().find(({ appointment }) => appointment.id === appointmentId);
+  const appointmentData = getAppointments().find(
+    ({ appointment }) => appointment.id === appointmentId,
+  );
   if (!appointmentData) {
-    showToast('La cita seleccionada ya no existe.');
+    showToast("La cita seleccionada ya no existe.");
     return;
   }
-  
+
   const appointment = appointmentData.appointment;
   const patient = resolveAppointmentPatient(appointment);
   if (!patient) {
-    showToast('No se encontró el expediente del paciente.');
+    showToast("No se encontró el expediente del paciente.");
     return;
   }
-  
-  const modal = document.querySelector('#payment-receipt-modal');
+
+  const modal = document.querySelector("#payment-receipt-modal");
   if (!modal) return;
-  
-  const totalAmount = getNumericAmount(appointment.total ?? appointment.balance);
+
+  const totalAmount = getNumericAmount(
+    appointment.total ?? appointment.balance,
+  );
   const balanceAmount = getNumericAmount(appointment.balance);
   const paidAmount = Math.max(totalAmount - balanceAmount, 0);
   const patientName = getPatientFullName(patient) || appointment.name;
-  
-  setFieldValue('#receipt-appointment-id', appointmentId);
-  setFieldValue('#receipt-patient', patientName);
-  setFieldValue('#receipt-appointment-date', formatDisplayDate(appointment.date));
-  setFieldValue('#receipt-treatment', appointment.reason || 'Consulta');
-  setFieldValue('#receipt-total', formatCurrency(totalAmount));
-  setFieldValue('#receipt-balance', formatCurrency(balanceAmount));
-  
+
+  setFieldValue("#receipt-appointment-id", appointmentId);
+  setFieldValue("#receipt-patient", patientName);
+  setFieldValue(
+    "#receipt-appointment-date",
+    formatDisplayDate(appointment.date),
+  );
+  setFieldValue("#receipt-treatment", appointment.reason || "Consulta");
+  setFieldValue("#receipt-total", formatCurrency(totalAmount));
+  setFieldValue("#receipt-balance", formatCurrency(balanceAmount));
+
   updatePaymentReceiptSummary();
-  const previousDisplay = document.querySelector('#receipt-previous-display');
-  if (previousDisplay) previousDisplay.textContent = formatCurrency(getPatientPendingAppointments(patient).filter(item => item.id !== appointment.id).reduce((sum, item) => sum + getNumericAmount(item.balance), 0));
-  
-  setFieldValue('#receipt-payment-date', getISODate(0));
-  setFieldValue('#receipt-reference', '');
-  setFieldValue('#receipt-notes', '');
-  
-  const paymentStatus = document.querySelector('#receipt-payment-status');
-  const paymentAmount = document.querySelector('#receipt-payment-amount');
-  
+  const previousDisplay = document.querySelector("#receipt-previous-display");
+  if (previousDisplay)
+    previousDisplay.textContent = formatCurrency(
+      getPatientPendingAppointments(patient)
+        .filter((item) => item.id !== appointment.id)
+        .reduce((sum, item) => sum + getNumericAmount(item.balance), 0),
+    );
+
+  setFieldValue("#receipt-payment-date", getISODate(0));
+  setFieldValue("#receipt-reference", "");
+  setFieldValue("#receipt-notes", "");
+
+  const paymentStatus = document.querySelector("#receipt-payment-status");
+  const paymentAmount = document.querySelector("#receipt-payment-amount");
+
   if (balanceAmount <= 0) {
-    if (paymentStatus) paymentStatus.value = 'Completo';
-    if (paymentAmount) paymentAmount.value = '0';
+    if (paymentStatus) paymentStatus.value = "Completo";
+    if (paymentAmount) paymentAmount.value = "0";
   } else {
-    if (paymentStatus) paymentStatus.value = 'Parcial';
+    if (paymentStatus) paymentStatus.value = "Parcial";
     if (paymentAmount) paymentAmount.value = String(balanceAmount);
   }
-  
-  setFieldValue('#receipt-payment-method', 'Efectivo');
+
+  setFieldValue("#receipt-payment-method", "Efectivo");
   updatePaymentReceiptAmountState();
-  
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
   lockPageScroll();
 }
 
 function updatePaymentReceiptAmountState() {
-  const status = document.querySelector('#receipt-payment-status');
-  const amount = document.querySelector('#receipt-payment-amount');
+  const status = document.querySelector("#receipt-payment-status");
+  const amount = document.querySelector("#receipt-payment-amount");
   if (!status || !amount) return;
-  
-  if (status.value === 'No pagado') {
-    amount.value = '0';
+
+  if (status.value === "No pagado") {
+    amount.value = "0";
     amount.readOnly = true;
   } else {
     amount.readOnly = false;
@@ -70,27 +80,27 @@ function updatePaymentReceiptAmountState() {
 }
 
 function closePaymentReceipt() {
-  const modal = document.querySelector('#payment-receipt-modal');
+  const modal = document.querySelector("#payment-receipt-modal");
   if (!modal) return;
-  
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
-  
-  const form = document.querySelector('#payment-receipt-form');
+
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+
+  const form = document.querySelector("#payment-receipt-form");
   if (form) form.reset();
   followUpAppointmentId = null;
-  
+
   updatePageScrollLock();
 }
 
 function createPaymentReceiptModal() {
-  if (document.querySelector('#payment-receipt-modal')) return;
-  
-  const modal = document.createElement('div');
-  modal.id = 'payment-receipt-modal';
-  modal.className = 'modal-backdrop';
-  modal.setAttribute('aria-hidden', 'true');
-  
+  if (document.querySelector("#payment-receipt-modal")) return;
+
+  const modal = document.createElement("div");
+  modal.id = "payment-receipt-modal";
+  modal.className = "modal-backdrop";
+  modal.setAttribute("aria-hidden", "true");
+
   modal.innerHTML = `
     <div class="modal-card payment-receipt-card" role="dialog" aria-modal="true" aria-labelledby="payment-receipt-title">
       <div class="payment-receipt-header">
@@ -149,14 +159,25 @@ function createPaymentReceiptModal() {
 
 function getPatientPendingAppointments(patient) {
   return getPatientAppointments(patient)
-    .filter(item => item.status !== 'Cancelada' && getNumericAmount(item.balance) > 0)
-    .sort((a, b) => a.date.localeCompare(b.date) || toMinutes(a.time) - toMinutes(b.time));
+    .filter(
+      (item) =>
+        item.status !== "Cancelada" && getNumericAmount(item.balance) > 0,
+    )
+    .sort(
+      (a, b) =>
+        a.date.localeCompare(b.date) || toMinutes(a.time) - toMinutes(b.time),
+    );
 }
 
 function allocatePatientPayment(patient, appointment, amount) {
   let remaining = amount;
   const allocations = [];
-  [appointment, ...getPatientPendingAppointments(patient).filter(item => item.id !== appointment.id)].forEach(item => {
+  [
+    appointment,
+    ...getPatientPendingAppointments(patient).filter(
+      (item) => item.id !== appointment.id,
+    ),
+  ].forEach((item) => {
     const applied = Math.min(getNumericAmount(item.balance), remaining);
     if (applied > 0) {
       allocations.push({ appointment: item, amount: applied });
@@ -166,16 +187,24 @@ function allocatePatientPayment(patient, appointment, amount) {
   return allocations;
 }
 
-async function recordPaymentSafely({ appointmentId, amount, method, paidOn, reference, notes, finalize }) {
+async function recordPaymentSafely({
+  appointmentId,
+  amount,
+  method,
+  paidOn,
+  reference,
+  notes,
+  finalize,
+}) {
   if (!isCloudConnected()) return false;
-  const { error } = await supabaseClient.rpc('record_payment', {
+  const { error } = await supabaseClient.rpc("record_payment", {
     p_appointment_id: appointmentId,
     p_amount: amount,
     p_method: method,
     p_paid_on: paidOn || null,
     p_reference: reference || null,
     p_notes: notes || null,
-    p_finalize: Boolean(finalize)
+    p_finalize: Boolean(finalize),
   });
   if (error) throw error;
   await connectToCloud();
@@ -183,8 +212,9 @@ async function recordPaymentSafely({ appointmentId, amount, method, paidOn, refe
 }
 
 function updatePaymentReceiptSummary() {
-  const total = document.querySelector('#receipt-total');
-  const totalDisplay = document.querySelector('#receipt-total-display');
-  
-  if (totalDisplay) totalDisplay.textContent = formatCurrency(total?.value || 0);
+  const total = document.querySelector("#receipt-total");
+  const totalDisplay = document.querySelector("#receipt-total-display");
+
+  if (totalDisplay)
+    totalDisplay.textContent = formatCurrency(total?.value || 0);
 }

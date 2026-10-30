@@ -1,5 +1,3 @@
--- Configuración clínica, catálogo de atención y cobros atómicos.
--- La configuración aplica a las citas nuevas o modificadas; nunca reescribe el historial.
 
 create table if not exists public.clinic_settings (
   id boolean primary key default true check (id),
@@ -144,7 +142,6 @@ begin
   return new;
 end $$;
 
--- Los pagos solo se crean desde esta transacción, nunca directamente desde el navegador.
 drop policy if exists payments_insert on public.payments;
 revoke insert, update, delete on public.payments from authenticated;
 revoke update (paid) on public.appointments from authenticated;

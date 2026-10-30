@@ -1,10 +1,3 @@
--- =====================================================================
--- Sistema Dental · esquema Supabase (PostgreSQL 15+)
--- Ejecutar COMPLETO una sola vez en: Supabase > SQL Editor.
--- Antes: Authentication > Providers > Email > desactivar "Allow new users to sign up"
--- (los usuarios se crean con "Invite user"; así nadie ajeno puede registrarse).
--- Todos los usuarios invitados tienen los mismos permisos.
--- =====================================================================
 create schema if not exists extensions;
 create schema if not exists private;
 revoke all on schema private from public;
@@ -14,7 +7,6 @@ create type public.profile_status as enum ('pending', 'approved', 'blocked');
 create type public.appt_status    as enum ('en_espera', 'finalizada', 'cancelada');
 create type public.app_role       as enum ('admin', 'receptionist', 'doctor');
 
--- ---------- Perfiles y acceso ----------
 create table public.profiles (
   id          uuid primary key references auth.users (id) on delete cascade,
   full_name   text not null default '',
@@ -43,7 +35,6 @@ $$;
 create function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
-  -- Solo existen usuarios invitados (registro público desactivado), por eso nacen aprobados.
   insert into public.profiles (id, full_name)
   values (new.id, coalesce(new.raw_user_meta_data ->> 'full_name', new.email, ''));
   return new;
@@ -54,7 +45,6 @@ create trigger on_auth_user_created after insert on auth.users
 create function public.touch_updated_at() returns trigger language plpgsql set search_path = '' as $$
 begin new.updated_at = now(); return new; end $$;
 
--- ---------- Pacientes ----------
 create table public.patients (
   id                 uuid primary key default gen_random_uuid(),
   first_name         text not null check (char_length(btrim(first_name)) between 1 and 80),
@@ -77,7 +67,6 @@ create table public.patients (
   updated_at         timestamptz not null default now(),
   created_by         uuid default auth.uid() references auth.users (id) on delete set null
 );
--- Homónimos permitidos si cambia la fecha de nacimiento
 create unique index patients_identity_uq on public.patients (lower(first_name), lower(last_name), birth_date);
 create index patients_full_name_trgm on public.patients using gin (full_name extensions.gin_trgm_ops);
 create trigger patients_touch before update on public.patients for each row execute function public.touch_updated_at();
@@ -93,7 +82,6 @@ create table public.treatments (
 );
 create index treatments_patient_idx on public.treatments (patient_id, recorded_on desc);
 
--- ---------- Horarios bloqueados ----------
 create table public.blocked_slots (
   slot_date date not null,
   slot_time time not null,
@@ -101,7 +89,6 @@ create table public.blocked_slots (
   primary key (slot_date, slot_time)
 );
 
--- ---------- Citas ----------
 create table public.appointments (
   id         uuid primary key default gen_random_uuid(),
   patient_id uuid not null references public.patients (id) on delete cascade,
@@ -123,7 +110,6 @@ create index appointments_patient_idx on public.appointments (patient_id, appt_d
 create index appointments_pending_idx on public.appointments (patient_id, appt_date, appt_time) where balance > 0 and status <> 'cancelada';
 create trigger appointments_touch before update on public.appointments for each row execute function public.touch_updated_at();
 
--- Máximo 3 pacientes por horario, validado en la base (seguro con varios usuarios a la vez)
 create function public.enforce_slot_capacity() returns trigger language plpgsql set search_path = '' as $$
 declare
   capacity constant int := 3;
@@ -171,7 +157,6 @@ create table public.appointment_notes (
 );
 create trigger notes_touch before update on public.appointment_notes for each row execute function public.touch_updated_at();
 
--- ---------- Pagos (solo se pueden crear, nunca editar ni borrar: no hay grant de update/delete) ----------
 create table public.payments (
   id             uuid primary key default gen_random_uuid(),
   patient_id     uuid not null references public.patients (id) on delete cascade,
@@ -189,7 +174,6 @@ create index payments_patient_idx on public.payments (patient_id, paid_on desc);
 create index payments_day_idx     on public.payments (paid_on);
 create index payments_appt_idx    on public.payments (appointment_id);
 
--- Aplica el pago a la cita actual y el resto al saldo más antiguo del paciente. Todo en una transacción.
 create function private.register_payment(
   p_appointment_id uuid, p_amount numeric, p_method text,
   p_paid_on date default null, p_reference text default null, p_notes text default null,
@@ -231,7 +215,6 @@ begin
   return jsonb_build_object('received', p_amount, 'pending_after', pending - p_amount);
 end $$;
 
--- ---------- Archivos clínicos (metadatos; el archivo vive en Storage privado) ----------
 create table public.patient_files (
   id           uuid primary key default gen_random_uuid(),
   patient_id   uuid not null references public.patients (id) on delete cascade,
@@ -253,7 +236,6 @@ create policy clinical_files_select on storage.objects for select to authenticat
 create policy clinical_files_insert on storage.objects for insert to authenticated with check (bucket_id = 'clinical-files' and (select private.is_approved()));
 create policy clinical_files_delete on storage.objects for delete to authenticated using (bucket_id = 'clinical-files' and (select private.is_approved()));
 
--- ---------- Bitácora de auditoría ----------
 create table public.audit_log (
   id         bigint generated always as identity primary key,
   at         timestamptz not null default now(),
@@ -276,7 +258,6 @@ create trigger patients_audit     after insert or update or delete on public.pat
 create trigger appointments_audit after insert or update or delete on public.appointments for each row execute function public.audit_row();
 create trigger payments_audit     after insert or update or delete on public.payments     for each row execute function public.audit_row();
 
--- ---------- Resumen del tablero (una consulta en vez de cargar todo) ----------
 create function public.dashboard_summary(p_day date) returns jsonb language sql stable set search_path = '' as $$
   select jsonb_build_object(
     'appointments', (select count(*) from public.appointments where appt_date = p_day and status <> 'cancelada'),
@@ -284,7 +265,6 @@ create function public.dashboard_summary(p_day date) returns jsonb language sql 
     'income',       (select coalesce(sum(amount), 0) from public.payments where paid_on = p_day));
 $$;
 
--- ---------- Seguridad: RLS + permisos mínimos ----------
 revoke all on all tables    in schema public from anon, authenticated;
 revoke all on all functions in schema public from public, anon, authenticated;
 revoke all on all sequences in schema public from anon, authenticated;
@@ -326,9 +306,5 @@ grant delete on public.appointments, public.patient_files to authenticated;
 grant insert on public.patient_files to authenticated;
 grant insert (id, patient_id, appointment_id, amount, method, paid_on, concept, reference, notes) on public.payments to authenticated;
 
--- Tiempo real para que 3-4 personas vean los cambios al instante (respeta RLS)
 alter publication supabase_realtime add table public.patients, public.treatments, public.blocked_slots,
   public.appointments, public.appointment_notes, public.payments, public.patient_files;
-
--- ---------- Quitar acceso a alguien ----------
--- update public.profiles set status = 'blocked' where id = (select id from auth.users where email = 'correo@ejemplo.com');

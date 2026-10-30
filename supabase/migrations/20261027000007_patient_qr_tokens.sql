@@ -1,4 +1,3 @@
--- Códigos opacos: no contienen nombre, ID ni URL y no son una credencial de acceso.
 create table public.patient_qr_tokens (
   patient_id uuid primary key references public.patients(id) on delete cascade,
   token text not null unique check (token ~ '^TD-[A-Z0-9]{8}$'),

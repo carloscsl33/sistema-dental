@@ -1,7 +1,3 @@
--- Roles internos y administración de usuarios de Thera-dent.
--- Después de aplicarla, promociona UNA cuenta existente a admin con:
--- update public.profiles set role = 'admin' where id =
---   (select id from auth.users where email = 'correo-del-administrador');
 
 create type public.app_role as enum ('admin', 'receptionist', 'doctor');
 
@@ -13,7 +9,6 @@ comment on column public.profiles.role is
 
 create index profiles_role_status_idx on public.profiles (role, status);
 
--- Aceleran la bitácora y las consultas por autor que reportó el asesor de rendimiento.
 create index appointment_notes_created_by_idx on public.appointment_notes (created_by);
 create index appointments_created_by_idx on public.appointments (created_by);
 create index patient_files_uploaded_by_idx on public.patient_files (uploaded_by);
@@ -45,7 +40,5 @@ create policy profiles_select_self_or_admin on public.profiles
   for select to authenticated
   using (id = (select auth.uid()) or (select private.is_admin()));
 
--- Los cambios de roles y estados se realizan solamente desde la Edge Function.
--- No se concede UPDATE directo a clientes autenticados.
 revoke insert, update, delete on public.profiles from authenticated;
 

@@ -1,6 +1,3 @@
--- Fase 4: separa información clínica sensible del directorio general de pacientes.
--- El directorio se puede consultar por personal aprobado, pero solamente
--- administración/recepción cambian sus datos generales y solo administración elimina.
 drop policy if exists patients_select on public.patients;
 drop policy if exists patients_insert on public.patients;
 drop policy if exists patients_update on public.patients;
@@ -15,7 +12,6 @@ create policy patients_directory_update on public.patients for update to authent
 create policy patients_directory_delete on public.patients for delete to authenticated
   using ((select private.is_admin()));
 
--- Los campos clínicos heredados dejan de ser legibles/escribibles por el API.
 revoke select (blood_type, medical_history, allergies, medications, medical_notes) on public.patients from authenticated;
 revoke insert (blood_type, medical_history, allergies, medications, medical_notes) on public.patients from authenticated;
 revoke update (blood_type, medical_history, allergies, medications, medical_notes) on public.patients from authenticated;
@@ -52,7 +48,6 @@ create policy clinical_records_staff_update on public.patient_clinical_records f
 create policy clinical_records_admin_delete on public.patient_clinical_records for delete to authenticated
   using ((select private.is_admin()));
 
--- Los módulos clínicos se reservan a administración y doctor/a.
 drop policy if exists treatments_select on public.treatments;
 drop policy if exists treatments_insert on public.treatments;
 drop policy if exists treatments_update on public.treatments;
