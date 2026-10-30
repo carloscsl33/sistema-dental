@@ -26,7 +26,8 @@ const MONTH_NAMES = [
 
 const PATIENTS_STORAGE_KEY = "dentalClinicPatients";
 
-const APPOINTMENTS_STORAGE_KEY = "dentalClinicAppointments";
+const LEGACY_APPOINTMENTS_STORAGE_KEY = "dentalClinicAppointments";
+const APPOINTMENTS_STORAGE_KEY = "dentalClinicAppointmentsV2";
 
 const BLOCKED_SLOTS_STORAGE_KEY = "dentalClinicBlockedAppointmentSlots";
 

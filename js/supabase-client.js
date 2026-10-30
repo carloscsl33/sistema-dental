@@ -12,5 +12,5 @@ const supabaseClient = (() => {
 })();
 
 function isCloudConnected() {
-  return Boolean(supabaseClient);
+  return Boolean(supabaseClient && currentAccess?.role);
 }

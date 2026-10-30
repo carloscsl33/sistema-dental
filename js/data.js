@@ -177,6 +177,14 @@ function cacheAppointmentsLocally() {
   );
 }
 
+function applyEmptyCloudAppointments() {
+  rebuildAppointmentCollections([]);
+  cacheAppointmentsLocally();
+  renderLists();
+  renderDashboardCalendar();
+  updateAttendedCount();
+}
+
 function saveAppointments() {
   const result = cacheAppointmentsLocally();
   if (isCloudConnected())
@@ -604,6 +612,7 @@ function syncPatientAppointmentReferences() {
 }
 
 function initializeStorage() {
+  localStorage.removeItem(LEGACY_APPOINTMENTS_STORAGE_KEY);
   patients = loadPatients();
   loadAppointments();
   loadBlockedAppointmentSlots();
@@ -1082,6 +1091,8 @@ async function connectToCloud() {
 
     const patientRows = patientsResult.data || [];
     const appointmentRows = appointmentsResult.data || [];
+
+    if (!appointmentRows.length) applyEmptyCloudAppointments();
 
     if (!patientRows.length && !appointmentRows.length) {
       const localPatients = loadPatients();
