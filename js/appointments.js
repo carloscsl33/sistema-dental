@@ -551,8 +551,11 @@ function updateAttendedCount() {
   element.textContent = String(count);
 }
 
+let appointmentModalReturnFocus = null;
+
 function openModal(index = null) {
   const modal = document.querySelector("#appointment-modal");
+  if (modal && !modal.classList.contains("open")) appointmentModalReturnFocus = document.activeElement;
   const patientInput = document.querySelector("#modal-patient");
   const patientIdInput = document.querySelector("#modal-patient-id");
   const motiveInput = document.querySelector("#modal-motive");
@@ -630,6 +633,7 @@ function openModal(index = null) {
 }
 
 function editAppointment(source, index) {
+  appointmentModalReturnFocus = document.activeElement;
   const list = getAppointmentList(source);
   const appointment = list[index];
   if (!appointment) return;
@@ -686,6 +690,11 @@ function closeModal() {
   const modal = document.querySelector("#appointment-modal");
   if (!modal) return;
 
+  if (modal.contains(document.activeElement)) {
+    if (appointmentModalReturnFocus?.isConnected && !modal.contains(appointmentModalReturnFocus)) appointmentModalReturnFocus.focus();
+    if (modal.contains(document.activeElement)) document.activeElement.blur();
+  }
+  appointmentModalReturnFocus = null;
   hidePatientSuggestions();
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
