@@ -807,10 +807,13 @@ function refreshPatientDetails(patient) {
   });
 }
 
+let patientModalReturnFocus = null;
+
 function openPatientModal(patientId = null) {
   const modal = document.querySelector("#patient-modal");
   const form = document.querySelector("#patient-form");
   if (!modal || !form) return;
+  patientModalReturnFocus = document.activeElement;
 
   editingPatient = patientId ? findPatientById(patientId) : null;
   if (!editingPatient && !canEditGeneralPatientData()) {
@@ -870,6 +873,13 @@ function closePatientModal() {
   const modal = document.querySelector("#patient-modal");
   if (!modal) return;
 
+  if (modal.contains(document.activeElement)) {
+    if (patientModalReturnFocus?.isConnected && !modal.contains(patientModalReturnFocus)) {
+      patientModalReturnFocus.focus();
+    }
+    if (modal.contains(document.activeElement)) document.activeElement.blur();
+  }
+  patientModalReturnFocus = null;
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
   editingPatient = null;
