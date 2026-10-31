@@ -795,9 +795,16 @@ async function connectToCloud() {
       supabaseClient.from('appointment_notes').select('*'),
       supabaseClient.from('blocked_slots').select('*')
     ]);
-    const firstError = [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult]
+    // Pacientes y citas son la agenda base: si alguno falla no se muestra una
+    // copia incompleta. Las demás consultas dependen del rol (por ejemplo,
+    // cobros para recepción/administración) y no deben impedir ver la agenda.
+    const essentialError = [patientsResult, appointmentsResult]
       .map(result => result.error).find(Boolean);
-    if (firstError) throw firstError;
+    if (essentialError) throw essentialError;
+
+    const optionalError = [treatmentsResult, filesResult, paymentsResult, notesResult, blockedResult]
+      .map(result => result.error).find(Boolean);
+    if (optionalError) console.warn('Algunos datos complementarios no se pudieron cargar.', optionalError);
 
     const patientRows = patientsResult.data || [];
     const appointmentRows = appointmentsResult.data || [];
@@ -826,19 +833,19 @@ async function connectToCloud() {
     }
 
     const treatmentsByPatient = new Map();
-    (treatmentsResult.data || []).forEach(row => {
+    (treatmentsResult.error ? [] : treatmentsResult.data || []).forEach(row => {
       const list = treatmentsByPatient.get(row.patient_id) || [];
       list.push(row);
       treatmentsByPatient.set(row.patient_id, list);
     });
     const filesByPatient = new Map();
-    (filesResult.data || []).forEach(row => {
+    (filesResult.error ? [] : filesResult.data || []).forEach(row => {
       const list = filesByPatient.get(row.patient_id) || [];
       list.push(row);
       filesByPatient.set(row.patient_id, list);
     });
     const paymentsByPatient = new Map();
-    (paymentsResult.data || []).forEach(row => {
+    (paymentsResult.error ? [] : paymentsResult.data || []).forEach(row => {
       const list = paymentsByPatient.get(row.patient_id) || [];
       list.push(row);
       paymentsByPatient.set(row.patient_id, list);
@@ -861,17 +868,17 @@ async function connectToCloud() {
     });
 
     const patientsById = new Map(patients.map(patient => [patient.id, patient]));
-    const notesByAppointment = new Map((notesResult.data || []).map(note => [note.appointment_id, note]));
+    const notesByAppointment = new Map((notesResult.error ? [] : notesResult.data || []).map(note => [note.appointment_id, note]));
     rebuildAppointmentCollections(appointmentRows.map(row => rowToAppointment(row, patientsById, notesByAppointment.get(row.id))));
 
-    blockedAppointmentSlots = (blockedResult.data || []).map(row => ({
+    blockedAppointmentSlots = (blockedResult.error ? [] : blockedResult.data || []).map(row => ({
       date: row.slot_date, time: row.slot_time.slice(0, 5), count: row.places
     }));
 
     lastSyncedPatients = new Map(patients.map(patient => [patient.id, cloneDeep(patient)]));
     lastSyncedAppointments = new Map(getAppointments().map(({ appointment }) => [appointment.id, cloneDeep(appointment)]));
     lastSyncedBlockedSlots = new Map(blockedAppointmentSlots.map(slot => [`${slot.date}|${slot.time}`, cloneDeep(slot)]));
-    cloudSyncedPaymentIds = new Set((paymentsResult.data || []).map(payment => payment.id));
+    cloudSyncedPaymentIds = new Set((paymentsResult.error ? [] : paymentsResult.data || []).map(payment => payment.id));
 
     finishCloudRefresh();
   } catch (error) {
