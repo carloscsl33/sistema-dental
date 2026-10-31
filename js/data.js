@@ -1,22 +1,14 @@
-let restoringFromStorage = false;
-function restoreLastSavedState() {
-  if (restoringFromStorage) return;
-  restoringFromStorage = true;
-  try {
-    if (isCloudConnected() && lastSyncedPatients.size) {
-      patients = Array.from(lastSyncedPatients.values()).map(cloneDeep);
-      rebuildAppointmentCollections(
-        Array.from(lastSyncedAppointments.values()).map(cloneDeep),
-      );
-      cachePatientsLocally();
-      cacheAppointmentsLocally();
-    } else {
-      initializeStorage();
-    }
-    renderLists();
-  } finally {
-    restoringFromStorage = false;
-  }
+function restoreLastCloudSnapshot() {
+  if (!isCloudConnected()) return;
+  patients = Array.from(lastSyncedPatients.values()).map(cloneDeep);
+  rebuildAppointmentCollections(
+    Array.from(lastSyncedAppointments.values()).map(cloneDeep),
+  );
+  blockedAppointmentSlots = Array.from(lastSyncedBlockedSlots.values()).map(
+    cloneDeep,
+  );
+  renderLists();
+  renderDashboardCalendar();
 }
 
 function saveToStorage(key, value) {
@@ -26,10 +18,17 @@ function saveToStorage(key, value) {
   } catch (error) {
     console.error(`No se pudo guardar ${key}:`, error);
     showToast(
-      "No se pudieron guardar los cambios. Se restauró el último estado guardado.",
+      "No se pudo guardar una copia local. Tus datos siguen protegidos en la nube.",
     );
-    setTimeout(restoreLastSavedState, 0);
     return false;
+  }
+}
+
+function removeFromStorage(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    console.warn(`No se pudo limpiar ${key}:`, error);
   }
 }
 
@@ -612,7 +611,7 @@ function syncPatientAppointmentReferences() {
 }
 
 function initializeStorage() {
-  localStorage.removeItem(LEGACY_APPOINTMENTS_STORAGE_KEY);
+  removeFromStorage(LEGACY_APPOINTMENTS_STORAGE_KEY);
   patients = loadPatients();
   loadAppointments();
   loadBlockedAppointmentSlots();
@@ -904,7 +903,7 @@ async function syncPatientsToCloud() {
   } catch (error) {
     console.error("No se pudo sincronizar con Supabase (pacientes):", error);
     showToast(describeCloudError(error));
-    restoreLastSavedState();
+    restoreLastCloudSnapshot();
   }
 }
 
@@ -961,7 +960,7 @@ async function syncAppointmentsToCloud() {
   } catch (error) {
     console.error("No se pudo sincronizar con Supabase (citas):", error);
     showToast(describeCloudError(error));
-    restoreLastSavedState();
+    restoreLastCloudSnapshot();
   }
 }
 
@@ -1241,9 +1240,9 @@ function disconnectFromCloud() {
   lastSyncedAppointments = new Map();
   lastSyncedBlockedSlots = new Map();
   cloudSyncedPaymentIds = new Set();
-  localStorage.removeItem(PATIENTS_STORAGE_KEY);
-  localStorage.removeItem(APPOINTMENTS_STORAGE_KEY);
-  localStorage.removeItem(BLOCKED_SLOTS_STORAGE_KEY);
+  removeFromStorage(PATIENTS_STORAGE_KEY);
+  removeFromStorage(APPOINTMENTS_STORAGE_KEY);
+  removeFromStorage(BLOCKED_SLOTS_STORAGE_KEY);
   renderLists();
 }
 
