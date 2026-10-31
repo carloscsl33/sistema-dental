@@ -1063,13 +1063,16 @@ async function connectToCloud() {
         .order("sort_order"),
       supabaseClient.from("treatment_catalog").select("*").order("sort_order"),
     ]);
-    const firstError = [
-      patientsResult,
+    const essentialError = [patientsResult, appointmentsResult]
+      .map((result) => result.error)
+      .find(Boolean);
+    if (essentialError) throw essentialError;
+
+    const optionalResults = [
       clinicalResult,
       treatmentsResult,
       filesResult,
       paymentsResult,
-      appointmentsResult,
       notesResult,
       blockedResult,
       settingsResult,
@@ -1077,10 +1080,14 @@ async function connectToCloud() {
       closuresResult,
       reasonsResult,
       catalogResult,
-    ]
-      .map((result) => result.error)
-      .find(Boolean);
-    if (firstError) throw firstError;
+    ];
+    const optionalError = optionalResults.map((result) => result.error).find(Boolean);
+    if (optionalError) {
+      console.warn(
+        "Algunos datos complementarios no se pudieron cargar; se mostrará la agenda disponible.",
+        optionalError,
+      );
+    }
     applyClinicConfiguration(
       settingsResult.data,
       hoursResult.data || [],
