@@ -1099,6 +1099,7 @@ async function connectToCloud() {
     const patientRows = patientsResult.data || [];
     const appointmentRows = appointmentsResult.data || [];
     document.documentElement.dataset.cloudSync = `received-${patientRows.length}-${appointmentRows.length}`;
+    document.documentElement.dataset.cloudCounts = `${patientRows.length}-${appointmentRows.length}`;
 
     if (!appointmentRows.length) applyEmptyCloudAppointments();
 
