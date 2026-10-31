@@ -1,4 +1,4 @@
-const CACHE = "dental-shell-v19";
+const CACHE = "dental-shell-v20";
 const SHELL = [
   "./",
   "index.html",

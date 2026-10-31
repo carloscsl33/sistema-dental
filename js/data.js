@@ -1014,6 +1014,7 @@ async function syncBlockedSlotsToCloud() {
 
 async function connectToCloud() {
   if (!isCloudConnected()) return;
+  document.documentElement.dataset.cloudSync = "loading";
   try {
     const clinicalQueries = canAccessClinicalRecords()
       ? [
@@ -1097,6 +1098,7 @@ async function connectToCloud() {
 
     const patientRows = patientsResult.data || [];
     const appointmentRows = appointmentsResult.data || [];
+    document.documentElement.dataset.cloudSync = `received-${patientRows.length}-${appointmentRows.length}`;
 
     if (!appointmentRows.length) applyEmptyCloudAppointments();
 
@@ -1208,8 +1210,10 @@ async function connectToCloud() {
     );
 
     finishCloudRefresh();
+    document.documentElement.dataset.cloudSync = "ready";
   } catch (error) {
     console.error("No se pudo cargar los datos de Supabase:", error);
+    document.documentElement.dataset.cloudSync = `error-${String(error?.message || error).slice(0, 120)}`;
     showToast(
       "No se pudieron cargar los datos de la nube. Mostrando la última copia guardada en este dispositivo.",
     );
