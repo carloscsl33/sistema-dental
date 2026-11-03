@@ -53,6 +53,7 @@ async function handleSession(session) {
       cloudSessionReady = true;
       applyAuthState(session);
       await connectToCloud();
+      await loadClinicConfiguration().catch(error => console.warn('No se pudo cargar la configuración de la clínica.', error));
       return;
     }
     applyAuthState(session);

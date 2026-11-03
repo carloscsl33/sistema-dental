@@ -68,6 +68,7 @@
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
       <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></i>Pacientes</a>
       <a class="nav-item" href="#administrar" data-page-link="administrar" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Administrar</a>
+      <a class="nav-item" href="#configuracion" data-page-link="configuracion" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Configuración</a>
     </nav>
     <div class="sidebar-footer">
       <div class="profile">
@@ -91,6 +92,7 @@
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
       <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></i>Pacientes</a>
       <a class="nav-item" href="#administrar" data-page-link="administrar" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Administrar</a>
+      <a class="nav-item" href="#configuracion" data-page-link="configuracion" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Configuración</a>
     </div>
     <div class="mobile-navigation-footer">
       <small class="mobile-navigation-status session-status" id="mobile-session-status">Sesión no iniciada</small>
@@ -204,6 +206,29 @@
         </div>
       </section>
     </section>
+    <section class="app-page" id="page-configuracion" data-roles="admin" hidden>
+      <header class="page-module-heading"><h2>Configuración del sistema</h2></header>
+      <form class="card settings-form" id="clinic-settings-form">
+        <header class="card-head settings-card-head"><div><h2>Información y agenda</h2><p>Datos de la clínica y reglas de disponibilidad para las citas.</p></div></header>
+        <section class="settings-section"><h3>Datos de la clínica</h3><div class="form-grid">
+          <label>Nombre de la clínica:<input name="clinic_name" maxlength="120" required></label>
+          <label>Responsable:<input name="responsible_name" maxlength="120"></label>
+          <label>Teléfono:<input name="phone" maxlength="30"></label>
+          <label>Correo:<input name="email" type="email" maxlength="254"></label>
+          <label class="full-width">Dirección:<input name="address" maxlength="250"></label>
+        </div></section>
+        <section class="settings-section"><h3>Reglas de agenda</h3><div class="form-grid">
+          <label>Duración por horario:<select name="slot_minutes"><option value="15">15 minutos</option><option value="20">20 minutos</option><option value="30">30 minutos</option><option value="45">45 minutos</option><option value="60">60 minutos</option></select></label>
+          <label>Pacientes por horario:<input name="slot_capacity" type="number" min="1" max="12" required></label>
+        </div></section>
+        <section class="settings-section"><h3>Horario de atención</h3><p class="field-help">Se aplica a citas nuevas o modificadas; el historial no cambia.</p><div id="business-hours-list" class="business-hours-list"></div></section>
+        <div class="settings-actions"><button class="new-button" type="submit">Guardar configuración</button></div>
+      </form>
+      <div class="settings-catalogs">
+        <section class="card settings-catalog-card"><header class="card-head"><div><h2>Motivos de cita</h2><p>Agrega o desactiva motivos de cita.</p></div></header><ul id="appointment-reasons-list" class="catalog-list"></ul><form id="catalog-reason-form" class="catalog-add"><input id="new-appointment-reason" maxlength="32" placeholder="Nuevo motivo"><button class="new-button" type="submit">Agregar</button></form></section>
+        <section class="card settings-catalog-card"><header class="card-head"><div><h2>Tratamientos</h2><p>Agrega o desactiva tratamientos.</p></div></header><ul id="treatment-catalog-list" class="catalog-list"></ul><form id="catalog-treatment-form" class="catalog-add"><input id="new-treatment-catalog" maxlength="120" placeholder="Nuevo tratamiento"><button class="new-button" type="submit">Agregar</button></form></section>
+      </div>
+    </section>
   </main>
 
   <div class="modal-backdrop" id="appointment-modal" aria-hidden="true">
@@ -236,7 +261,8 @@
       <label>Costo de la cita*
         <input id="modal-amount" type="number" min="0" max="1000000" step="0.01" placeholder="$0.00" required>
       </label>
-      <label>Fecha*<input id="modal-date" type="date" required></label>
+      <div class="appointment-schedule">
+      <fieldset class="appointment-calendar-field"><legend>Fecha*</legend><input id="modal-date" type="date" tabindex="-1" aria-hidden="true"><div class="appointment-calendar-header"><button type="button" class="appointment-calendar-nav" data-appointment-calendar-month="-1" aria-label="Mes anterior">‹</button><strong id="appointment-calendar-title"></strong><button type="button" class="appointment-calendar-nav" data-appointment-calendar-month="1" aria-label="Mes siguiente">›</button></div><div class="appointment-calendar-weekdays" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div><div class="appointment-calendar-days" id="appointment-calendar-days"></div><small class="field-help" id="appointment-calendar-help" aria-live="polite"></small></fieldset>
       <fieldset class="appointment-time-field">
         <legend>Hora*</legend>
         <select id="modal-time" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
@@ -250,6 +276,7 @@
         </div>
         <small class="field-help" id="modal-time-help" aria-live="polite">Cada horario admite hasta 3 pacientes.</small>
       </fieldset>
+      </div>
       <div class="appointment-notes-actions appointment-form-actions">
         <button class="modal-primary-button" id="confirm-appointment" type="submit">Guardar cita</button>
         <button class="modal-secondary-button" id="appointment-no-schedule" type="button">No agendar cita</button>
@@ -396,6 +423,7 @@
   <script src="js/state.js?v=20261020-2"></script>
   <script src="js/utils.js?v=20261020-2"></script>
   <script src="js/access.js?v=20261102-admin-1"></script>
+  <script src="js/settings.js?v=20261103-settings-1"></script>
   <script src="js/data.js?v=20261102-cloud-1"></script>
   <script src="js/appointments.js?v=20261022-1"></script>
   <script src="js/calendar.js?v=20261021-1"></script>

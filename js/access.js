@@ -11,7 +11,7 @@ function getCurrentRole() { return currentAccess.role; }
 function hasRole(...roles) { return roles.includes(currentAccess.role); }
 
 function canAccessPage(page) {
-  return page !== 'administrar' || hasRole('admin');
+  return !['administrar', 'configuracion'].includes(page) || hasRole('admin');
 }
 
 function applyRoleAccess() {

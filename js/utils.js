@@ -84,9 +84,17 @@ function toInputTime(timeValue) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
-function createAppointmentTimeSlots() {
+function createAppointmentTimeSlots(date = getISODate(0)) {
+  const weekday = new Date(`${date}T12:00:00`).getDay();
+  const configuredHours = businessHours.find(item => Number(item.day_of_week) === weekday);
+  if (configuredHours && !configuredHours.is_open) return [];
+  const opening = String(configuredHours?.opens_at || '09:00').slice(0, 5).split(':').map(Number);
+  const closing = String(configuredHours?.closes_at || '19:00').slice(0, 5).split(':').map(Number);
+  const slotMinutes = Number(clinicSettings.slot_minutes) || 30;
+  const start = opening[0] * 60 + opening[1];
+  const end = closing[0] * 60 + closing[1];
   const slots = [];
-  for (let minutes = 9 * 60; minutes <= 19 * 60; minutes += 30) {
+  for (let minutes = start; minutes <= end; minutes += slotMinutes) {
     slots.push(`${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`);
   }
   return slots;

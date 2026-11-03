@@ -167,6 +167,7 @@ document.addEventListener('click', async event => {
     const dateInput = document.querySelector('#modal-date');
     const timeInput = document.querySelector('#modal-time');
     if (dateInput) dateInput.value = date;
+    renderAppointmentCalendar(true);
     refreshAppointmentTimeSlots(time);
     if (timeInput) timeInput.value = time;
     return;
@@ -525,6 +526,30 @@ document.addEventListener('click', async event => {
     if (document.body.classList.contains('mobile-nav-open')) setMobileNavigation(false);
     return;
   }
+
+  const appointmentCalendarMonth = event.target.closest('[data-appointment-calendar-month]');
+  if (appointmentCalendarMonth) {
+    const daysHost = document.querySelector('#appointment-calendar-days');
+    const direction = Number(appointmentCalendarMonth.dataset.appointmentCalendarMonth);
+    const [year, month] = (daysHost?.dataset.month || '').split('-').map(Number);
+    if (!daysHost || !year || !month || ![-1, 1].includes(direction)) return;
+    const nextMonth = new Date(year, month - 1 + direction, 1, 12);
+    const currentMonth = new Date(getISODate(0).slice(0, 7) + '-01T12:00:00');
+    if (nextMonth < currentMonth) return;
+    daysHost.dataset.month = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}`;
+    renderAppointmentCalendar();
+    return;
+  }
+
+  const appointmentCalendarDay = event.target.closest('[data-appointment-date]');
+  if (appointmentCalendarDay && !appointmentCalendarDay.disabled) {
+    const dateInput = document.querySelector('#modal-date');
+    if (!dateInput) return;
+    dateInput.value = appointmentCalendarDay.dataset.appointmentDate;
+    renderAppointmentCalendar();
+    refreshAppointmentTimeSlots(document.querySelector('#modal-time')?.value || '');
+    return;
+  }
 });
 
 document.addEventListener('change', event => {
@@ -554,6 +579,7 @@ document.addEventListener('change', event => {
   }
 
   if (event.target.matches('#modal-date')) {
+    renderAppointmentCalendar();
     refreshAppointmentTimeSlots(document.querySelector('#modal-time')?.value || '');
     return;
   }

@@ -3442,10 +3442,56 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .admin-user-modal { width: min(480px, calc(100vw - 30px)); }
 .admin-user-actions { margin-top: 6px; }
 
+.page-module-heading { margin: 8px 0 22px; }
+.page-module-heading h2 { margin: 4px 0 6px; color: var(--ink); font: 800 24px "Nunito Sans", sans-serif; }
+.settings-form { padding: 0 24px 22px; }
+.settings-card-head { margin: 0 -24px; padding: 20px 20px 18px; border-bottom: 1px solid var(--line); }
+.settings-section { padding: 22px 0; border-bottom: 1px solid var(--line); }
+.settings-section h3 { margin: 0 0 14px; color: var(--ink); font: 800 15px "Nunito Sans", sans-serif; }
+.settings-section .field-help { margin: -6px 0 16px; }
+#clinic-settings-form .form-grid > label { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 0 12px; min-width: 0; color: #617088; font-size: 12px; font-weight: 700; }
+.business-hours-list { display: grid; gap: 8px; max-width: 720px; }
+.hours-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(116px, .72fr) 14px minmax(116px, .72fr); align-items: center; gap: 10px; }
+.hours-day-toggle { display: flex; align-items: center; gap: 8px; color: #53637b; font-size: 13px; font-weight: 700; }
+.hours-row input { min-width: 0; }
+.hours-separator { color: var(--muted); text-align: center; }
+.settings-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+.settings-catalogs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+.settings-catalog-card { display: flex; min-height: 270px; flex-direction: column; }
+.settings-catalog-card .card-head { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.catalog-list { flex: 1; list-style: none; padding: 0; margin: 14px 0; display: grid; align-content: start; gap: 0; }
+.catalog-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eef2f5; color: #53637b; font-size: 13px; }
+.catalog-status-button { min-width: 76px; min-height: 32px; padding: 6px 10px; border: 1px solid #dfe6ed; border-radius: 7px; background: #fff; color: #617088; font: 700 11px "Nunito Sans", sans-serif; cursor: pointer; }
+.catalog-status-button.is-active { border-color: #bee8e4; background: #e8f8f6; color: #15827c; }
+.catalog-status-button.is-inactive { background: #f7f9fb; color: #71809a; }
+.catalog-add { display: flex; gap: 9px; padding-top: 4px; }
+.catalog-add input { min-width: 0; flex: 1; }
+
+.appointment-schedule { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); align-items: start; gap: 20px; margin-top: 16px; }
+.appointment-calendar-field, .appointment-time-field { min-width: 0; margin: 0; padding: 0; border: 0; }
+.appointment-calendar-field legend, .appointment-time-field legend { margin-bottom: 10px; color: #617088; font-size: 12px; font-weight: 700; }
+#appointment-form #modal-date { position: absolute; width: 1px; height: 1px; min-height: 0; margin: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+.appointment-calendar-header { display: grid; grid-template-columns: 34px minmax(0, 1fr) 34px; align-items: center; gap: 8px; margin-bottom: 10px; }
+.appointment-calendar-header strong { color: var(--ink); font-size: 13px; text-align: center; text-transform: capitalize; }
+.appointment-calendar-nav { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid #e0e6ed; border-radius: 8px; background: #fff; color: #53637b; font-size: 23px; line-height: 1; cursor: pointer; }
+.appointment-calendar-nav:disabled { opacity: .4; cursor: not-allowed; }
+.appointment-calendar-weekdays, .appointment-calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+.appointment-calendar-weekdays { margin-bottom: 5px; }
+.appointment-calendar-weekdays span { color: #8a98ac; font-size: 10px; font-weight: 700; text-align: center; }
+.appointment-calendar-day { display: grid; min-width: 0; aspect-ratio: 1; place-items: center; padding: 0; border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--ink); font-size: 12px; cursor: pointer; }
+.appointment-calendar-day:hover:not(:disabled):not(.is-selected) { border-color: #bfe8e3; background: #f2fbfa; }
+.appointment-calendar-day.is-today { border-color: #bfe8e3; color: #147e78; font-weight: 700; }
+.appointment-calendar-day.is-selected { border-color: var(--teal); background: var(--teal); color: #fff; font-weight: 800; }
+.appointment-calendar-day:disabled { color: #c1c9d3; cursor: not-allowed; }
+.appointment-calendar-field .field-help { display: block; min-height: 30px; margin-top: 8px; color: #7b899d; font-size: 10px; font-weight: 500; }
+
 @media (max-width: 640px) {
   .admin-header { align-items: stretch; flex-direction: column; }
   .admin-header .new-button { width: 100%; }
   .admin-users-table { min-width: 640px; }
+  .settings-catalogs, .appointment-schedule { grid-template-columns: 1fr; }
+  .hours-row { grid-template-columns: minmax(120px, 1fr) minmax(96px, .72fr) 12px minmax(96px, .72fr); gap: 6px; }
+  #clinic-settings-form .form-grid > label { grid-template-columns: 1fr; gap: 6px; }
 }
 
 @media (max-width: 480px) {

@@ -708,7 +708,7 @@ function createClinicalServiceRow(service = {}, removable = false) {
       <label>Tratamiento / servicio*
         <select class="clinical-service-select" aria-label="Tratamiento o servicio" required>
           <option value="">Seleccionar tratamiento</option>
-          ${CLINICAL_SERVICE_OPTIONS.map(option => `<option value="${escapeHTML(option)}">${escapeHTML(option)}</option>`).join('')}
+          ${getTreatmentCatalogOptions().map(option => `<option value="${escapeHTML(option)}">${escapeHTML(option)}</option>`).join('')}
         </select>
       </label>
       ${removable ? '<button type="button" class="clinical-service-remove outline-button" aria-label="Quitar servicio">Quitar</button>' : ''}
@@ -726,7 +726,7 @@ function createClinicalServiceRow(service = {}, removable = false) {
   const customInput = row.querySelector('.clinical-service-custom-input');
   const diagnosis = row.querySelector('.clinical-service-diagnosis');
   const serviceName = String(service.tratamiento || '');
-  if (serviceName && CLINICAL_SERVICE_OPTIONS.includes(serviceName)) {
+  if (serviceName && getTreatmentCatalogOptions().includes(serviceName)) {
     select.value = serviceName;
   } else if (serviceName) {
     select.value = 'Otro...';

@@ -6,7 +6,8 @@ const pages = {
   centro: ['Centro de Mando'],
   citas: ['Citas'],
   pacientes: ['Pacientes'],
-  administrar: ['Administrar']
+  administrar: ['Administrar'],
+  configuracion: ['Configuración']
 };
 
 const MONTH_NAMES = [
@@ -30,7 +31,16 @@ const APPOINTMENTS_STORAGE_KEY = 'dentalClinicAppointments';
 
 const BLOCKED_SLOTS_STORAGE_KEY = 'dentalClinicBlockedAppointmentSlots';
 
-const MAX_PATIENTS_PER_SLOT = 3;
+let MAX_PATIENTS_PER_SLOT = 3;
+
+let clinicSettings = {
+  clinic_name: 'Thera-dent',
+  slot_minutes: 30,
+  slot_capacity: 3
+};
+let businessHours = [];
+let appointmentReasons = [];
+let treatmentCatalog = [];
 
 const ALLOWED_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'doc', 'docx'];
 
