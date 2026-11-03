@@ -16,13 +16,12 @@ function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
 }
 
-function isValidBackup(backup: unknown): backup is { format: string; version: number; tables: Record<string, unknown[]> } {
+function isValidBackup(backup: unknown): backup is { format: string; version: number; tables: Record<string, unknown> } {
   if (!backup || typeof backup !== "object") return false;
-  const candidate = backup as { format?: string; version?: number; tables?: Record<string, unknown[]> };
+  const candidate = backup as { format?: string; version?: number; tables?: Record<string, unknown> };
   return candidate.format === "theradent-backup"
     && candidate.version === 1
-    && Boolean(candidate.tables)
-    && tables.every(table => Array.isArray(candidate.tables[table]));
+    && Boolean(candidate.tables);
 }
 
 Deno.serve(async req => {
@@ -70,8 +69,9 @@ Deno.serve(async req => {
 
     const backup = body.backup;
     if (!isValidBackup(backup)) return json({ error: "invalid_backup" }, 400);
-    if (body.action === "reset" && body.confirmation !== "BORRAR TODO") return json({ error: "confirmation_required" }, 400);
-    if (body.action === "restore" && body.confirmation !== "RESTABLECER TODO") return json({ error: "confirmation_required" }, 400);
+    const confirmation = String(body.confirmation || "").trim().toUpperCase();
+    if (body.action === "reset" && confirmation !== "BORRAR TODO") return json({ error: "confirmation_required" }, 400);
+    if (body.action === "restore" && confirmation !== "RESTABLECER TODO") return json({ error: "confirmation_required" }, 400);
     if (!["restore", "reset"].includes(body.action)) return json({ error: "invalid_action" }, 400);
 
     const deleteColumn: Record<string, string> = {
@@ -94,7 +94,7 @@ Deno.serve(async req => {
 
     if (body.action === "restore") {
       for (const table of tables) {
-        let rows = backup.tables[table];
+        let rows = Array.isArray(backup.tables[table]) ? backup.tables[table] : [];
         if (table === "patients") rows = rows.map(({ full_name, ...row }: Record<string, unknown>) => row);
         if (!rows.length) continue;
         const { error } = await admin.from(table).insert(rows);

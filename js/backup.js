@@ -7,7 +7,17 @@ async function runSystemMaintenance(action, payload = {}) {
   const { data, error } = await supabaseClient.functions.invoke('system-maintenance', {
     body: { action, ...payload }
   });
-  if (error || data?.error) throw new Error(data?.error || error?.message || 'No se pudo completar la operación.');
+  if (error) {
+    let message = '';
+    try {
+      const details = await error.context?.clone?.().json();
+      message = details?.error || '';
+    } catch (_) {
+      // La respuesta no siempre contiene JSON; se utiliza el mensaje seguro de respaldo.
+    }
+    throw new Error(message || error.message || 'No se pudo completar la operación.');
+  }
+  if (data?.error) throw new Error(data.error);
   return data;
 }
 
