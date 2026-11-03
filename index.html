@@ -229,6 +229,15 @@
         <section class="card settings-catalog-card"><header class="card-head"><div><h2>Motivos de cita</h2><p>Agrega o desactiva motivos de cita.</p></div></header><ul id="appointment-reasons-list" class="catalog-list"></ul><form id="catalog-reason-form" class="catalog-add"><input id="new-appointment-reason" maxlength="32" placeholder="Nuevo motivo"><button class="new-button" type="submit">Agregar</button></form></section>
         <section class="card settings-catalog-card"><header class="card-head"><div><h2>Tratamientos</h2><p>Agrega o desactiva tratamientos.</p></div></header><ul id="treatment-catalog-list" class="catalog-list"></ul><form id="catalog-treatment-form" class="catalog-add"><input id="new-treatment-catalog" maxlength="120" placeholder="Nuevo tratamiento"><button class="new-button" type="submit">Agregar</button></form></section>
       </div>
+      <section class="card settings-maintenance">
+        <header class="card-head"><div><h2>Copias de seguridad</h2><p>Descarga un respaldo completo o recupera la información desde una copia previa.</p></div></header>
+        <p class="field-help">Solo las cuentas administradoras pueden usar estas opciones. Restaurar o reiniciar reemplaza la información actual.</p>
+        <div class="settings-actions settings-maintenance-actions">
+          <button class="new-button" type="button" id="backup-download">Descargar copia de seguridad</button>
+          <label class="outline-button backup-upload-label" for="backup-restore-file">Restaurar desde archivo<input type="file" id="backup-restore-file" accept="application/json,.json" hidden></label>
+          <button class="outline-button danger-button" type="button" id="system-reset">Restablecer datos clínicos</button>
+        </div>
+      </section>
     </section>
   </main>
 
@@ -453,6 +462,7 @@
   <script src="js/patients.js?v=20261102-cloud-1"></script>
   <script src="js/qr.js?v=20261103-qr-1"></script>
   <script src="js/patient-qr.js?v=20261103-qr-1"></script>
+  <script src="js/backup.js?v=20261103-backup-1"></script>
   <script src="js/events.js?v=20261102-cloud-1"></script>
   <script src="js/admin.js?v=20261102-admin-1"></script>
   <script src="js/main.js?v=20261020-2"></script>

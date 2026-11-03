@@ -365,9 +365,8 @@ function renderPatientDirectory(query = '') {
         <strong>${escapeHTML(item.name)}</strong>
         <small>${escapeHTML(item.patient?.telefono || `${item.appointments.length} ${item.appointments.length === 1 ? 'cita' : 'citas'}`)}</small>
       </span>
-      <span class="patient-list-arrow" aria-hidden="true">›</span>
       </button>
-      ${item.patient ? `<span class="patient-list-actions"><button type="button" class="patient-list-action" data-edit-patient="${escapeHTML(item.patient.id)}">Editar</button><button type="button" class="patient-list-action is-danger" data-delete-patient="${escapeHTML(item.patient.id)}">Eliminar</button></span>` : ''}
+      ${item.patient ? `<span class="patient-list-actions"><button type="button" class="row-action" data-patient-qr="${escapeHTML(item.patient.id)}">Tarjeta QR</button><button type="button" class="row-action appointment-edit-button" data-edit-patient="${escapeHTML(item.patient.id)}">Editar</button><button type="button" class="row-action delete-action" data-delete-patient="${escapeHTML(item.patient.id)}">Eliminar</button></span>` : ''}
     </article>
   `).join('') : `<p class="empty-state">No se encontraron pacientes.</p>`;
 }
@@ -558,9 +557,6 @@ function showPatientDetails(ref) {
       <button type="button" class="patient-back-button" data-patient-back aria-label="Volver al directorio">‹</button>
       <span class="patient-details-avatar">${escapeHTML(getInitials(fullName))}</span>
       <div><span class="eyebrow">EXPEDIENTE</span><h2>${escapeHTML(fullName)}</h2></div>
-      ${patient.id ? `<div class="patient-details-actions">
-        <button type="button" class="row-action" data-patient-qr="${escapeHTML(patient.id)}">Tarjeta QR</button>
-      </div>` : ''}
     </div>
     <div class="patient-detail-stats">
       <div><span>Citas registradas</span><strong>${appointments.length}</strong></div>
