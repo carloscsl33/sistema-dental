@@ -580,7 +580,7 @@ document.addEventListener('click', event => {
   }
 });
 
-document.addEventListener('submit', event => {
+document.addEventListener('submit', async event => {
   if (event.target.matches('#appointment-notes-form')) {
     event.preventDefault();
     const appointmentId = document.querySelector('#appointment-notes-id')?.value;
@@ -729,7 +729,8 @@ document.addEventListener('submit', event => {
     removeAppointmentById(appointment.id);
     addAppointmentToDateCollection(updatedAppointment);
     if (isRescheduling) rescheduleAppointmentId = null;
-    saveAppointments();
+    cacheAppointmentsLocally();
+    if (isCloudConnected() && !(await syncAppointmentsToCloud())) return;
     renderLists();
     refreshPatientDetails(patient);
     closeModal();
@@ -745,7 +746,8 @@ document.addEventListener('submit', event => {
   
   rescheduleAppointmentId = null;
   addAppointmentToDateCollection(appointment, true);
-  saveAppointments();
+  cacheAppointmentsLocally();
+  if (isCloudConnected() && !(await syncAppointmentsToCloud())) return;
   renderLists();
   refreshPatientDetails(patient);
   closeModal();

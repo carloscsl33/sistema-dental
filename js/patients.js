@@ -852,7 +852,7 @@ function clinicalRecordExists(patient, record) {
   );
 }
 
-function savePatientForm(generateAppointment = false) {
+async function savePatientForm(generateAppointment = false) {
   const wasEditing = Boolean(editingPatient);
   const oldPatientName = editingPatient ? getPatientFullName(editingPatient) : '';
   const patient = collectPatientForm();
@@ -899,17 +899,24 @@ function savePatientForm(generateAppointment = false) {
     const index = patients.findIndex(item => item.id === patient.id);
     if (index !== -1) patients[index] = patient;
     if (oldPatientName !== newPatientName) updatePatientAppointmentReferences(patient.id, oldPatientName, newPatientName);
-    showToast('Expediente actualizado correctamente.');
   } else {
     patients.push(patient);
-    showToast('Paciente registrado correctamente.');
   }
   
-  savePatients();
-  saveAppointments();
+  // Primero conserva una copia local. El mensaje de éxito sólo se muestra
+  // después de que Supabase confirma el expediente y cualquier referencia de cita.
+  cachePatientsLocally();
+  cacheAppointmentsLocally();
+  if (isCloudConnected()) {
+    const patientsSaved = await syncPatientsToCloud();
+    const appointmentsSaved = patientsSaved && await syncAppointmentsToCloud();
+    if (!patientsSaved || !appointmentsSaved) return false;
+  }
+
   renderLists();
   showPatientDetails('id:' + patient.id);
   closePatientModal();
+  showToast(wasEditing ? 'Expediente actualizado correctamente.' : 'Paciente registrado correctamente.');
   
   if (generateAppointment) {
     openModal();

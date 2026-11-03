@@ -626,14 +626,14 @@ function describeCloudError(error) {
 }
 
 async function syncPatientsToCloud() {
-  if (!isCloudConnected()) return;
+  if (!isCloudConnected()) return true;
   const currentIds = new Set(patients.map(p => p.id));
   const toDelete = Array.from(lastSyncedPatients.keys()).filter(id => !currentIds.has(id));
   const toUpsert = patients.filter(p => {
     const previous = lastSyncedPatients.get(p.id);
     return !previous || JSON.stringify(previous) !== JSON.stringify(p);
   });
-  if (!toDelete.length && !toUpsert.length) return;
+  if (!toDelete.length && !toUpsert.length) return true;
 
   try {
     for (const id of toDelete) {
@@ -698,15 +698,17 @@ async function syncPatientsToCloud() {
 
       lastSyncedPatients.set(patient.id, cloneDeep(patient));
     }
+    return true;
   } catch (error) {
     console.error('No se pudo sincronizar con Supabase (pacientes):', error);
     showToast(describeCloudError(error));
     restoreLastSavedState();
+    return false;
   }
 }
 
 async function syncAppointmentsToCloud() {
-  if (!isCloudConnected()) return;
+  if (!isCloudConnected()) return true;
   const current = getAppointments().map(({ appointment }) => appointment);
   const currentIds = new Set(current.map(a => a.id));
   const toDelete = Array.from(lastSyncedAppointments.keys()).filter(id => !currentIds.has(id));
@@ -714,7 +716,7 @@ async function syncAppointmentsToCloud() {
     const previous = lastSyncedAppointments.get(a.id);
     return !previous || JSON.stringify(previous) !== JSON.stringify(a);
   });
-  if (!toDelete.length && !toUpsert.length) return;
+  if (!toDelete.length && !toUpsert.length) return true;
 
   try {
     for (const id of toDelete) {
@@ -741,10 +743,12 @@ async function syncAppointmentsToCloud() {
       }
       lastSyncedAppointments.set(appointment.id, cloneDeep(appointment));
     }
+    return true;
   } catch (error) {
     console.error('No se pudo sincronizar con Supabase (citas):', error);
     showToast(describeCloudError(error));
     restoreLastSavedState();
+    return false;
   }
 }
 
