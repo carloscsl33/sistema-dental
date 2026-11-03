@@ -3475,7 +3475,10 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .settings-maintenance .card-head { margin: 0 -24px; padding: 20px 20px 18px; border-bottom: 1px solid var(--line); }
 .settings-maintenance .field-help { margin: 18px 0 0; }
 .settings-maintenance-actions { justify-content: flex-start; }
-.backup-upload-label { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; cursor: pointer; }
+.backup-selected-file { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 18px; padding: 12px 14px; border: 1px solid #cbeae7; border-radius: 9px; background: #f2fbfa; color: #53637b; }
+.backup-selected-file-label { color: #15827c; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.backup-selected-file strong { overflow: hidden; color: var(--ink); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+#backup-restore-file { display: none !important; }
 .danger-button { border-color: #f0c8c4; color: #b74242; }
 .danger-button:hover, .danger-button:focus-visible { border-color: #e6aca6; background: #fff4f3; color: #a73730; }
 .settings-catalogs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
@@ -3521,7 +3524,8 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .patient-list-actions .delete-action { background: #fff0f0; color: #b74242; }
 .patient-back-button { display: inline-grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; margin: 0 2px 0 0; padding: 0; border: 0; background: transparent; color: #15827c; font-size: 31px; line-height: 1; cursor: pointer; }
 .patient-back-button:hover { color: #106a65; transform: translateX(-2px); }
-.patient-qr-modal { width: min(560px, 100%); max-width: 560px; padding: 28px; border: 0; border-radius: 15px; text-align: center; }
+.patient-qr-modal { position: relative; width: min(560px, 100%); max-width: 560px; padding: 28px; border: 0; border-radius: 15px; text-align: center; }
+.patient-qr-modal .modal-close { top: 14px; right: 14px; }
 .patient-qr-modal h2 { margin-bottom: 5px; }
 .patient-qr-image { display: grid; place-items: center; margin: 18px auto 8px; }
 .patient-qr-image svg { width: min(260px, 76vw); height: auto; border: 8px solid #fff; box-shadow: 0 0 0 1px var(--line); }
@@ -3544,6 +3548,8 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
   #appointment-modal .appointment-modal { width: calc(100vw - 24px); }
   .patient-list-actions { gap: 4px; }
   .patient-list-actions .row-action { min-height: 34px; }
+  .backup-selected-file { grid-template-columns: 1fr; align-items: stretch; }
+  .backup-selected-file .outline-button { width: 100%; }
 }
 
 @media (max-width: 480px) {

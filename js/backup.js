@@ -1,3 +1,5 @@
+let selectedSystemBackupFile = null;
+
 async function runSystemMaintenance(action, payload = {}) {
   if (!hasRole('admin')) throw new Error('Solo una cuenta administradora puede realizar esta acción.');
   if (!supabaseClient) throw new Error('No hay conexión con la base de datos.');
@@ -70,11 +72,18 @@ async function resetSystemData() {
 
 document.addEventListener('click', event => {
   if (event.target.closest('#backup-download')) downloadSystemBackup();
+  if (event.target.closest('#backup-restore-open')) document.querySelector('#backup-restore-file')?.click();
+  if (event.target.closest('#backup-restore-confirm') && selectedSystemBackupFile) restoreSystemBackup(selectedSystemBackupFile);
   if (event.target.closest('#system-reset')) resetSystemData();
 });
 
 document.addEventListener('change', event => {
   if (!event.target.matches('#backup-restore-file')) return;
   const file = event.target.files?.[0];
-  restoreSystemBackup(file).finally(() => { event.target.value = ''; });
+  const selection = document.querySelector('#backup-restore-selection');
+  const filename = document.querySelector('#backup-restore-filename');
+  selectedSystemBackupFile = file || null;
+  if (filename) filename.textContent = file ? file.name : '';
+  if (selection) selection.hidden = !file;
+  event.target.value = '';
 });

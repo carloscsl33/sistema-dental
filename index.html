@@ -232,9 +232,15 @@
       <section class="card settings-maintenance">
         <header class="card-head"><div><h2>Copias de seguridad</h2><p>Respalda la información de clínica, agenda y expedientes, o recupérala desde una copia previa.</p></div></header>
         <p class="field-help">Solo las cuentas administradoras pueden usar estas opciones. Restaurar o reiniciar reemplaza la información actual.</p>
+        <div class="backup-selected-file" id="backup-restore-selection" hidden aria-live="polite">
+          <span class="backup-selected-file-label">Archivo seleccionado</span>
+          <strong id="backup-restore-filename"></strong>
+          <button class="outline-button" type="button" id="backup-restore-confirm">Restaurar esta copia</button>
+        </div>
         <div class="settings-actions settings-maintenance-actions">
           <button class="new-button" type="button" id="backup-download">Descargar copia de seguridad</button>
-          <label class="outline-button backup-upload-label" for="backup-restore-file">Restaurar desde archivo<input type="file" id="backup-restore-file" accept="application/json,.json" hidden></label>
+          <button class="outline-button" type="button" id="backup-restore-open">Restaurar desde archivo</button>
+          <input type="file" id="backup-restore-file" accept="application/json,.json" hidden>
           <button class="outline-button danger-button" type="button" id="system-reset">Restablecer datos clínicos</button>
         </div>
       </section>
