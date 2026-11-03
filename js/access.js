@@ -4,7 +4,7 @@ const ROLE_LABELS = {
   doctor: 'Doctor/a'
 };
 
-let currentAccess = { role: null, status: null, fullName: '' };
+let currentAccess = { id: null, role: null, status: null, fullName: '' };
 
 function getCurrentRole() { return currentAccess.role; }
 
@@ -35,13 +35,13 @@ async function loadCurrentAccess(session) {
     .eq('id', session.user.id)
     .maybeSingle();
   if (error || !data || data.status !== 'approved' || !ROLE_LABELS[data.role]) return null;
-  currentAccess = { role: data.role, status: data.status, fullName: data.full_name || '' };
+  currentAccess = { id: session.user.id, role: data.role, status: data.status, fullName: data.full_name || '' };
   applyRoleAccess();
   return currentAccess;
 }
 
 function clearCurrentAccess() {
-  currentAccess = { role: null, status: null, fullName: '' };
+  currentAccess = { id: null, role: null, status: null, fullName: '' };
   document.documentElement.dataset.role = '';
 }
 

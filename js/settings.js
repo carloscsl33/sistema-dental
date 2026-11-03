@@ -70,7 +70,7 @@ document.addEventListener('submit', async event => {
     event.preventDefault();
     const form = event.target;
     const values = Object.fromEntries(new FormData(form));
-    const settings = { id: true, clinic_name: values.clinic_name.trim(), responsible_name: values.responsible_name.trim(), phone: values.phone.trim(), email: values.email.trim(), address: values.address.trim(), slot_minutes: Number(values.slot_minutes), slot_capacity: Number(values.slot_capacity) };
+    const settings = { id: true, clinic_name: values.clinic_name.trim(), responsible_name: values.responsible_name.trim(), phone: values.phone.trim(), email: values.email.trim(), address: values.address.trim(), slot_minutes: Number(values.slot_minutes), slot_capacity: Number(values.slot_capacity), updated_by: currentAccess.id };
     try {
       const [settingsResult, hoursResult] = await Promise.all([supabaseClient.from('clinic_settings').upsert(settings), supabaseClient.from('business_hours').upsert(getConfigurationHours(form), { onConflict: 'day_of_week' })]);
       if (settingsResult.error || hoursResult.error) throw settingsResult.error || hoursResult.error;
