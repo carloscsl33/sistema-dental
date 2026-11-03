@@ -44,8 +44,13 @@ async function handleSession(session) {
   if (passwordRecoveryActive) return applyAuthState(null);
   if (session) {
     if (!cloudSessionReady) {
+      const access = await loadCurrentAccess(session);
+      if (!access) {
+        setAuthMessage('#auth-message', 'Tu cuenta no tiene acceso activo. Comunícate con la administración de la clínica.');
+        await supabaseClient.auth.signOut({ scope: 'local' });
+        return;
+      }
       cloudSessionReady = true;
-      // La sesión ya es válida: liberar la interfaz antes de cualquier diálogo de sincronización.
       applyAuthState(session);
       await connectToCloud();
       return;
@@ -56,6 +61,7 @@ async function handleSession(session) {
       cloudSessionReady = false;
       disconnectFromCloud();
     }
+    clearCurrentAccess();
     applyAuthState(null);
   }
 }

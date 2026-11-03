@@ -583,6 +583,10 @@ function updateAppointmentStatus(appointmentId, status) {
 
 function changePage(page, appointmentFilter = null) {
   if (!pages[page]) return;
+  if (!canAccessPage(page)) {
+    showToast('No tienes permiso para acceder a este módulo.');
+    return;
+  }
 
   if (page === 'citas' && appointmentFilter) {
     activeAppointmentFilter = appointmentFilter;
@@ -598,6 +602,7 @@ function changePage(page, appointmentFilter = null) {
   
   if (page === 'pacientes') renderPatientDirectory();
   if (page === 'citas') renderAppointmentTable();
+  if (page === 'administrar') loadManagedUsers();
   
   if (!document.querySelector('#patient-modal.open') && !document.querySelector('#appointment-modal.open')) {
     window.scrollTo({ top: 0, behavior: 'smooth' });

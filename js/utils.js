@@ -17,9 +17,10 @@ function updatePageScrollLock() {
   const patientAppointmentsOpen = document.querySelector('#patient-appointments-modal')?.classList.contains('open');
   const patientOpen = document.querySelector('#patient-modal')?.classList.contains('open');
   const dailyAgendaOpen = document.querySelector('#daily-agenda-modal')?.classList.contains('open');
+  const adminUserOpen = document.querySelector('#admin-user-modal')?.classList.contains('open');
   const confirmationOpen = document.querySelector('#confirmation-modal')?.classList.contains('open');
   
-  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || confirmationOpen) {
+  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || adminUserOpen || confirmationOpen) {
     lockPageScroll();
   } else {
     unlockPageScroll();
@@ -134,13 +135,20 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
   acceptButton.textContent = confirmLabel;
   inputLabel.hidden = !input;
   inputElement.required = Boolean(input);
+  inputElement.type = input?.type || 'number';
   inputElement.value = input ? String(input.value) : '';
   inputElement.setCustomValidity('');
   if (input) {
     inputCaption.textContent = input.label;
-    inputElement.min = String(input.min);
-    inputElement.max = String(input.max);
-    inputElement.step = '1';
+    if (input.type === 'text') {
+      inputElement.removeAttribute('min');
+      inputElement.removeAttribute('max');
+      inputElement.removeAttribute('step');
+    } else {
+      inputElement.min = String(input.min);
+      inputElement.max = String(input.max);
+      inputElement.step = '1';
+    }
   } else {
     inputElement.removeAttribute('min');
     inputElement.removeAttribute('max');
@@ -161,17 +169,25 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
       document.removeEventListener('keydown', handleKeydown);
       updatePageScrollLock();
       if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) previouslyFocused.focus();
-      resolve({ confirmed, value: input ? Number(inputElement.value) : null });
+      resolve({ confirmed, value: input ? (input.type === 'text' ? inputElement.value : Number(inputElement.value)) : null });
     };
     const cancel = () => finish(false);
     const accept = () => {
       if (input) {
         inputElement.setCustomValidity('');
-        const value = Number(inputElement.value);
-        if (!Number.isInteger(value) || value < input.min || value > input.max) {
-          inputElement.setCustomValidity(`Ingresa un número del ${input.min} al ${input.max}.`);
-          inputElement.reportValidity();
-          return;
+        if (input.type === 'text') {
+          if (input.match && inputElement.value !== input.match) {
+            inputElement.setCustomValidity(`Escribe exactamente: ${input.match}`);
+            inputElement.reportValidity();
+            return;
+          }
+        } else {
+          const value = Number(inputElement.value);
+          if (!Number.isInteger(value) || value < input.min || value > input.max) {
+            inputElement.setCustomValidity(`Ingresa un número del ${input.min} al ${input.max}.`);
+            inputElement.reportValidity();
+            return;
+          }
         }
       }
       finish(true);
