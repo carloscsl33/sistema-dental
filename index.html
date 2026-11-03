@@ -117,6 +117,7 @@
           <div id="patient-search-results" class="patient-search-results" role="listbox" aria-label="Resultados de pacientes" aria-hidden="true"></div>
         </div>
         <button class="new-button" id="new-patient-dashboard" type="button">+ Nuevo paciente</button>
+        <button class="new-button" id="patient-qr-scan-open" type="button">Escanear QR</button>
         <button class="new-button" id="new-appointment" type="button">+ Nueva cita</button>
       </div>
     </header>
@@ -416,6 +417,27 @@
       <div class="appointment-notes-actions admin-user-actions"><button class="modal-secondary-button" id="admin-user-cancel" type="button">Cancelar</button><button class="modal-primary-button" type="submit">Guardar usuario</button></div>
     </form>
   </div>
+  <div class="modal-backdrop" id="patient-qr-modal" aria-hidden="true">
+    <section class="confirmation-modal patient-qr-modal" role="dialog" aria-modal="true" aria-labelledby="patient-qr-title">
+      <button type="button" class="modal-close" id="patient-qr-close" aria-label="Cerrar">×</button>
+      <h2 id="patient-qr-title">Tarjeta de paciente</h2>
+      <p id="patient-qr-name"></p>
+      <div id="patient-qr-image" class="patient-qr-image"></div>
+      <small id="patient-qr-token" class="patient-qr-token"></small>
+      <p class="field-help">Este código solo se consulta dentro de Thera-dent con una sesión autorizada.</p>
+      <button class="new-button" type="button" id="patient-qr-download">Descargar QR</button>
+    </section>
+  </div>
+  <div class="modal-backdrop" id="patient-qr-scanner" aria-hidden="true">
+    <form class="confirmation-modal" id="patient-qr-scanner-form" role="dialog" aria-modal="true" aria-labelledby="patient-qr-scanner-title">
+      <button type="button" class="modal-close" id="patient-qr-scanner-close" aria-label="Cerrar">×</button>
+      <h2 id="patient-qr-scanner-title">Abrir expediente con QR</h2>
+      <p>Escanea con la cámara, lector USB o escribe el código de la tarjeta.</p>
+      <video id="patient-qr-video" hidden playsinline muted></video>
+      <label>Código QR<input id="patient-qr-manual" autocomplete="off" autocapitalize="characters" placeholder="TD-XXXXXXXX" required></label>
+      <div class="appointment-notes-actions"><button class="outline-button" type="button" id="patient-qr-camera">Usar cámara</button><button class="new-button" type="submit">Abrir expediente</button></div>
+    </form>
+  </div>
   <div class="toast" id="toast" role="status"></div>
   <script src="js/supabase.js?v=20261020-2"></script>
   <script src="js/config.js?v=20261020-2"></script>
@@ -429,6 +451,8 @@
   <script src="js/calendar.js?v=20261021-1"></script>
   <script src="js/payments.js?v=20261020-2"></script>
   <script src="js/patients.js?v=20261102-cloud-1"></script>
+  <script src="js/qr.js?v=20261103-qr-1"></script>
+  <script src="js/patient-qr.js?v=20261103-qr-1"></script>
   <script src="js/events.js?v=20261102-cloud-1"></script>
   <script src="js/admin.js?v=20261102-admin-1"></script>
   <script src="js/main.js?v=20261020-2"></script>

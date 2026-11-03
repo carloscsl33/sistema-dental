@@ -342,7 +342,7 @@ document.addEventListener('click', async event => {
     changePage('pacientes');
     renderPatientDirectory();
     showPatientDetails(ref);
-    document.querySelectorAll('.patient-list-item').forEach(item => {
+    document.querySelectorAll('[data-select-patient]').forEach(item => {
       item.classList.toggle('selected', item.dataset.selectPatient === ref);
     });
     return;
@@ -405,9 +405,18 @@ document.addEventListener('click', async event => {
 
   if (patientItem) {
     showPatientDetails(patientItem.dataset.selectPatient);
-    document.querySelectorAll('.patient-list-item').forEach(item => {
+    document.querySelectorAll('[data-select-patient]').forEach(item => {
       item.classList.toggle('selected', item === patientItem);
     });
+    return;
+  }
+
+  if (event.target.closest('[data-patient-back]')) {
+    selectedPatientId = null;
+    const layout = document.querySelector('.patient-directory-layout');
+    const details = document.querySelector('#patient-details');
+    layout?.classList.remove('is-detail-open');
+    if (details) details.innerHTML = '<span class="large-module-icon" aria-hidden="true">♟</span><h2>Selecciona un paciente</h2><p>Su expediente, información y próximas citas aparecerán aquí.</p>';
     return;
   }
   
@@ -424,6 +433,36 @@ document.addEventListener('click', async event => {
   const editPatientBtn = event.target.closest('[data-edit-patient]');
   if (editPatientBtn) {
     openPatientModal(editPatientBtn.dataset.editPatient);
+    return;
+  }
+
+  const qrButton = event.target.closest('[data-patient-qr]');
+  if (qrButton) {
+    await openPatientQr(qrButton.dataset.patientQr);
+    return;
+  }
+
+  if (event.target.closest('#patient-qr-scan-open')) {
+    openPatientQrScanner();
+    return;
+  }
+  if (event.target.closest('#patient-qr-close')) {
+    const modal = document.querySelector('#patient-qr-modal');
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    updatePageScrollLock();
+    return;
+  }
+  if (event.target.closest('#patient-qr-download')) {
+    downloadPatientQr();
+    return;
+  }
+  if (event.target.closest('#patient-qr-scanner-close')) {
+    closePatientQrScanner();
+    return;
+  }
+  if (event.target.closest('#patient-qr-camera')) {
+    await startPatientQrCamera();
     return;
   }
 
@@ -607,6 +646,11 @@ document.addEventListener('click', event => {
 });
 
 document.addEventListener('submit', async event => {
+  if (event.target.matches('#patient-qr-scanner-form')) {
+    event.preventDefault();
+    await resolvePatientQr(document.querySelector('#patient-qr-manual')?.value);
+    return;
+  }
   if (event.target.matches('#appointment-notes-form')) {
     event.preventDefault();
     const appointmentId = document.querySelector('#appointment-notes-id')?.value;

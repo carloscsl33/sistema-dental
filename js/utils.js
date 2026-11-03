@@ -18,9 +18,11 @@ function updatePageScrollLock() {
   const patientOpen = document.querySelector('#patient-modal')?.classList.contains('open');
   const dailyAgendaOpen = document.querySelector('#daily-agenda-modal')?.classList.contains('open');
   const adminUserOpen = document.querySelector('#admin-user-modal')?.classList.contains('open');
+  const patientQrOpen = document.querySelector('#patient-qr-modal')?.classList.contains('open');
+  const patientQrScannerOpen = document.querySelector('#patient-qr-scanner')?.classList.contains('open');
   const confirmationOpen = document.querySelector('#confirmation-modal')?.classList.contains('open');
   
-  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || adminUserOpen || confirmationOpen) {
+  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || adminUserOpen || patientQrOpen || patientQrScannerOpen || confirmationOpen) {
     lockPageScroll();
   } else {
     unlockPageScroll();

@@ -358,14 +358,17 @@ function renderPatientDirectory(query = '') {
   });
   
   container.innerHTML = filteredPatients.length ? filteredPatients.map(item => `
-    <button class="patient-list-item" data-select-patient="${escapeHTML(item.patient ? 'id:' + item.patient.id : 'name:' + item.name)}">
+    <article class="patient-list-item">
       <span class="patient-list-avatar">${escapeHTML(getInitials(item.name))}</span>
+      <button type="button" class="patient-list-select" data-select-patient="${escapeHTML(item.patient ? 'id:' + item.patient.id : 'name:' + item.name)}">
       <span class="patient-list-copy">
         <strong>${escapeHTML(item.name)}</strong>
-        <small>${item.appointments.length} ${item.appointments.length === 1 ? 'cita' : 'citas'}</small>
+        <small>${escapeHTML(item.patient?.telefono || `${item.appointments.length} ${item.appointments.length === 1 ? 'cita' : 'citas'}`)}</small>
       </span>
       <span class="patient-list-arrow" aria-hidden="true">›</span>
-    </button>
+      </button>
+      ${item.patient ? `<span class="patient-list-actions"><button type="button" class="patient-list-action" data-edit-patient="${escapeHTML(item.patient.id)}">Editar</button><button type="button" class="patient-list-action is-danger" data-delete-patient="${escapeHTML(item.patient.id)}">Eliminar</button></span>` : ''}
+    </article>
   `).join('') : `<p class="empty-state">No se encontraron pacientes.</p>`;
 }
 
@@ -531,6 +534,7 @@ function showPatientDetails(ref) {
     patient = { id: null, nombre: name, apellidos: '', fechaNacimiento: '', sexo: '', telefono: '', correo: '', direccion: '', contactoEmergencia: '', parentescoEmergencia: '', telefonoEmergencia: '', antecedentesMedicos: '', alergias: '', medicamentos: '', tipoSangre: '', observacionesMedicas: '', tratamientoActual: '', diagnostico: '', fechaRegistroClinico: '', historialClinico: [], historialFinanciero: [], archivosClinicos: [] };
   }
   selectedPatientId = patient.id || null;
+  document.querySelector('.patient-directory-layout')?.classList.add('is-detail-open');
   const fullName = getPatientFullName(patient) || name;
   const outstandingBalance = appointments.reduce((sum, appointment) => {
     if (appointment.status === 'Cancelada') return sum;
@@ -551,11 +555,11 @@ function showPatientDetails(ref) {
   
   details.innerHTML = `
     <div class="patient-details-heading">
+      <button type="button" class="patient-back-button" data-patient-back aria-label="Volver al directorio">‹</button>
       <span class="patient-details-avatar">${escapeHTML(getInitials(fullName))}</span>
       <div><span class="eyebrow">EXPEDIENTE</span><h2>${escapeHTML(fullName)}</h2></div>
       ${patient.id ? `<div class="patient-details-actions">
-        <button type="button" class="row-action" data-edit-patient="${escapeHTML(patient.id)}">Editar expediente</button>
-        <button type="button" class="row-action delete-action" data-delete-patient="${escapeHTML(patient.id)}">Eliminar paciente</button>
+        <button type="button" class="row-action" data-patient-qr="${escapeHTML(patient.id)}">Tarjeta QR</button>
       </div>` : ''}
     </div>
     <div class="patient-detail-stats">
@@ -1003,7 +1007,7 @@ function openPatientRecordFromSearch(patientId) {
   renderPatientDirectory();
   const ref = 'id:' + patient.id;
   showPatientDetails(ref);
-  document.querySelectorAll('.patient-list-item').forEach(item => {
+    document.querySelectorAll('[data-select-patient]').forEach(item => {
     item.classList.toggle('selected', item.dataset.selectPatient === ref);
   });
 }

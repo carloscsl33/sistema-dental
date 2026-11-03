@@ -3485,6 +3485,32 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .appointment-calendar-day:disabled { color: #c1c9d3; cursor: not-allowed; }
 .appointment-calendar-field .field-help { display: block; min-height: 30px; margin-top: 8px; color: #7b899d; font-size: 10px; font-weight: 500; }
 
+.patient-directory-layout { display: block; }
+.patient-directory-layout:not(.is-detail-open) .patient-details { display: none; }
+.patient-directory-layout:not(.is-detail-open) .patient-list { border-right: 0; }
+.patient-directory-layout.is-detail-open .patient-list { display: none; }
+.patient-directory-layout.is-detail-open .patient-details { min-height: 430px; }
+.patient-list-item { gap: 9px; }
+.patient-list-select { display: flex; min-width: 0; flex: 1; align-items: center; gap: 11px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.patient-list-select:hover, .patient-list-select.selected { background: #eaf8f6; }
+.patient-list-actions { display: inline-flex; flex: 0 0 auto; gap: 5px; }
+.patient-list-action { min-height: 30px; padding: 5px 7px; border: 1px solid #dfe6ed; border-radius: 7px; background: #fff; color: #60708b; font: 700 10px inherit; cursor: pointer; }
+.patient-list-action:hover { border-color: #b8dedb; background: #f0fbfa; color: #167f7a; }
+.patient-list-action.is-danger:hover { border-color: #f2c4c0; background: #fff4f3; color: #bc3f36; }
+.patient-back-button { display: inline-grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; margin: 0 2px 0 0; padding: 0; border: 0; background: transparent; color: #15827c; font-size: 31px; line-height: 1; cursor: pointer; }
+.patient-back-button:hover { color: #106a65; transform: translateX(-2px); }
+.patient-qr-modal { width: min(560px, 100%); max-width: 560px; padding: 28px; border: 0; border-radius: 15px; text-align: center; }
+.patient-qr-modal h2 { margin-bottom: 5px; }
+.patient-qr-image { display: grid; place-items: center; margin: 18px auto 8px; }
+.patient-qr-image svg { width: min(260px, 76vw); height: auto; border: 8px solid #fff; box-shadow: 0 0 0 1px var(--line); }
+.patient-qr-token { display: block; margin-bottom: 14px; color: var(--muted); font-family: monospace; letter-spacing: .09em; }
+#patient-qr-video { width: 100%; max-height: 240px; margin: 0 0 14px; border: 1px solid #e0e6ed; border-radius: 9px; background: #f8fafc; object-fit: cover; }
+#patient-qr-scanner .confirmation-modal { display: grid; width: min(560px, 100%); padding: 28px; border: 0; border-radius: 15px; gap: 14px; }
+#patient-qr-scanner h2, #patient-qr-scanner p { margin: 0; }
+#patient-qr-scanner label { display: grid; gap: 7px; color: #617088; font-size: 12px; font-weight: 700; text-align: left; }
+#patient-qr-scanner input { display: block; width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #e0e6ed; border-radius: 8px; background: #fff; color: var(--ink); font: inherit; outline: none; }
+#patient-qr-scanner input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31, 167, 160, .14); }
+
 @media (max-width: 640px) {
   .admin-header { align-items: stretch; flex-direction: column; }
   .admin-header .new-button { width: 100%; }
@@ -3492,6 +3518,8 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
   .settings-catalogs, .appointment-schedule { grid-template-columns: 1fr; }
   .hours-row { grid-template-columns: minmax(120px, 1fr) minmax(96px, .72fr) 12px minmax(96px, .72fr); gap: 6px; }
   #clinic-settings-form .form-grid > label { grid-template-columns: 1fr; gap: 6px; }
+  .patient-list-actions { gap: 4px; }
+  .patient-list-action { min-height: 34px; }
 }
 
 @media (max-width: 480px) {
