@@ -1078,8 +1078,23 @@ main {
 }
 
 .managed-appointment-actions .delete-action {
+  border: 1px solid #f2c4c0;
   background: #fff0f0;
   color: #b74242;
+}
+
+.appointment-whatsapp {
+  border: 1px solid #b9e3cd;
+  border-radius: 8px;
+  background: #e9f8ef;
+  color: #218451;
+}
+
+.appointment-whatsapp:hover,
+.appointment-whatsapp:focus-visible {
+  border-color: #8dcfaf;
+  background: #ddf4e6;
+  color: #176f42;
 }
 
 .managed-appointment-actions .appointment-edit-button {
@@ -1124,10 +1139,12 @@ main {
 }
 
 .patient-financial-entry {
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .patient-financial-entry-heading,
@@ -1155,25 +1172,24 @@ main {
 }
 
 .patient-financial-entry-amounts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
 }
 
 .patient-financial-entry-amounts span {
   display: grid;
   gap: 3px;
-  padding: 9px;
-  border-radius: 8px;
-  background: #f7f9fb;
+  text-align: right;
 }
 
 .patient-financial-entry-amounts strong { color: var(--ink); font-size: 13px; }
 
 @media (max-width: 480px) {
+  .patient-financial-entry { grid-template-columns: 1fr; gap: 10px; }
   .patient-financial-entry-heading { align-items: stretch; flex-direction: column; }
-  .patient-financial-entry-amounts { grid-template-columns: 1fr; }
+  .patient-financial-entry-amounts { justify-content: space-between; gap: 8px; }
 }
 
 .patient-info-button.patient-general-add-advance {
@@ -3505,9 +3521,10 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .status-chip.is-active { background: #ecf8ed; color: #328543; }
 .status-chip.is-blocked { background: #fff0ef; color: #bd5149; }
 .admin-table-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
-.admin-action-button { min-height: 32px; padding: 6px 9px; border: 1px solid #dfe6ed; border-radius: 8px; background: #fff; color: #60708b; cursor: pointer; font: 700 11px inherit; }
-.admin-action-button:hover:not(:disabled), .admin-action-button:focus-visible { border-color: #b8dedb; background: #f0fbfa; color: #167f7a; outline: none; }
-.admin-action-button.is-danger:hover:not(:disabled), .admin-action-button.is-danger:focus-visible { border-color: #f2c4c0; background: #fff4f3; color: #bc3f36; }
+.admin-action-button { min-height: 32px; padding: 6px 9px; border: 1px solid #d8efec; border-radius: 8px; background: #e7f7f5; color: #15827c; cursor: pointer; font: 700 11px inherit; }
+.admin-action-button.appointment-edit-button { border-color: #e2e8f0; background: #fff; color: #60708b; }
+.admin-action-button.delete-action { border-color: #f2c4c0; background: #fff0f0; color: #b74242; }
+.admin-action-button:hover:not(:disabled), .admin-action-button:focus-visible { filter: brightness(.97); outline: none; }
 .admin-action-button:disabled { cursor: not-allowed; opacity: .45; }
 .admin-user-modal { width: min(480px, calc(100vw - 30px)); }
 .admin-user-actions { margin-top: 6px; }
@@ -3523,7 +3540,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .finance-modal textarea { min-height: 82px; resize: vertical; }
 .finance-filters input:focus, .finance-filters select:focus, .finance-modal input:focus, .finance-modal select:focus, .finance-modal textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31,167,160,.14); }
 .finance-toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.finance-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
+.finance-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 18px; }
 .finance-kpis article { display: grid; gap: 7px; padding: 19px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
 .finance-kpis small { color: var(--muted); font-size: 12px; }
 .finance-kpis strong { color: var(--ink); font: 800 23px "Nunito Sans", sans-serif; }
@@ -3531,17 +3548,24 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .finance-chart-card, .finance-section { padding: 20px 22px; }
 .finance-chart-card { margin-bottom: 18px; }
 .finance-chart { display: flex; min-height: 184px; gap: 16px; align-items: end; padding: 12px 4px 0; }
+.finance-year-chart { gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.finance-year-chart .finance-chart-month { min-width: 26px; }
 .finance-chart-month { display: grid; min-width: 36px; flex: 1; gap: 8px; justify-items: center; }
 .finance-bars { display: flex; width: 100%; min-height: 145px; align-items: end; justify-content: center; gap: 5px; }
 .finance-bar { width: min(42%, 28px); border-radius: 7px 7px 2px 2px; }
 .finance-bar-income { background: var(--teal); }
 .finance-chart-month small { color: var(--muted); font-size: 11px; text-transform: capitalize; }
+.finance-chart-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.finance-year-select { display: grid; gap: 5px; color: #617088; font-size: 11px; font-weight: 700; }
+.finance-year-select select { min-height: 36px; padding: 7px 28px 7px 10px; border: 1px solid #e0e6ed; border-radius: 8px; background: #fff; color: var(--ink); font: inherit; }
+.finance-movement-filters { margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--line); }
 .finance-legend { display: flex; gap: 16px; margin: 13px 0 0; color: var(--muted); font-size: 11px; }
 .finance-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .finance-dot { width: 8px; height: 8px; border-radius: 999px; }.finance-dot.income { background: var(--teal); }
 .finance-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; }
 .finance-loading { color: var(--muted); text-align: center; }
 .finance-movement-list, .finance-debt-list { display: grid; }
+.finance-debt-list { max-height: 420px; overflow-y: auto; overscroll-behavior: contain; padding-right: 5px; }
 .finance-movement { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid #edf1f4; }
 .finance-debtor { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid #edf1f4; }
 .finance-movement:last-child, .finance-debtor:last-child { border-bottom: 0; }
@@ -3583,6 +3607,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .settings-maintenance .card-head { margin: 0 -24px; padding: 20px 20px 18px; border-bottom: 1px solid var(--line); }
 .settings-maintenance .field-help { margin: 18px 0 0; }
 .settings-maintenance-actions { justify-content: flex-start; }
+.settings-maintenance-actions .new-button, .settings-maintenance-actions .outline-button, .backup-selected-file .outline-button { min-height: 38px; border-radius: 8px; padding: 8px 12px; }
 .backup-selected-file { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 18px; padding: 12px 14px; border: 1px solid #cbeae7; border-radius: 9px; background: #f2fbfa; color: #53637b; }
 .backup-selected-file-label { color: #15827c; font-size: 11px; font-weight: 800; text-transform: uppercase; }
 .backup-selected-file strong { overflow: hidden; color: var(--ink); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
@@ -3594,6 +3619,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .settings-catalog-card .card-head { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
 .catalog-list { flex: 1; list-style: none; padding: 0; margin: 14px 0; display: grid; align-content: start; gap: 0; }
 .catalog-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eef2f5; color: #53637b; font-size: 13px; }
+.catalog-row-actions { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 7px; }
 .catalog-status-button { min-width: 76px; min-height: 32px; padding: 6px 10px; border: 1px solid #dfe6ed; border-radius: 7px; background: #fff; color: #617088; font: 700 11px "Nunito Sans", sans-serif; cursor: pointer; }
 .catalog-status-button.is-active { border-color: #bee8e4; background: #e8f8f6; color: #15827c; }
 .catalog-status-button.is-inactive { background: #f7f9fb; color: #71809a; }
@@ -3627,7 +3653,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .patient-list-select { display: flex; min-width: 0; flex: 1; align-items: center; gap: 11px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
 .patient-list-select:hover, .patient-list-select.selected { background: #eaf8f6; }
 .patient-list-actions { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; }
-.patient-list-actions .row-action { min-height: 32px; }
+.patient-list-actions .row-action { min-height: 38px; padding: 7px 11px; font-size: 11px; }
 .patient-list-actions .appointment-edit-button { border: 1px solid #e2e8f0; background: #fff; color: #60708b; }
 .patient-list-actions .delete-action { background: #fff0f0; color: #b74242; }
 .patient-back-button { display: inline-grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; margin: 0 2px 0 0; padding: 0; border: 0; background: transparent; color: #15827c; font-size: 31px; line-height: 1; cursor: pointer; }

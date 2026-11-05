@@ -48,7 +48,7 @@ function renderBusinessHoursRow(name, day) {
 function renderCatalogList(selector, rows, kind) {
   const host = document.querySelector(selector);
   if (!host) return;
-  host.innerHTML = rows.length ? rows.map(row => `<li><span>${escapeHTML(row.name)}</span><button type="button" class="catalog-status-button ${row.is_active ? 'is-active' : 'is-inactive'}" data-toggle-catalog="${kind}" data-catalog-id="${row.id}" data-active="${row.is_active}">${row.is_active ? 'Activo' : 'Inactivo'}</button></li>`).join('') : '<li class="empty-state">Aún no hay opciones.</li>';
+  host.innerHTML = rows.length ? rows.map(row => `<li><span>${escapeHTML(row.name)}</span><span class="catalog-row-actions"><button type="button" class="catalog-status-button ${row.is_active ? 'is-active' : 'is-inactive'}" data-toggle-catalog="${kind}" data-catalog-id="${row.id}" data-active="${row.is_active}">${row.is_active ? 'Activo' : 'Inactivo'}</button><button type="button" class="row-action delete-action catalog-delete-button" data-delete-catalog="${kind}" data-catalog-id="${row.id}" data-catalog-name="${escapeHTML(row.name)}">Eliminar</button></span></li>`).join('') : '<li class="empty-state">Aún no hay opciones.</li>';
 }
 
 async function renderConfigurationModule() {
@@ -100,9 +100,21 @@ document.addEventListener('change', event => {
 
 document.addEventListener('click', async event => {
   const toggle = event.target.closest('[data-toggle-catalog]');
-  if (!toggle) return;
-  const table = toggle.dataset.toggleCatalog === 'reason' ? 'appointment_reasons' : 'treatment_catalog';
-  const { error } = await supabaseClient.from(table).update({ is_active: toggle.dataset.active !== 'true' }).eq('id', toggle.dataset.catalogId);
-  if (error) return showToast('No se pudo actualizar la opción.');
+  if (toggle) {
+    const table = toggle.dataset.toggleCatalog === 'reason' ? 'appointment_reasons' : 'treatment_catalog';
+    const { error } = await supabaseClient.from(table).update({ is_active: toggle.dataset.active !== 'true' }).eq('id', toggle.dataset.catalogId);
+    if (error) return showToast('No se pudo actualizar la opción.');
+    await renderConfigurationModule();
+    return;
+  }
+  const remove = event.target.closest('[data-delete-catalog]');
+  if (!remove) return;
+  const label = remove.dataset.deleteCatalog === 'reason' ? 'motivo' : 'tratamiento';
+  const { confirmed } = await showConfirmationDialog({ title: `¿Eliminar ${label}?`, message: `Se eliminará “${remove.dataset.catalogName}”. Las citas y expedientes ya registrados conservarán su historial.`, confirmLabel: 'Eliminar' });
+  if (!confirmed) return;
+  const table = remove.dataset.deleteCatalog === 'reason' ? 'appointment_reasons' : 'treatment_catalog';
+  const { error } = await supabaseClient.from(table).delete().eq('id', remove.dataset.catalogId);
+  if (error) return showToast('No se pudo eliminar la opción.');
   await renderConfigurationModule();
+  showToast(`${label[0].toUpperCase() + label.slice(1)} eliminado.`);
 });

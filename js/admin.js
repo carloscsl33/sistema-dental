@@ -21,9 +21,9 @@ function renderManagedUsers() {
       <td><span class="status-chip ${user.status === 'approved' ? 'is-active' : 'is-blocked'}">${escapeHTML(statusLabel(user.status))}</span></td>
       <td>${escapeHTML(formatAdminDate(user.lastSignInAt))}</td>
       <td class="admin-table-actions">
-        <button class="admin-action-button" type="button" data-admin-edit="${escapeHTML(user.id)}">Editar</button>
-        <button class="admin-action-button" type="button" data-admin-reset="${escapeHTML(user.id)}">Restablecer</button>
-        <button class="admin-action-button is-danger" type="button" data-admin-delete="${escapeHTML(user.id)}" ${user.isCurrentUser ? 'disabled' : ''}>Eliminar</button>
+        <button class="row-action appointment-edit-button admin-action-button" type="button" data-admin-edit="${escapeHTML(user.id)}">Editar</button>
+        <button class="row-action admin-action-button" type="button" data-admin-reset="${escapeHTML(user.id)}">Restablecer</button>
+        <button class="row-action delete-action admin-action-button" type="button" data-admin-delete="${escapeHTML(user.id)}" ${user.isCurrentUser ? 'disabled' : ''}>Eliminar</button>
       </td>
     </tr>`).join('');
   empty.hidden = managedUsers.length > 0;

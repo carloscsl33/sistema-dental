@@ -301,7 +301,7 @@ function tomorrowMarkup(item, index) {
           <small>${escapeHTML(treatment)} · Saldo: ${formatCurrency(balance)}</small>
         </div>
       </div>
-      <button class="whatsapp" data-reminder="${escapeHTML(name)}" data-reminder-time="${escapeHTML(time)}" data-reminder-phone="${escapeHTML(phone)}" aria-label="Preparar recordatorio por WhatsApp">
+      <button class="row-action appointment-whatsapp" data-reminder="${escapeHTML(name)}" data-reminder-time="${escapeHTML(time)}" data-reminder-phone="${escapeHTML(phone)}" aria-label="Preparar recordatorio por WhatsApp">
         <span>WhatsApp</span>
       </button>
     </div>
@@ -330,9 +330,9 @@ function appointmentCardMarkup(appointment, index, source) {
       </div>
       <div class="managed-appointment-actions">
         <button class="row-action" data-patient-info="${escapeHTML(cardPatient ? 'id:' + cardPatient.id : 'name:' + name)}">Expediente</button>
-        ${canEdit ? `<button class="row-action appointment-edit-button" data-edit-appointment="${escapeHTML(appointment.id)}">Editar cita</button>` : ''}
-        ${date === getISODate(1) ? `<button class="whatsapp" data-reminder="${escapeHTML(name)}" data-reminder-time="${escapeHTML(time)}" data-reminder-phone="${escapeHTML(phone)}" aria-label="Preparar recordatorio por WhatsApp"><span>WhatsApp</span></button>` : ''}
-        ${status !== 'Finalizada' ? `<button class="row-action delete-action" data-delete-appointment="${escapeHTML(appointment.id)}">Eliminar cita</button>` : ''}
+        ${canEdit ? `<button class="row-action appointment-edit-button" data-edit-appointment="${escapeHTML(appointment.id)}">Editar</button>` : ''}
+        ${date === getISODate(1) ? `<button class="row-action appointment-whatsapp" data-reminder="${escapeHTML(name)}" data-reminder-time="${escapeHTML(time)}" data-reminder-phone="${escapeHTML(phone)}" aria-label="Preparar recordatorio por WhatsApp"><span>WhatsApp</span></button>` : ''}
+        ${status !== 'Finalizada' ? `<button class="row-action delete-action" data-delete-appointment="${escapeHTML(appointment.id)}">Eliminar</button>` : ''}
       </div>
     </article>
   `;
