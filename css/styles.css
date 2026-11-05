@@ -1097,6 +1097,18 @@ main {
   color: #176f42;
 }
 
+.managed-appointment-actions .row-action.delete-action {
+  border-color: #e7aaa5;
+  background: #d9534f;
+  color: #fff;
+}
+
+.managed-appointment-actions .row-action.appointment-whatsapp {
+  border-color: #82c99f;
+  background: #2ca866;
+  color: #fff;
+}
+
 .managed-appointment-actions .appointment-edit-button {
   border-color: #e2e8f0;
   background: #fff;
@@ -3612,7 +3624,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .backup-selected-file-label { color: #15827c; font-size: 11px; font-weight: 800; text-transform: uppercase; }
 .backup-selected-file strong { overflow: hidden; color: var(--ink); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 #backup-restore-file { display: none !important; }
-.danger-button { border-color: #f0c8c4; color: #b74242; }
+.danger-button { border-color: #e7aaa5; background: #d9534f; color: #fff; }
 .danger-button:hover, .danger-button:focus-visible { border-color: #e6aca6; background: #fff4f3; color: #a73730; }
 .settings-catalogs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
 .settings-catalog-card { display: flex; min-height: 270px; flex-direction: column; }
