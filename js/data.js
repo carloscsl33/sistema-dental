@@ -654,7 +654,7 @@ async function syncPatientsToCloud() {
         id: record.id,
         patient_id: patient.id,
         name: record.tratamiento || 'Tratamiento',
-        diagnosis: record.diagnostico || 'Sin diagnóstico',
+        diagnosis: record.diagnostico || null,
         recorded_on: record.fecha || getISODate(0),
         is_active: activeKeys.has(normalizeName(record.tratamiento) + '|' + normalizeName(record.diagnostico))
       }));
@@ -689,7 +689,11 @@ async function syncPatientsToCloud() {
           paid_on: payment.fecha,
           concept: payment.concepto || null,
           reference: payment.referencia || null,
-          notes: payment.notas || null
+          notes: payment.notas || null,
+          appointment_date: payment.fechaCita || null,
+          appointment_time: payment.horaCita ? toInputTime(payment.horaCita) : null,
+          appointment_total: payment.montoTotal === undefined ? null : getNumericAmount(payment.montoTotal),
+          balance_after: payment.saldoRestante === undefined ? null : getNumericAmount(payment.saldoRestante)
         }));
         const { error: paymentsError } = await supabaseClient.from('payments').insert(paymentRows);
         if (paymentsError) throw paymentsError;
@@ -864,6 +868,10 @@ async function connectToCloud() {
         concepto: payment.concept || 'Pago de consulta',
         metodo: payment.method,
         citaId: payment.appointment_id,
+        fechaCita: payment.appointment_date || '',
+        horaCita: payment.appointment_time ? formatTimeFromInput(payment.appointment_time) : '',
+        montoTotal: payment.appointment_total == null ? undefined : Number(payment.appointment_total),
+        saldoRestante: payment.balance_after == null ? undefined : Number(payment.balance_after),
         referencia: payment.reference || '',
         notas: payment.notes || '',
         createdAt: payment.created_at

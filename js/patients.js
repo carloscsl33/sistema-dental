@@ -355,7 +355,7 @@ function renderPatientDirectory(query = '') {
     
     const apptText = item.appointments.map(a => [a.reason, a.time, a.date, a.balance].filter(Boolean).join(' ')).join(' ');
     return normalizeSearchText(`${item.name} ${apptText}`).includes(normalizedQuery);
-  });
+  }).sort((a, b) => a.name.localeCompare(b.name, 'es-MX', { sensitivity: 'base' }));
   
   container.innerHTML = filteredPatients.length ? filteredPatients.map(item => `
     <article class="patient-list-item">
@@ -446,67 +446,32 @@ async function removePatientClinicalService(patientId, recordIndex) {
 }
 
 function renderPatientFinancialHistory(patient) {
-  const history = patient.historialFinanciero || [];
-  if (!history.length) {
-    return `<p class="empty-history">No hay movimientos financieros registrados.</p>`;
-  }
+  const history = (patient.historialFinanciero || [])
+    .filter(payment => getNumericAmount(payment.monto) > 0)
+    .sort((a, b) => `${b.fecha || ''}${b.createdAt || ''}`.localeCompare(`${a.fecha || ''}${a.createdAt || ''}`));
+  if (!history.length) return `<p class="empty-history">No hay movimientos financieros registrados.</p>`;
 
-  const appointmentsWithPayments = new Set(
-    history.map(payment => payment.citaId).filter(Boolean)
-  );
-  const appointments = new Map();
-  getPatientAppointments(patient).forEach(appointment => {
-    if (!appointmentsWithPayments.has(appointment.id)) return;
-    const total = getNumericAmount(appointment.total ?? appointment.balance);
-    const due = getNumericAmount(appointment.balance);
-    const paid = appointment.paid !== undefined
-      ? getNumericAmount(appointment.paid)
-      : Math.max(total - due, 0);
-    appointments.set(appointment.id, {
-      fecha: appointment.date,
-      concepto: appointment.reason || 'Cita',
-      estipulado: total,
-      pagado: paid,
-      debe: due,
-      fechaMovimiento: appointment.date
-    });
-  });
-
-  history.forEach(payment => {
-    const record = appointments.get(payment.citaId);
-    if (record) {
-      record.fechaMovimiento = payment.fecha || record.fechaMovimiento;
-      return;
-    }
-    const key = payment.citaId || payment.id;
-    const legacyRecord = appointments.get(key) || {
-      fecha: payment.fechaCita || payment.fecha,
-      concepto: payment.concepto || 'Cita',
-      estipulado: getNumericAmount(payment.montoTotal),
-      pagado: 0,
-      debe: getNumericAmount(payment.saldoRestante),
-      fechaMovimiento: payment.fecha
-    };
-    legacyRecord.estipulado = Math.max(legacyRecord.estipulado, getNumericAmount(payment.montoTotal));
-    legacyRecord.pagado += getNumericAmount(payment.monto);
-    legacyRecord.debe = getNumericAmount(payment.saldoRestante);
-    legacyRecord.fechaMovimiento = payment.fecha || legacyRecord.fechaMovimiento;
-    appointments.set(key, legacyRecord);
-  });
-
-  if (!appointments.size) {
-    return `<p class="empty-history">No hay movimientos financieros registrados.</p>`;
-  }
-
-  return [...appointments.values()].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).map(record => `
-    <div class="patient-financial-entry">
-      <span>
-        <strong>${formatDisplayDate(record.fecha)}</strong>
-        <small><strong>Concepto:</strong> ${escapeHTML(record.concepto)} · <strong>Total:</strong> ${formatCurrency(record.estipulado)} · <strong>Pagado:</strong> ${formatCurrency(record.pagado)} · <strong>Pendiente:</strong> ${formatCurrency(record.debe)}</small>
-      </span>
-      <strong>Actualizado: ${formatDisplayDate(record.fechaMovimiento)}</strong>
-    </div>
-  `).join('');
+  const appointmentsById = new Map(getPatientAppointments(patient).map(appointment => [appointment.id, appointment]));
+  return history.map(payment => {
+    const appointment = appointmentsById.get(payment.citaId);
+    const concept = payment.concepto || appointment?.reason || 'Pago de consulta';
+    const appointmentDate = payment.fechaCita || appointment?.date || payment.fecha;
+    const appointmentTime = payment.horaCita || appointment?.time || '';
+    const total = payment.montoTotal === undefined ? getNumericAmount(appointment?.total ?? appointment?.balance) : getNumericAmount(payment.montoTotal);
+    const balance = payment.saldoRestante === undefined ? getNumericAmount(appointment?.balance) : getNumericAmount(payment.saldoRestante);
+    return `
+      <article class="patient-financial-entry">
+        <div class="patient-financial-entry-heading">
+          <div><strong>${escapeHTML(concept)}</strong><small>Cita: ${formatDisplayDate(appointmentDate)}${appointmentTime ? ` · ${escapeHTML(appointmentTime)}` : ''}</small></div>
+          <small>Pago: ${formatDisplayDate(payment.fecha)}</small>
+        </div>
+        <div class="patient-financial-entry-amounts">
+          <span><small>Monto pagado</small><strong>${formatCurrency(payment.monto)}</strong></span>
+          <span><small>Saldo restante</small><strong>${formatCurrency(balance)}</strong></span>
+          <span><small>Monto establecido</small><strong>${formatCurrency(total)}</strong></span>
+        </div>
+      </article>`;
+  }).join('');
 }
 
 function resolvePatientRef(ref) {
@@ -716,8 +681,8 @@ function createClinicalServiceRow(service = {}, removable = false) {
     <label class="clinical-service-custom" hidden>Tratamiento personalizado*
       <input class="clinical-service-custom-input" type="text" maxlength="120" placeholder="Escribe el tratamiento" required>
     </label>
-    <label>Diagnóstico / motivo del tratamiento*
-      <textarea class="clinical-service-diagnosis" rows="3" placeholder="Describe el diagnóstico o motivo del tratamiento..." required></textarea>
+    <label>Diagnóstico / motivo del tratamiento
+      <textarea class="clinical-service-diagnosis" rows="3" placeholder="Describe el diagnóstico o motivo del tratamiento..."></textarea>
     </label>
   `;
 

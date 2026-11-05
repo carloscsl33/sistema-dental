@@ -169,6 +169,10 @@ create table public.payments (
   concept        text,
   reference      text check (char_length(reference) <= 80),
   notes          text check (char_length(notes) <= 500),
+  appointment_date date,
+  appointment_time time,
+  appointment_total numeric(10,2) check (appointment_total >= 0),
+  balance_after  numeric(10,2) check (balance_after >= 0),
   created_at     timestamptz not null default now(),
   created_by     uuid default auth.uid() references auth.users (id) on delete set null
 );
@@ -202,15 +206,15 @@ begin
 
   remaining := round(p_amount, 2);
   for rec in
-    select id, motive, total, paid from public.appointments
+    select id, motive, appt_date, appt_time, total, paid from public.appointments
      where patient_id = cur.patient_id and status <> 'cancelada' and total > paid
      order by (id = cur.id) desc, appt_date, appt_time
   loop
     exit when remaining <= 0;
     applied := least(rec.total - rec.paid, remaining);
     update public.appointments set paid = paid + applied where id = rec.id;
-    insert into public.payments (patient_id, appointment_id, amount, method, paid_on, concept, reference, notes, created_by)
-    values (cur.patient_id, rec.id, applied, p_method, day, rec.motive, p_reference, p_notes, (select auth.uid()));
+    insert into public.payments (patient_id, appointment_id, amount, method, paid_on, concept, reference, notes, appointment_date, appointment_time, appointment_total, balance_after, created_by)
+    values (cur.patient_id, rec.id, applied, p_method, day, rec.motive, p_reference, p_notes, rec.appt_date, rec.appt_time, rec.total, rec.total - rec.paid - applied, (select auth.uid()));
     remaining := remaining - applied;
   end loop;
 
@@ -309,7 +313,7 @@ grant insert (id, patient_id, appt_date, appt_time, motive, total, paid, status)
 grant update (patient_id, appt_date, appt_time, motive, total, status, paid) on public.appointments to authenticated;
 grant delete on public.appointments, public.patient_files to authenticated;
 grant insert on public.patient_files to authenticated;
-grant insert (id, patient_id, appointment_id, amount, method, paid_on, concept, reference, notes) on public.payments to authenticated;
+grant insert (id, patient_id, appointment_id, amount, method, paid_on, concept, reference, notes, appointment_date, appointment_time, appointment_total, balance_after) on public.payments to authenticated;
 
 -- Tiempo real para que 3-4 personas vean los cambios al instante (respeta RLS)
 alter publication supabase_realtime add table public.patients, public.treatments, public.blocked_slots,

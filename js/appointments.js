@@ -329,8 +329,8 @@ function appointmentCardMarkup(appointment, index, source) {
         <strong>${formatCurrency(balance)}</strong>
       </div>
       <div class="managed-appointment-actions">
-        <button class="patient-info-button" data-patient-info="${escapeHTML(cardPatient ? 'id:' + cardPatient.id : 'name:' + name)}">Expediente</button>
-        ${canEdit ? `<button class="patient-info-button appointment-edit-button" data-edit-appointment="${escapeHTML(appointment.id)}">Editar cita</button>` : ''}
+        <button class="row-action" data-patient-info="${escapeHTML(cardPatient ? 'id:' + cardPatient.id : 'name:' + name)}">Expediente</button>
+        ${canEdit ? `<button class="row-action appointment-edit-button" data-edit-appointment="${escapeHTML(appointment.id)}">Editar cita</button>` : ''}
         ${date === getISODate(1) ? `<button class="whatsapp" data-reminder="${escapeHTML(name)}" data-reminder-time="${escapeHTML(time)}" data-reminder-phone="${escapeHTML(phone)}" aria-label="Preparar recordatorio por WhatsApp"><span>WhatsApp</span></button>` : ''}
         ${status !== 'Finalizada' ? `<button class="row-action delete-action" data-delete-appointment="${escapeHTML(appointment.id)}">Eliminar cita</button>` : ''}
       </div>

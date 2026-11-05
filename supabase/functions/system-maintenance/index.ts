@@ -74,6 +74,12 @@ Deno.serve(async req => {
     if (body.action === "restore" && confirmation !== "RESTABLECER TODO") return json({ error: "confirmation_required" }, 400);
     if (!["restore", "reset"].includes(body.action)) return json({ error: "invalid_action" }, 400);
 
+    if (body.action === "restore") {
+      const { error } = await admin.rpc("restore_theradent_backup", { p_backup: backup });
+      if (error) throw new Error(`No se pudo restaurar la copia: ${error.message}`);
+      return json({ success: true });
+    }
+
     const deleteColumn: Record<string, string> = {
       clinic_settings: "id",
       business_hours: "day_of_week",
@@ -92,15 +98,6 @@ Deno.serve(async req => {
       if (error) throw new Error(`No se pudo limpiar ${table}: ${error.message}`);
     }
 
-    if (body.action === "restore") {
-      for (const table of tables) {
-        let rows = Array.isArray(backup.tables[table]) ? backup.tables[table] : [];
-        if (table === "patients") rows = rows.map(({ full_name, ...row }: Record<string, unknown>) => row);
-        if (!rows.length) continue;
-        const { error } = await admin.from(table).insert(rows);
-        if (error) throw new Error(`No se pudo restaurar ${table}: ${error.message}`);
-      }
-    }
     return json({ success: true });
   } catch (error) {
     console.error("system-maintenance failed", error);

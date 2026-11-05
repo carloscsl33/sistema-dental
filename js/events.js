@@ -84,7 +84,7 @@ document.addEventListener('submit', event => {
       if (!Array.isArray(patient.historialFinanciero)) patient.historialFinanciero = [];
       patient.historialFinanciero.push({
         id: generateId('payment'), fecha: paymentDate, monto: amount, concepto: item.reason || 'Pago de consulta',
-        metodo: paymentMethod, estado: item.paymentStatus, citaId: item.id, fechaCita: item.date, referencia: reference,
+        metodo: paymentMethod, estado: item.paymentStatus, citaId: item.id, fechaCita: item.date, horaCita: item.time, referencia: reference,
         notas: notes, saldoAnterior: before, saldoRestante: after, montoTotal: itemTotal, createdAt: new Date().toISOString()
       });
     });
@@ -187,7 +187,8 @@ document.addEventListener('click', async event => {
         label: `¿Cuántos lugares deseas bloquear? (1-${remainingPlaces})`,
         min: 1,
         max: remainingPlaces,
-        value: 1
+        type: 'number',
+        value: ''
       }
     });
     if (!confirmed) return;

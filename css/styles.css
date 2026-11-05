@@ -1088,6 +1088,20 @@ main {
   color: #60708b;
 }
 
+.managed-appointment-actions .row-action {
+  min-height: 32px;
+  border: 1px solid #d8efec;
+  border-radius: 8px;
+  background: #e7f7f5;
+  color: #15827c;
+}
+
+.managed-appointment-actions .appointment-edit-button {
+  border-color: #e2e8f0;
+  background: #fff;
+  color: #60708b;
+}
+
 .patient-info-button {
   border: 1px solid #e2e8f0;
   border-radius: 6px;
@@ -1102,6 +1116,64 @@ main {
 .patient-info-button:hover,
 .row-action:hover {
   filter: brightness(0.97);
+}
+
+.financial-history {
+  display: grid;
+  gap: 12px;
+}
+
+.patient-financial-entry {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.patient-financial-entry-heading,
+.patient-financial-entry-heading > div {
+  display: flex;
+}
+
+.patient-financial-entry-heading {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink);
+}
+
+.patient-financial-entry-heading > div {
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.patient-financial-entry-heading small,
+.patient-financial-entry-amounts small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.patient-financial-entry-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.patient-financial-entry-amounts span {
+  display: grid;
+  gap: 3px;
+  padding: 9px;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.patient-financial-entry-amounts strong { color: var(--ink); font-size: 13px; }
+
+@media (max-width: 480px) {
+  .patient-financial-entry-heading { align-items: stretch; flex-direction: column; }
+  .patient-financial-entry-amounts { grid-template-columns: 1fr; }
 }
 
 .patient-info-button.patient-general-add-advance {
