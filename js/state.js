@@ -6,6 +6,7 @@ const pages = {
   centro: ['Centro de Mando'],
   citas: ['Citas'],
   pacientes: ['Pacientes'],
+  finanzas: ['Finanzas'],
   administrar: ['Administrar'],
   configuracion: ['Configuración']
 };

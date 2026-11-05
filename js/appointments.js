@@ -636,6 +636,7 @@ function changePage(page, appointmentFilter = null) {
   if (page === 'citas') renderAppointmentTable();
   if (page === 'administrar') loadManagedUsers();
   if (page === 'configuracion') renderConfigurationModule();
+  if (page === 'finanzas') renderFinanceModule?.();
   
   if (!document.querySelector('#patient-modal.open') && !document.querySelector('#appointment-modal.open')) {
     window.scrollTo({ top: 0, behavior: 'smooth' });

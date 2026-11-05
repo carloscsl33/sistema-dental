@@ -18,7 +18,7 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && document.body.classList.contains('mobile-nav-open')) setMobileNavigation(false);
 });
 
-document.addEventListener('submit', event => {
+document.addEventListener('submit', async event => {
   if (event.target.matches('#payment-receipt-form')) {
     event.preventDefault();
     
@@ -73,6 +73,43 @@ document.addEventListener('submit', event => {
       return;
     }
 
+    const shouldScheduleFollowUp = followUpAppointmentId === appointmentId;
+    if (isCloudConnected() && paymentAmount > 0) {
+      try {
+        await recordPaymentSafely({ appointmentId, amount: paymentAmount, method: paymentMethod, paidOn: paymentDate, reference, notes, finalize: shouldScheduleFollowUp });
+      } catch (error) {
+        console.error('No se pudo registrar el pago:', error);
+        showToast(String(error?.message || '').includes('overpayment') ? 'El monto excede el saldo pendiente actual.' : 'No se pudo registrar el pago. Verifica el saldo e inténtalo de nuevo.');
+        return;
+      }
+      if (event.submitter?.id === 'payment-receipt-whatsapp') {
+        const refreshedPatient = patients.find(item => item.id === patient.id) || patient;
+        const pendingAfter = getPatientPendingAppointments(refreshedPatient).reduce((sum, item) => sum + getNumericAmount(item.balance), 0);
+        const receiptMessage = [
+          '____________________________', 'RECIBO DE PAGO',
+          `Paciente: ${getPatientFullName(refreshedPatient) || appointment.name}`,
+          `Fecha de la cita: ${formatDisplayDate(appointment.date)}`,
+          `Motivo: ${appointment.reason || 'Consulta'}`,
+          `Costo de la cita: ${formatCurrency(totalAmount)}`,
+          `Pago recibido: ${formatCurrency(paymentAmount)} (${paymentMethod})`,
+          `Saldo pendiente total: ${formatCurrency(pendingAfter)}`
+        ].join('\n');
+        const phone = /^\d{10}$/.test(refreshedPatient.telefono) ? `52${refreshedPatient.telefono}` : '';
+        const whatsappWindow = window.open(`https://wa.me/${phone}?text=${encodeURIComponent(receiptMessage)}`, '_blank');
+        if (!whatsappWindow) showToast('Permite las ventanas emergentes para abrir WhatsApp.');
+      }
+      closePaymentReceipt();
+      refreshFinanceModule?.();
+      if (shouldScheduleFollowUp) {
+        showToast(`Pago de ${formatCurrency(paymentAmount)} registrado. Agenda la siguiente cita.`);
+        const currentIndex = todayAppointments.findIndex(item => item.id === appointmentId);
+        if (currentIndex !== -1) openModal(currentIndex);
+      } else {
+        showToast(`Pago de ${formatCurrency(paymentAmount)} registrado correctamente.`);
+      }
+      return;
+    }
+
     allocatePatientPayment(patient, appointment, paymentAmount).forEach(({ appointment: item, amount }) => {
       const itemTotal = getNumericAmount(item.total ?? item.balance);
       const before = getNumericAmount(item.balance);
@@ -89,7 +126,6 @@ document.addEventListener('submit', event => {
       });
     });
 
-    const shouldScheduleFollowUp = followUpAppointmentId === appointmentId;
     if (shouldScheduleFollowUp) appointment.status = 'Finalizada';
 
     if (event.submitter?.id === 'payment-receipt-whatsapp') {

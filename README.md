@@ -12,6 +12,7 @@ invitado desde Supabase (Authentication → Users → Invite user).
 - `js/auth.js` — pantalla de inicio de sesión.
 - `supabase/schema.sql` — esquema completo (tablas, RLS, límite de 3 por horario, auditoría, Storage). Ya ejecutado.
 - `supabase/002_conectar_app.sql` — migración para permitir registrar pagos desde la app. Ya ejecutado.
+- `supabase/006_finance_module.sql` — módulo Finanzas: pagos seguros, gastos, correcciones y respaldo de esos movimientos. Debe ejecutarse después de las migraciones anteriores al instalar una base nueva.
 - `vercel.json` — cabeceras de seguridad al publicar.
 
 ## Cómo funciona la conexión

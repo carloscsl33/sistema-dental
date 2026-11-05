@@ -11,6 +11,7 @@ function getCurrentRole() { return currentAccess.role; }
 function hasRole(...roles) { return roles.includes(currentAccess.role); }
 
 function canAccessPage(page) {
+  if (page === 'finanzas') return hasRole('admin', 'receptionist');
   return !['administrar', 'configuracion'].includes(page) || hasRole('admin');
 }
 

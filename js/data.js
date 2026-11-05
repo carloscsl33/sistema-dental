@@ -595,7 +595,7 @@ function appointmentToRow(appointment) {
 }
 
 function appointmentToUpdateRow(appointment) {
-  const { id, ...row } = appointmentToRow(appointment);
+  const { id, paid, ...row } = appointmentToRow(appointment);
   return row;
 }
 
@@ -906,6 +906,7 @@ function finishCloudRefresh() {
   subscribeRealtime();
   renderLists();
   renderDashboardCalendar();
+  refreshFinanceModule?.();
   updateAttendedCount();
   updateDashboardIncome();
   if (document.querySelector('#page-pacientes')?.classList.contains('active')) renderPatientDirectory(globalSearchQuery);
@@ -941,6 +942,8 @@ function subscribeRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'treatments' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'appointment_notes' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, scheduleRealtimeRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, scheduleRealtimeRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'payment_refunds' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'patient_files' }, scheduleRealtimeRefresh)
     .subscribe();
 }

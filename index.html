@@ -67,6 +67,7 @@
       <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
       <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></i>Pacientes</a>
+      <a class="nav-item" href="#finanzas" data-page-link="finanzas" data-roles="admin receptionist" hidden><i aria-hidden="true">$</i>Finanzas</a>
       <a class="nav-item" href="#administrar" data-page-link="administrar" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Administrar</a>
       <a class="nav-item" href="#configuracion" data-page-link="configuracion" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Configuración</a>
     </nav>
@@ -91,6 +92,7 @@
       <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
       <a class="nav-item" href="#pacientes" data-page-link="pacientes"><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20c.65-3.55 2.82-5.25 6.5-5.25s5.85 1.7 6.5 5.25"/></svg></i>Pacientes</a>
+      <a class="nav-item" href="#finanzas" data-page-link="finanzas" data-roles="admin receptionist" hidden><i aria-hidden="true">$</i>Finanzas</a>
       <a class="nav-item" href="#administrar" data-page-link="administrar" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Administrar</a>
       <a class="nav-item" href="#configuracion" data-page-link="configuracion" data-roles="admin" hidden><i aria-hidden="true">⚙</i>Configuración</a>
     </div>
@@ -190,6 +192,10 @@
           </section>
         </div>
       </section>
+    </section>
+    <section class="app-page" id="page-finanzas" data-roles="admin receptionist" hidden>
+      <header class="page-module-heading"><h2>Finanzas</h2><p>Ingresos, gastos, saldos y movimientos de la clínica.</p></header>
+      <div id="finance-dashboard" aria-live="polite"></div>
     </section>
     <section class="app-page" id="page-administrar" data-roles="admin" hidden>
       <section class="card admin-card">
@@ -457,19 +463,20 @@
   <script src="js/supabase.js?v=20261020-2"></script>
   <script src="js/config.js?v=20261020-2"></script>
   <script src="js/supabase-client.js?v=20261020-2"></script>
-  <script src="js/state.js?v=20261020-2"></script>
+  <script src="js/state.js?v=20261104-finance-1"></script>
   <script src="js/utils.js?v=20261020-2"></script>
-  <script src="js/access.js?v=20261102-admin-1"></script>
+  <script src="js/access.js?v=20261104-finance-1"></script>
   <script src="js/settings.js?v=20261103-settings-1"></script>
-  <script src="js/data.js?v=20261104-financial-1"></script>
-  <script src="js/appointments.js?v=20261104-actions-1"></script>
+  <script src="js/data.js?v=20261104-finance-1"></script>
+  <script src="js/appointments.js?v=20261104-finance-1"></script>
   <script src="js/calendar.js?v=20261021-1"></script>
-  <script src="js/payments.js?v=20261020-2"></script>
+  <script src="js/payments.js?v=20261104-finance-1"></script>
+  <script src="js/finance.js?v=20261104-finance-1"></script>
   <script src="js/patients.js?v=20261104-financial-1"></script>
   <script src="js/qr.js?v=20261103-qr-1"></script>
   <script src="js/patient-qr.js?v=20261103-qr-1"></script>
   <script src="js/backup.js?v=20261103-backup-1"></script>
-  <script src="js/events.js?v=20261104-financial-1"></script>
+  <script src="js/events.js?v=20261104-finance-1"></script>
   <script src="js/admin.js?v=20261102-admin-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
   <script src="js/auth.js?v=20261023-1"></script>
