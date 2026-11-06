@@ -507,10 +507,6 @@ document.addEventListener('click', async event => {
     return;
   }
   if (event.target.closest('#patient-qr-camera')) {
-    openPatientQrDeviceCamera();
-    return;
-  }
-  if (event.target.closest('#patient-qr-live-camera')) {
     await startPatientQrCamera();
     return;
   }
