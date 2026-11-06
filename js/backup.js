@@ -70,6 +70,7 @@ async function resetSystemData() {
 
   try {
     await runSystemMaintenance('reset', { confirmation });
+    clearClinicalLocalSnapshot?.();
     showToast('Datos clínicos restablecidos. Actualizando el sistema…');
     window.setTimeout(() => window.location.reload(), 850);
   } catch (error) {

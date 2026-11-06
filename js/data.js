@@ -932,6 +932,19 @@ function disconnectFromCloud() {
   renderLists();
 }
 
+function clearClinicalLocalSnapshot() {
+  patients = [];
+  rebuildAppointmentCollections([]);
+  blockedAppointmentSlots = [];
+  lastSyncedPatients = new Map();
+  lastSyncedAppointments = new Map();
+  lastSyncedBlockedSlots = new Map();
+  cloudSyncedPaymentIds = new Set();
+  localStorage.removeItem(PATIENTS_STORAGE_KEY);
+  localStorage.removeItem(APPOINTMENTS_STORAGE_KEY);
+  localStorage.removeItem(BLOCKED_SLOTS_STORAGE_KEY);
+}
+
 function scheduleRealtimeRefresh() {
   clearTimeout(realtimeRefreshTimer);
   realtimeRefreshTimer = setTimeout(() => connectToCloud(), 400);

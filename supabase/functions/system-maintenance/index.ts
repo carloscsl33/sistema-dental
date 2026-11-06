@@ -71,7 +71,7 @@ Deno.serve(async req => {
     if (!["restore", "reset"].includes(body.action)) return json({ error: "invalid_action" }, 400);
 
     if (body.action === "reset" && confirmation !== "BORRAR TODO") return json({ error: "confirmation_required" }, 400);
-    if (body.action === "restore" && confirmation !== "RESTABLECER TODO") return json({ error: "confirmation_required" }, 400);
+    if (body.action === "restore" && confirmation !== "RESTAURAR TODO") return json({ error: "confirmation_required" }, 400);
 
     const backup = body.backup;
     if (body.action === "restore" && !isValidBackup(backup)) return json({ error: "invalid_backup" }, 400);
