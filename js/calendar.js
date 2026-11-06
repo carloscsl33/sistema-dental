@@ -16,6 +16,7 @@ function openDailyAgenda(date) {
   const dateObject = new Date(`${date}T12:00:00`);
   dateLabel.textContent = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(dateObject);
   const appointments = getCalendarAppointments(date);
+  const canManage = canManageAppointments();
   const slots = [];
   for (let minutes = 9 * 60; minutes <= 19 * 60; minutes += 30) {
     const time = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
@@ -30,7 +31,7 @@ function openDailyAgenda(date) {
     slots.push(`<div class="daily-agenda-slot ${blocked ? 'is-blocked' : matches.length ? 'has-appointments' : 'is-free'}">
       <strong class="daily-agenda-time">${formatTimeFromInput(time)}</strong>
       <div class="daily-agenda-slot-content">${matches.length ? matches.map(appointment => `<div class="daily-agenda-appointment"><strong>${escapeHTML(appointment.name)}</strong><span>${escapeHTML(appointment.reason || 'Cita')}${appointment.status ? ` · ${escapeHTML(appointment.status)}` : ''}</span></div>`).join('') : ''}<span class="daily-agenda-free-label">${blocked ? `${blockedCount} ${blockedCount === 1 ? 'lugar ocupado' : 'lugares ocupados'} · ` : ''}${availableCount ? `${availableCount} ${availableCount === 1 ? 'lugar disponible' : 'lugares disponibles'}` : 'Sin lugares disponibles'}</span></div>
-      <div class="daily-agenda-slot-actions">${canBook ? `<button type="button" class="daily-agenda-book" data-agenda-book="${date}" data-agenda-time="${time}">Agendar</button>` : ''}${hasSpace && !isPastDate && !isPastTime ? `<button type="button" class="daily-agenda-block" data-agenda-block="${date}" data-agenda-time="${time}">Deshabilitar</button>` : ''}${blocked ? `<button type="button" class="daily-agenda-unblock" data-agenda-unblock="${date}" data-agenda-time="${time}">Liberar 1 lugar</button>` : ''}</div>
+      <div class="daily-agenda-slot-actions">${canManage && canBook ? `<button type="button" class="daily-agenda-book" data-agenda-book="${date}" data-agenda-time="${time}">Agendar</button>` : ''}${canManage && hasSpace && !isPastDate && !isPastTime ? `<button type="button" class="daily-agenda-block" data-agenda-block="${date}" data-agenda-time="${time}">Deshabilitar</button>` : ''}${canManage && blocked ? `<button type="button" class="daily-agenda-unblock" data-agenda-unblock="${date}" data-agenda-time="${time}">Liberar 1 lugar</button>` : ''}</div>
     </div>`);
   }
   list.innerHTML = slots.join('');

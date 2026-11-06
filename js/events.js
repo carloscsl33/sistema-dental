@@ -21,6 +21,10 @@ document.addEventListener('keydown', event => {
 document.addEventListener('submit', async event => {
   if (event.target.matches('#payment-receipt-form')) {
     event.preventDefault();
+    if (!canManagePayments()) {
+      showToast('Tu rol no tiene acceso a cobros.');
+      return;
+    }
     
     const appointmentId = document.querySelector('#receipt-appointment-id')?.value;
     const paymentStatus = document.querySelector('#receipt-payment-status')?.value;
@@ -189,6 +193,7 @@ document.addEventListener('click', async event => {
 
   const agendaBookButton = event.target.closest('[data-agenda-book]');
   if (agendaBookButton) {
+    if (!canManageAppointments()) return showToast('Tu rol solo puede consultar las citas.');
     const { agendaBook: date, agendaTime: time } = agendaBookButton.dataset;
     if (date < getISODate(0)) {
       showToast('No se pueden agendar citas en fechas pasadas.');
@@ -211,6 +216,7 @@ document.addEventListener('click', async event => {
 
   const agendaBlockButton = event.target.closest('[data-agenda-block]');
   if (agendaBlockButton) {
+    if (!canManageAppointments()) return showToast('Tu rol solo puede consultar las citas.');
     const { agendaBlock: date, agendaTime: time } = agendaBlockButton.dataset;
     const appointmentCount = getCalendarAppointments(date).filter(appointment => toInputTime(appointment.time) === time && appointment.status !== 'Cancelada').length;
     const remainingPlaces = Math.max(MAX_PATIENTS_PER_SLOT - appointmentCount - getBlockedAppointmentSlotCount(date, time), 0);
@@ -243,6 +249,7 @@ document.addEventListener('click', async event => {
 
   const agendaUnblockButton = event.target.closest('[data-agenda-unblock]');
   if (agendaUnblockButton) {
+    if (!canManageAppointments()) return showToast('Tu rol solo puede consultar las citas.');
     const { agendaUnblock: date, agendaTime: time } = agendaUnblockButton.dataset;
     const previousSlots = blockedAppointmentSlots.map(slot => ({ ...slot }));
     const slotIndex = blockedAppointmentSlots.findIndex(slot => slot.date === date && slot.time === time);
@@ -392,6 +399,7 @@ document.addEventListener('click', async event => {
   }
 
   if (event.target.closest('#appointment-notes-edit')) {
+    if (!canRecordClinicalProgress()) return showToast('Tu rol no puede modificar avances clínicos.');
     const appointmentId = document.querySelector('#appointment-notes-id')?.value;
     const appointment = getAppointments().find(({ appointment: item }) => item.id === appointmentId)?.appointment;
     const observation = appointment?.observations?.[0];
@@ -690,6 +698,10 @@ document.addEventListener('submit', async event => {
   }
   if (event.target.matches('#appointment-notes-form')) {
     event.preventDefault();
+    if (!canRecordClinicalProgress()) {
+      showToast('Tu rol no puede registrar avances clínicos.');
+      return;
+    }
     const appointmentId = document.querySelector('#appointment-notes-id')?.value;
     const notesInput = document.querySelector('#appointment-notes-text');
     const observationText = notesInput?.value.trim();
@@ -742,6 +754,10 @@ document.addEventListener('submit', async event => {
 
   if (!event.target.matches('#appointment-form')) return;
   event.preventDefault();
+  if (!canManageAppointments()) {
+    showToast('Tu rol no puede guardar citas.');
+    return;
+  }
   
   const patientInput = document.querySelector('#modal-patient');
   const patientIdInput = document.querySelector('#modal-patient-id');
@@ -867,6 +883,10 @@ document.addEventListener('submit', event => {
   if (event.target.matches('#patient-form')) {
     event.preventDefault();
     const generateAppointment = event.submitter?.id === 'patient-save-appointment';
+    if (generateAppointment && !canManageAppointments()) {
+      showToast('Tu rol no puede generar citas.');
+      return;
+    }
     Promise.all(pendingClinicalFiles.map(item => item.persistence))
       .then(() => savePatientForm(generateAppointment))
       .catch(error => {

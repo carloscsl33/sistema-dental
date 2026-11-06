@@ -214,18 +214,19 @@ function openAppointmentNotes(appointmentId) {
   const cancelButton = document.querySelector('#appointment-notes-cancel');
   const actions = document.querySelector('.appointment-notes-actions');
   const hasObservation = Array.isArray(appointment.observations) && appointment.observations.length > 0;
+  const canRecordProgress = canRecordClinicalProgress();
   form.dataset.editingObservation = 'false';
-  modal.classList.toggle('is-viewing-observation', hasObservation);
-  form.classList.toggle('is-viewing-observation', hasObservation);
-  if (title) title.textContent = hasObservation ? 'Avance registrado' : 'Registrar avance';
+  modal.classList.toggle('is-viewing-observation', hasObservation || !canRecordProgress);
+  form.classList.toggle('is-viewing-observation', hasObservation || !canRecordProgress);
+  if (title) title.textContent = canRecordProgress ? (hasObservation ? 'Avance registrado' : 'Registrar avance') : 'Avances clínicos';
   if (appointmentDetails) {
     appointmentDetails.textContent = `${patientName} · ${formatDisplayDate(appointment.date)} · ${appointment.time} · ${appointment.reason}`;
   }
   if (appointmentIdInput) appointmentIdInput.value = appointmentId;
   if (notesInput) notesInput.value = '';
-  if (notesLabel) notesLabel.hidden = hasObservation;
-  if (saveButton) saveButton.hidden = hasObservation;
-  if (editButton) editButton.hidden = !hasObservation;
+  if (notesLabel) notesLabel.hidden = hasObservation || !canRecordProgress;
+  if (saveButton) saveButton.hidden = hasObservation || !canRecordProgress;
+  if (editButton) editButton.hidden = !hasObservation || !canRecordProgress;
   if (cancelEditButton) cancelEditButton.hidden = true;
   if (cancelButton) cancelButton.textContent = 'Cerrar';
   if (actions) actions.hidden = false;
@@ -252,6 +253,9 @@ function closeAppointmentNotes() {
 
 function statusActions(name, appointmentId) {
   const currentStatus = getAppointments().find(({ appointment }) => appointment.id === appointmentId)?.appointment?.status || 'En espera';
+  if (!canManageAppointments()) {
+    return `<div class="appointment-status"><span class="appointment-status-current ${getStatusClass(currentStatus)}">${escapeHTML(currentStatus)}</span></div>`;
+  }
   return `
     <div class="appointment-status">
       <span class="appointment-status-current ${getStatusClass(currentStatus)}">${escapeHTML(currentStatus)}</span>
@@ -314,6 +318,7 @@ function appointmentCardMarkup(appointment, index, source) {
   const cardPatient = resolveAppointmentPatient(appointment);
   const phone = cardPatient?.telefono || '';
   const canEdit = status !== 'Finalizada' && date >= getISODate(0);
+  const canManage = canManageAppointments();
   return `
     <article class="managed-appointment" data-search-match="${appointmentMatchesSearch(appointment) ? 'true' : 'false'}">
       <div class="managed-appointment-time">
@@ -330,9 +335,9 @@ function appointmentCardMarkup(appointment, index, source) {
       </div>
       <div class="managed-appointment-actions">
         <button class="row-action" data-patient-info="${escapeHTML(cardPatient ? 'id:' + cardPatient.id : 'name:' + name)}">Expediente</button>
-        ${canEdit ? `<button class="row-action appointment-edit-button" data-edit-appointment="${escapeHTML(appointment.id)}">Editar</button>` : ''}
-        ${date === getISODate(1) ? `<button class="row-action appointment-whatsapp" data-reminder="${escapeHTML(name)}" data-reminder-time="${escapeHTML(time)}" data-reminder-phone="${escapeHTML(phone)}" aria-label="Preparar recordatorio por WhatsApp"><span>WhatsApp</span></button>` : ''}
-        ${status !== 'Finalizada' ? `<button class="row-action delete-action" data-delete-appointment="${escapeHTML(appointment.id)}">Eliminar</button>` : ''}
+        ${canManage && canEdit ? `<button class="row-action appointment-edit-button" data-edit-appointment="${escapeHTML(appointment.id)}">Editar</button>` : ''}
+        ${canManage && date === getISODate(1) ? `<button class="row-action appointment-whatsapp" data-reminder="${escapeHTML(name)}" data-reminder-time="${escapeHTML(time)}" data-reminder-phone="${escapeHTML(phone)}" aria-label="Preparar recordatorio por WhatsApp"><span>WhatsApp</span></button>` : ''}
+        ${canManage && status !== 'Finalizada' ? `<button class="row-action delete-action" data-delete-appointment="${escapeHTML(appointment.id)}">Eliminar</button>` : ''}
       </div>
     </article>
   `;
@@ -424,6 +429,10 @@ function updateAttendedCount() {
 }
 
 function openModal(index = null) {
+  if (!canManageAppointments()) {
+    showToast('Tu rol solo puede consultar las citas.');
+    return;
+  }
   const modal = document.querySelector('#appointment-modal');
   const patientInput = document.querySelector('#modal-patient');
   const patientIdInput = document.querySelector('#modal-patient-id');
@@ -485,6 +494,10 @@ function openModal(index = null) {
 }
 
 function editAppointment(source, index) {
+  if (!canManageAppointments()) {
+    showToast('Tu rol no puede modificar citas.');
+    return;
+  }
   const list = getAppointmentList(source);
   const appointment = list[index];
   if (!appointment) return;
@@ -550,6 +563,10 @@ function closeModal() {
 }
 
 async function deleteAppointment(appointmentId) {
+  if (!canManageAppointments()) {
+    showToast('Tu rol no puede eliminar citas.');
+    return;
+  }
   const appointment = getAppointments().find(({ appointment: item }) => item.id === appointmentId)?.appointment;
   if (!appointment) return;
   
@@ -570,6 +587,10 @@ async function deleteAppointment(appointmentId) {
 }
 
 function updateAppointmentStatus(appointmentId, status) {
+  if (!canManageAppointments()) {
+    showToast('Tu rol no puede cambiar el estatus de citas.');
+    return;
+  }
   const item = getAppointments().find(({ appointment }) => appointment.id === appointmentId);
   if (!item) return;
   const todayIndex = todayAppointments.findIndex(a => a.id === appointmentId);

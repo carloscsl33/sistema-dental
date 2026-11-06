@@ -1,6 +1,10 @@
 // Pagos y recibos
 
 function openPaymentReceipt(appointmentId) {
+  if (!canManagePayments()) {
+    showToast('Tu rol no tiene acceso a cobros.');
+    return;
+  }
   const appointmentData = getAppointments().find(({ appointment }) => appointment.id === appointmentId);
   if (!appointmentData) {
     showToast('La cita seleccionada ya no existe.');

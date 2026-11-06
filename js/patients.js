@@ -271,7 +271,7 @@ function renderPatientAppointmentRows(appointments) {
   return appointments.map(appointment => {
     const isToday = appointment.date === getISODate(0);
     const hasObservation = Array.isArray(appointment.observations) && appointment.observations.length > 0;
-    const canAddObservation = appointment.date === getISODate(0) && appointment.status !== 'Cancelada';
+    const canAddObservation = canRecordClinicalProgress() && appointment.date === getISODate(0) && appointment.status !== 'Cancelada';
     return `<div class="patient-appointment-entry ${isToday ? 'is-today-appointment' : ''}">
       <span>
         <strong>${escapeHTML(appointment.reason)}${isToday ? ' <span class="today-appointment-badge">HOY</span>' : ''}</strong>

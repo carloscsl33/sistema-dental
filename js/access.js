@@ -10,6 +10,14 @@ function getCurrentRole() { return currentAccess.role; }
 
 function hasRole(...roles) { return roles.includes(currentAccess.role); }
 
+// Estas comprobaciones también se usan dentro de los controladores para que un
+// elemento oculto no pueda habilitar una acción desde la consola del navegador.
+function canManageAppointments() { return hasRole('admin', 'receptionist'); }
+
+function canManagePayments() { return hasRole('admin', 'receptionist'); }
+
+function canRecordClinicalProgress() { return hasRole('admin', 'doctor'); }
+
 function canAccessPage(page) {
   if (page === 'finanzas') return hasRole('admin', 'receptionist');
   return !['administrar', 'configuracion'].includes(page) || hasRole('admin');

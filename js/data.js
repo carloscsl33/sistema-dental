@@ -737,13 +737,18 @@ async function syncAppointmentsToCloud() {
         : await supabaseClient.from('appointments').insert(appointmentToRow(appointment));
       if (error) throw error;
 
-      const note = appointment.observations && appointment.observations[0];
-      if (note && note.text) {
-        const { error: noteError } = await supabaseClient.from('appointment_notes')
-          .upsert({ appointment_id: appointment.id, body: note.text });
-        if (noteError) throw noteError;
-      } else {
-        await supabaseClient.from('appointment_notes').delete().eq('appointment_id', appointment.id);
+      // Recepción puede actualizar la cita, pero nunca debe tocar los avances
+      // existentes al sincronizarla. Solo Administración y Doctor/a los alteran.
+      if (canRecordClinicalProgress()) {
+        const note = appointment.observations && appointment.observations[0];
+        if (note && note.text) {
+          const { error: noteError } = await supabaseClient.from('appointment_notes')
+            .upsert({ appointment_id: appointment.id, body: note.text });
+          if (noteError) throw noteError;
+        } else {
+          const { error: noteDeleteError } = await supabaseClient.from('appointment_notes').delete().eq('appointment_id', appointment.id);
+          if (noteDeleteError) throw noteDeleteError;
+        }
       }
       lastSyncedAppointments.set(appointment.id, cloneDeep(appointment));
     }
