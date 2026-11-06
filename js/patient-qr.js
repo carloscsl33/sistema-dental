@@ -24,7 +24,7 @@ async function openPatientQr(patientId) {
       getPatientFullName(patient);
     document.querySelector("#patient-qr-image").innerHTML = renderPatientQrSvg(
       token,
-      260,
+      220,
     );
     document.querySelector("#patient-qr-token").textContent = token;
     const modal = document.querySelector("#patient-qr-modal");
@@ -162,12 +162,42 @@ async function startPatientQrCamera() {
     showToast(message);
   }
 }
+function escapePatientQrSvgText(value) {
+  return String(value || "").replace(/[&<>"']/g, (character) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&apos;",
+    };
+    return entities[character];
+  });
+}
+
 function downloadPatientQr() {
   const svg = document.querySelector("#patient-qr-image svg");
   const name =
     document.querySelector("#patient-qr-name")?.textContent || "paciente";
-  if (!svg) return;
-  const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
+  const token = document.querySelector("#patient-qr-token")?.textContent?.trim();
+  if (!svg || !token) return;
+
+  const viewBox = svg
+    .getAttribute("viewBox")
+    ?.trim()
+    .split(/\s+/)
+    .map(Number);
+  const sourceSize = viewBox?.[2] || 1;
+  const cardWidth = 230;
+  const qrSize = 180;
+  const qrX = (cardWidth - qrSize) / 2;
+  const qrY = 16;
+  const nameY = qrY + qrSize + 24;
+  const tokenY = nameY + 20;
+  const cardHeight = tokenY + 19;
+  const visibleName = name.length > 31 ? `${name.slice(0, 30)}…` : name;
+  const card = `<svg xmlns="http://www.w3.org/2000/svg" width="${cardWidth}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}" role="img" aria-label="Tarjeta QR de ${escapePatientQrSvgText(name)}"><rect width="100%" height="100%" fill="#ffffff"/><g transform="translate(${qrX} ${qrY}) scale(${qrSize / sourceSize})">${svg.innerHTML}</g><text x="${cardWidth / 2}" y="${nameY}" text-anchor="middle" fill="#122039" font-family="Arial, sans-serif" font-size="13" font-weight="700">${escapePatientQrSvgText(visibleName)}</text><text x="${cardWidth / 2}" y="${tokenY}" text-anchor="middle" fill="#617088" font-family="monospace" font-size="10" letter-spacing="1">${escapePatientQrSvgText(token)}</text></svg>`;
+  const blob = new Blob([card], { type: "image/svg+xml" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
