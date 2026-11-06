@@ -69,10 +69,7 @@ async function resetSystemData() {
   if (!confirmed) return;
 
   try {
-    await runSystemMaintenance('reset', {
-      backup: { format: 'theradent-backup', version: 1 },
-      confirmation
-    });
+    await runSystemMaintenance('reset', { confirmation });
     showToast('Datos clínicos restablecidos. Actualizando el sistema…');
     window.setTimeout(() => window.location.reload(), 850);
   } catch (error) {

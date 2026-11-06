@@ -67,12 +67,14 @@ Deno.serve(async req => {
       return json({ format: "theradent-backup", version: 1, exported_at: new Date().toISOString(), note: "Incluye información de clínica, agenda y expedientes; no incluye contraseñas, sesiones ni archivos binarios de Storage.", tables: Object.fromEntries(entries) });
     }
 
-    const backup = body.backup;
-    if (!isValidBackup(backup)) return json({ error: "invalid_backup" }, 400);
     const confirmation = String(body.confirmation || "").trim().toUpperCase();
+    if (!["restore", "reset"].includes(body.action)) return json({ error: "invalid_action" }, 400);
+
     if (body.action === "reset" && confirmation !== "BORRAR TODO") return json({ error: "confirmation_required" }, 400);
     if (body.action === "restore" && confirmation !== "RESTABLECER TODO") return json({ error: "confirmation_required" }, 400);
-    if (!["restore", "reset"].includes(body.action)) return json({ error: "invalid_action" }, 400);
+
+    const backup = body.backup;
+    if (body.action === "restore" && !isValidBackup(backup)) return json({ error: "invalid_backup" }, 400);
 
     if (body.action === "restore") {
       const { error } = await admin.rpc("restore_theradent_backup", { p_backup: backup });
@@ -89,9 +91,7 @@ Deno.serve(async req => {
       patient_clinical_records: "patient_id",
       patient_qr_tokens: "patient_id"
     };
-    const tablesToClear = body.action === "reset"
-      ? deleteOrder.filter(table => !["clinic_settings", "business_hours", "appointment_reasons", "treatment_catalog"].includes(table))
-      : deleteOrder;
+    const tablesToClear = deleteOrder.filter(table => !["clinic_settings", "business_hours", "appointment_reasons", "treatment_catalog"].includes(table));
 
     for (const table of tablesToClear) {
       const { error } = await admin.from(table).delete().not(deleteColumn[table] || "id", "is", null);
