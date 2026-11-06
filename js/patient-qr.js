@@ -90,6 +90,58 @@ function openPatientQrScanner() {
   document.querySelector("#patient-qr-manual")?.focus();
   lockPageScroll();
 }
+
+function openPatientQrDeviceCamera() {
+  stopPatientQrCamera();
+  setPatientQrCameraStatus('Abriendo la cámara del dispositivo…');
+  document.querySelector('#patient-qr-photo')?.click();
+}
+
+async function decodePatientQrPhoto(file) {
+  if (!file) return;
+  if (!window.jsQR) {
+    setPatientQrCameraStatus('No se pudo cargar el lector QR. Revisa tu conexión e inténtalo de nuevo.');
+    return;
+  }
+  setPatientQrCameraStatus('Leyendo el código de la imagen…');
+  const imageUrl = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = imageUrl;
+    });
+    const canvas = document.createElement('canvas');
+    const maxDimension = 1600;
+    const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new Error('canvas_unavailable');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const frame = context.getImageData(0, 0, canvas.width, canvas.height);
+    const code = window.jsQR(frame.data, frame.width, frame.height, { inversionAttempts: 'attemptBoth' });
+    if (!code?.data) {
+      setPatientQrCameraStatus('No se detectó un QR. Acerca la tarjeta, enfócala bien y vuelve a intentarlo.');
+      return;
+    }
+    setPatientQrCameraStatus('Código detectado. Abriendo expediente…');
+    await resolvePatientQr(code.data);
+  } catch (_) {
+    setPatientQrCameraStatus('No se pudo leer la imagen. Intenta tomar otra fotografía del QR.');
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+document.addEventListener('change', event => {
+  if (!event.target.matches('#patient-qr-photo')) return;
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  decodePatientQrPhoto(file);
+});
+
 async function startPatientQrCamera() {
   if (!navigator.mediaDevices?.getUserMedia)
     return showToast(

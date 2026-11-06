@@ -3680,6 +3680,8 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 #patient-qr-scanner .confirmation-modal { position: relative; display: grid; width: min(560px, 100%); padding: 28px; border: 0; border-radius: 15px; gap: 14px; }
 #patient-qr-scanner .modal-close { display: grid; }
 #patient-qr-scanner h2, #patient-qr-scanner p { margin: 0; }
+#patient-qr-scanner .appointment-notes-actions { flex-wrap: wrap; justify-content: stretch; }
+#patient-qr-scanner .appointment-notes-actions button { flex: 1 1 145px; }
 #patient-qr-scanner label { display: grid; gap: 7px; color: #617088; font-size: 12px; font-weight: 700; text-align: left; }
 #patient-qr-scanner input { display: block; width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #e0e6ed; border-radius: 8px; background: #fff; color: var(--ink); font: inherit; outline: none; }
 #patient-qr-scanner input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31, 167, 160, .14); }
