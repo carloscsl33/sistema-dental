@@ -216,10 +216,12 @@
     <section class="app-page" id="page-configuracion" data-roles="admin" hidden>
       <header class="page-module-heading"></header>
       <form class="card settings-form" id="clinic-settings-form">
-        <header class="card-head settings-card-head"><div><h2>Información y agenda</h2><p>Datos de la clínica y reglas de disponibilidad para las citas.</p></div></header>
-        <section class="settings-section"><h3>Datos de la clínica</h3><div class="form-grid">
+        <header class="card-head settings-card-head"><div><h2>Clínica y agenda</h2><p>Identidad, datos para recibos y reglas de disponibilidad.</p></div></header>
+        <section class="settings-section"><h3>Identidad de clínica</h3><p class="field-help">El nombre se muestra en el menú y en las áreas principales del sistema.</p><div class="form-grid">
           <label>Nombre de la clínica:<input name="clinic_name" maxlength="120" required></label>
           <label>Responsable:<input name="responsible_name" maxlength="120"></label>
+        </div></section>
+        <section class="settings-section"><h3>Datos para recibo</h3><p class="field-help">Se utilizarán en los comprobantes de pago. El nombre se toma de la identidad de la clínica.</p><div class="form-grid">
           <label>Teléfono:<input name="phone" maxlength="30"></label>
           <label>Correo:<input name="email" type="email" maxlength="254"></label>
           <label class="full-width">Dirección:<input name="address" maxlength="250"></label>
