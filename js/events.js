@@ -897,6 +897,10 @@ document.addEventListener('submit', event => {
 });
 
 document.addEventListener('input', event => {
+  if (event.target.matches('#patient-qr-manual')) {
+    event.target.value = event.target.value.toUpperCase();
+    return;
+  }
   if (event.target.matches('#patient-phone, #emergency-phone')) {
     event.target.value = event.target.value.replace(/\D/g, '').slice(0, 10);
     return;
