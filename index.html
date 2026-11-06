@@ -455,12 +455,14 @@
       <h2 id="patient-qr-scanner-title">Abrir expediente con QR</h2>
       <p>Escanea con la cámara, lector USB o escribe el código de la tarjeta.</p>
       <video id="patient-qr-video" hidden playsinline muted></video>
+      <p id="patient-qr-camera-status" class="field-help" role="status" aria-live="polite" hidden></p>
       <label>Código QR<input id="patient-qr-manual" autocomplete="off" autocapitalize="characters" placeholder="TD-XXXXXXXX" required></label>
       <div class="appointment-notes-actions"><button class="outline-button" type="button" id="patient-qr-camera">Usar cámara</button><button class="new-button" type="submit">Abrir expediente</button></div>
     </form>
   </div>
   <div class="toast" id="toast" role="status"></div>
   <script src="js/supabase.js?v=20261020-2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script src="js/config.js?v=20261020-2"></script>
   <script src="js/supabase-client.js?v=20261020-2"></script>
   <script src="js/state.js?v=20261104-finance-1"></script>
@@ -474,7 +476,7 @@
   <script src="js/finance.js?v=20261105-finance-6"></script>
   <script src="js/patients.js?v=20261105-roles-1"></script>
   <script src="js/qr.js?v=20261103-qr-1"></script>
-  <script src="js/patient-qr.js?v=20261103-qr-1"></script>
+  <script src="js/patient-qr.js?v=20261106-qr-camera-1"></script>
   <script src="js/backup.js?v=20261103-backup-1"></script>
   <script src="js/events.js?v=20261105-roles-1"></script>
   <script src="js/admin.js?v=20261105-ui-1"></script>

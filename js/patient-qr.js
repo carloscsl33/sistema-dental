@@ -54,9 +54,19 @@ async function resolvePatientQr(value) {
 }
 let qrCameraStream = null,
   qrCameraTimer = null;
+let qrCameraReading = false;
+
+function setPatientQrCameraStatus(message = '') {
+  const status = document.querySelector('#patient-qr-camera-status');
+  if (!status) return;
+  status.textContent = message;
+  status.hidden = !message;
+}
+
 function stopPatientQrCamera() {
   clearInterval(qrCameraTimer);
   qrCameraTimer = null;
+  qrCameraReading = false;
   qrCameraStream?.getTracks().forEach((track) => track.stop());
   qrCameraStream = null;
   const video = document.querySelector("#patient-qr-video");
@@ -67,6 +77,7 @@ function stopPatientQrCamera() {
 }
 function closePatientQrScanner() {
   stopPatientQrCamera();
+  setPatientQrCameraStatus();
   const modal = document.querySelector("#patient-qr-scanner");
   modal?.classList.remove("open");
   modal?.setAttribute("aria-hidden", "true");
@@ -80,12 +91,16 @@ function openPatientQrScanner() {
   lockPageScroll();
 }
 async function startPatientQrCamera() {
-  if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia)
+  if (!navigator.mediaDevices?.getUserMedia)
     return showToast(
-      "Este navegador no admite lectura por cámara. Usa el lector USB o escribe el código.",
+      "Este navegador no permite usar la cámara. Usa el lector USB o escribe el código.",
     );
+
+  stopPatientQrCamera();
+  setPatientQrCameraStatus('Solicitando permiso para usar la cámara…');
   try {
     const video = document.querySelector("#patient-qr-video");
+    if (!video) return;
     qrCameraStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: "environment" } },
       audio: false,
@@ -93,18 +108,58 @@ async function startPatientQrCamera() {
     video.srcObject = qrCameraStream;
     video.hidden = false;
     await video.play();
-    const detector = new BarcodeDetector({ formats: ["qr_code"] });
-    qrCameraTimer = setInterval(async () => {
+    let detector = null;
+    if ("BarcodeDetector" in window) {
       try {
-        const found = await detector.detect(video);
-        if (found[0]?.rawValue) {
-          stopPatientQrCamera();
-          resolvePatientQr(found[0].rawValue);
+        detector = new BarcodeDetector({ formats: ["qr_code"] });
+      } catch (_) {
+        // Algunos navegadores exponen la API, pero no el formato QR.
+      }
+    }
+    const fallbackCanvas = detector ? null : document.createElement('canvas');
+    const fallbackContext = fallbackCanvas?.getContext('2d', { willReadFrequently: true });
+    if (!detector && (!window.jsQR || !fallbackContext)) {
+      stopPatientQrCamera();
+      setPatientQrCameraStatus('No se pudo cargar el lector QR. Revisa tu conexión e inténtalo de nuevo.');
+      return;
+    }
+    setPatientQrCameraStatus('Cámara activa. Coloca el código QR dentro del recuadro.');
+    qrCameraTimer = setInterval(async () => {
+      if (qrCameraReading || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+      qrCameraReading = true;
+      try {
+        let rawValue = '';
+        if (detector) {
+          const found = await detector.detect(video);
+          rawValue = found[0]?.rawValue || '';
+        } else if (fallbackCanvas && fallbackContext) {
+          fallbackCanvas.width = video.videoWidth;
+          fallbackCanvas.height = video.videoHeight;
+          if (fallbackCanvas.width && fallbackCanvas.height) {
+            fallbackContext.drawImage(video, 0, 0, fallbackCanvas.width, fallbackCanvas.height);
+            const frame = fallbackContext.getImageData(0, 0, fallbackCanvas.width, fallbackCanvas.height);
+            rawValue = window.jsQR(frame.data, frame.width, frame.height, { inversionAttempts: 'dontInvert' })?.data || '';
+          }
         }
-      } catch (_) {}
-    }, 350);
-  } catch (_) {
-    showToast("No se pudo abrir la cámara. Revisa el permiso del navegador.");
+        if (rawValue) {
+          stopPatientQrCamera();
+          setPatientQrCameraStatus('Código detectado. Abriendo expediente…');
+          resolvePatientQr(rawValue);
+        }
+      } catch (_) {
+        // Un cuadro de video inválido no debe detener el escáner; se intenta de nuevo.
+      } finally {
+        qrCameraReading = false;
+      }
+    }, 250);
+  } catch (error) {
+    const message = error?.name === 'NotAllowedError'
+      ? 'El navegador bloqueó la cámara. Autoriza la cámara para este sitio y vuelve a intentarlo.'
+      : error?.name === 'NotFoundError'
+        ? 'No se encontró una cámara disponible en este dispositivo.'
+        : 'No se pudo abrir la cámara. Revisa el permiso del navegador.';
+    setPatientQrCameraStatus(message);
+    showToast(message);
   }
 }
 function downloadPatientQr() {
