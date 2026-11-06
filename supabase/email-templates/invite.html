@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Invitación a Thera-dent</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f4f7fa;color:#122039;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f7fa;">
+      <tr><td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e4eaf0;border-radius:16px;overflow:hidden;">
+          <tr><td style="padding:26px 32px;background:#1fa7a0;color:#ffffff;">
+            <span style="display:inline-block;width:34px;height:34px;line-height:34px;text-align:center;border-radius:9px;background:#ffffff;color:#1fa7a0;font-size:20px;font-weight:700;">T</span>
+            <span style="margin-left:10px;font-size:19px;font-weight:700;vertical-align:8px;">Thera-dent</span>
+          </td></tr>
+          <tr><td style="padding:34px 32px 12px;">
+            <h1 style="margin:0 0 18px;font-size:25px;line-height:1.25;color:#122039;">Has sido invitado(a)</h1>
+            <p style="margin:0 0 18px;font-size:16px;line-height:1.6;color:#46566f;">Hola{{ if .Data.full_name }}, {{ .Data.full_name }}{{ end }}:</p>
+            <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#46566f;">Has sido invitado(a) a formar parte de <strong style="color:#122039;">Thera-dent</strong>. Para activar tu cuenta y crear una contraseña segura, selecciona el siguiente botón.</p>
+          </td></tr>
+          <tr><td align="center" style="padding:8px 32px 30px;">
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 24px;border-radius:8px;background:#1fa7a0;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">Crear mi contraseña</a>
+          </td></tr>
+          <tr><td style="padding:0 32px 32px;">
+            <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:#69788e;">Este enlace es personal, de un solo uso y tiene una vigencia limitada por tu seguridad.</p>
+            <p style="margin:0;font-size:14px;line-height:1.55;color:#69788e;">Nunca compartas este enlace ni tus datos de acceso con otras personas.</p>
+          </td></tr>
+          <tr><td style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e4eaf0;">
+            <p style="margin:0;font-size:13px;line-height:1.5;color:#8290a4;">Equipo de Thera-dent</p>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>
