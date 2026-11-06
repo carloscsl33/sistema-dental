@@ -116,7 +116,7 @@ function qrPlace(matrix, data, mask) {
     const v = (fmt >> i) & 1;
     if (i < 6) matrix[i][8] = v;
     else if (i < 8) matrix[i + 1][8] = v;
-    else matrix[20 - i][8] = v;
+    else matrix[6 + i][8] = v;
     if (i < 8) matrix[8][20 - i] = v;
     else if (i < 9) matrix[8][15 - i] = v;
     else matrix[8][14 - i] = v;
