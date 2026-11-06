@@ -1098,9 +1098,9 @@ main {
 }
 
 .managed-appointment-actions .row-action.delete-action {
-  border-color: #e7aaa5;
-  background: #d9534f;
-  color: #fff;
+  border-color: #f2c4c0;
+  background: #fff0f0;
+  color: #b74242;
 }
 
 .managed-appointment-actions .row-action.appointment-whatsapp {
@@ -3570,7 +3570,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .finance-chart-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .finance-year-select { display: grid; gap: 5px; color: #617088; font-size: 11px; font-weight: 700; }
 .finance-year-select select { min-height: 36px; padding: 7px 28px 7px 10px; border: 1px solid #e0e6ed; border-radius: 8px; background: #fff; color: var(--ink); font: inherit; }
-.finance-movement-filters { margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--line); }
+.finance-movement-filters { margin: 16px 0 20px; padding-top: 0; border-top: 0; }
 .finance-legend { display: flex; gap: 16px; margin: 13px 0 0; color: var(--muted); font-size: 11px; }
 .finance-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .finance-dot { width: 8px; height: 8px; border-radius: 999px; }.finance-dot.income { background: var(--teal); }
@@ -3625,7 +3625,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .backup-selected-file strong { overflow: hidden; color: var(--ink); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 #backup-restore-file { display: none !important; }
 .danger-button { border-color: #e7aaa5; background: #d9534f; color: #fff; }
-.danger-button:hover, .danger-button:focus-visible { border-color: #e6aca6; background: #fff4f3; color: #a73730; }
+.danger-button:hover, .danger-button:focus-visible { border-color: #e7aaa5; background: #d9534f; color: #fff; }
 .settings-catalogs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
 .settings-catalog-card { display: flex; min-height: 270px; flex-direction: column; }
 .settings-catalog-card .card-head { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
