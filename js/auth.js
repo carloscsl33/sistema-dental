@@ -6,6 +6,7 @@ const authViews = {
 };
 
 let passwordRecoveryActive = false;
+let invitationPasswordSetupActive = false;
 
 function setAuthMessage(id, text = '', success = false) {
   const message = document.querySelector(id);
@@ -77,6 +78,11 @@ function isRecoveryLink() {
   return window.location.hash.includes('type=recovery');
 }
 
+function isInvitationLink() {
+  return window.location.hash.includes('type=invite')
+    || new URLSearchParams(window.location.search).get('set-password') === '1';
+}
+
 function passwordIsStrong(password) {
   const groups = [/[a-z]/, /[A-Z]/, /\d/, /[^A-Za-z\d]/].filter(rule => rule.test(password)).length;
   return password.length >= 12 && groups >= 3;
@@ -91,8 +97,9 @@ async function initializeAuth() {
     return;
   }
 
-  if (isRecoveryLink()) {
+  if (isRecoveryLink() || isInvitationLink()) {
     passwordRecoveryActive = true;
+    invitationPasswordSetupActive = isInvitationLink();
     showAuthView('reset');
     applyAuthState(null);
   }
@@ -180,7 +187,9 @@ document.addEventListener('submit', async event => {
     }
 
     setSubmitState(form, true, 'Guardando…');
-    const { error } = await supabaseClient.auth.updateUser({ password });
+    const { error } = invitationPasswordSetupActive
+      ? await supabaseClient.functions.invoke('complete-invite', { body: { password } })
+      : await supabaseClient.auth.updateUser({ password });
     if (error) {
       setAuthMessage('#reset-message', 'El enlace no es válido o expiró. Solicita uno nuevo para continuar.');
       setSubmitState(form, false);
@@ -190,6 +199,7 @@ document.addEventListener('submit', async event => {
     document.querySelector('#new-password').value = '';
     document.querySelector('#confirm-password').value = '';
     passwordRecoveryActive = false;
+    invitationPasswordSetupActive = false;
     window.history.replaceState({}, document.title, window.location.pathname);
     await supabaseClient.auth.signOut();
     showAuthView('login');
