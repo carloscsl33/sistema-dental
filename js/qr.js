@@ -145,24 +145,12 @@ function qrPenalty(m) {
 }
 function renderPatientQrSvg(token, size = 260) {
   if (!/^TD-[A-Z0-9]{8}$/.test(token)) throw new Error("Código QR inválido.");
-  const data = qrBits(token);
-  let best = null;
-  for (let mask = 0; mask < 8; mask++) {
-    const matrix = qrPlace(qrBase(), data, mask);
-    const score = qrPenalty(matrix);
-    if (!best || score < best.score) best = { matrix, score };
-  }
-  const quiet = 4,
-    cells = 29,
-    rects = [];
-  best.matrix.forEach((row, y) =>
-    row.forEach((on, x) => {
-      if (on)
-        rects.push(
-          `<rect x="${x + quiet}" y="${y + quiet}" width="1" height="1"/>`,
-        );
-    }),
-  );
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${cells} ${cells}" width="${size}" height="${size}" shape-rendering="crispEdges" role="img" aria-label="Código QR de paciente"><rect width="${cells}" height="${cells}" fill="#fff"/><g fill="#122039">${rects.join("")}</g></svg>`;
+  if (typeof window.qrcode !== 'function') throw new Error('El generador QR no está disponible.');
+  const code = window.qrcode(0, 'M');
+  code.addData(token, 'Alphanumeric');
+  code.make();
+  return code.createSvgTag({ cellSize: Math.max(1, Math.floor(size / (code.getModuleCount() + 8))), margin: 4, scalable: true })
+    .replace('<svg ', '<svg role="img" aria-label="Código QR de paciente" ')
+    .replace(/#000000/g, '#122039');
 }
 
