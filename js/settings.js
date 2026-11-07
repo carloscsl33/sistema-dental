@@ -1,12 +1,53 @@
 const WEEKDAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
+function clinicLogoFallback() {
+  return (String(clinicSettings?.clinic_name || 'T').trim().charAt(0) || 'T').toUpperCase();
+}
+
+function setClinicLogo(node, url = '') {
+  if (!node) return;
+  node.classList.remove('has-logo');
+  node.replaceChildren(document.createTextNode(clinicLogoFallback()));
+  if (!url) return;
+  const image = new Image();
+  image.alt = '';
+  image.decoding = 'async';
+  image.onload = () => { node.classList.add('has-logo'); node.replaceChildren(image); };
+  image.onerror = () => { node.classList.remove('has-logo'); node.replaceChildren(document.createTextNode(clinicLogoFallback())); };
+  image.src = url;
+}
+
+function renderClinicLogoPreview(url = clinicLogoUrl) {
+  const preview = document.querySelector('#clinic-logo-preview');
+  const remove = document.querySelector('#clinic-logo-remove');
+  if (preview) setClinicLogo(preview, url);
+  if (remove) remove.hidden = !(url || selectedClinicLogoFile || clinicSettings?.logo_path);
+}
+
+function renderClinicBranding() {
+  document.querySelectorAll('[data-clinic-name]').forEach(node => { node.textContent = clinicSettings.clinic_name || 'Thera-dent'; });
+  document.querySelectorAll('[data-clinic-brand-icon]').forEach(node => setClinicLogo(node, clinicLogoUrl));
+  renderClinicLogoPreview();
+}
+
+async function refreshClinicLogo() {
+  clinicLogoUrl = '';
+  const path = String(clinicSettings?.logo_path || '').trim();
+  if (path && isCloudConnected()) {
+    const { data, error } = await supabaseClient.storage.from('clinic-assets').createSignedUrl(path, 60 * 60 * 12);
+    if (!error && data?.signedUrl) clinicLogoUrl = data.signedUrl;
+    else console.warn('No se pudo cargar el logo de la clínica.', error);
+  }
+  renderClinicBranding();
+}
+
 function applyClinicConfiguration(settings, hours, reasons, catalog) {
   if (settings) clinicSettings = { ...clinicSettings, ...settings };
   businessHours = hours || [];
   appointmentReasons = reasons || [];
   treatmentCatalog = catalog || [];
   MAX_PATIENTS_PER_SLOT = Number(clinicSettings.slot_capacity) || 3;
-  document.querySelectorAll('[data-clinic-name]').forEach(node => { node.textContent = clinicSettings.clinic_name || 'Thera-dent'; });
+  refreshClinicLogo();
   populateAppointmentReasonOptions();
 }
 
@@ -56,6 +97,7 @@ async function renderConfigurationModule() {
   if (!form || !hasRole('admin')) return;
   try { await loadClinicConfiguration(); } catch (error) { showToast('No se pudo cargar la configuración.'); return; }
   for (const key of ['clinic_name', 'responsible_name', 'phone', 'email', 'address', 'slot_minutes', 'slot_capacity']) form.elements[key].value = clinicSettings[key] ?? '';
+  renderClinicLogoPreview();
   document.querySelector('#business-hours-list').innerHTML = WEEKDAY_NAMES.map(renderBusinessHoursRow).join('');
   renderCatalogList('#appointment-reasons-list', appointmentReasons, 'reason');
   renderCatalogList('#treatment-catalog-list', treatmentCatalog, 'treatment');
@@ -74,13 +116,31 @@ document.addEventListener('submit', async event => {
       return;
     }
     const values = Object.fromEntries(new FormData(form));
-    const settings = { id: true, clinic_name: values.clinic_name.trim(), responsible_name: values.responsible_name.trim(), phone: values.phone.trim(), email: values.email.trim(), address: values.address.trim(), slot_minutes: Number(values.slot_minutes), slot_capacity: Number(values.slot_capacity), updated_by: currentAccess.id };
+    const previousLogoPath = String(clinicSettings.logo_path || '').trim();
+    let logoPath = previousLogoPath || null;
+    let uploadedLogoPath = '';
     try {
+      if (selectedClinicLogoFile) {
+        const extension = selectedClinicLogoFile.type === 'image/png' ? 'png' : selectedClinicLogoFile.type === 'image/webp' ? 'webp' : 'jpg';
+        uploadedLogoPath = `clinic-logo-${Date.now()}.${extension}`;
+        const { error: uploadError } = await supabaseClient.storage.from('clinic-assets').upload(uploadedLogoPath, selectedClinicLogoFile, { contentType: selectedClinicLogoFile.type, upsert: false });
+        if (uploadError) throw uploadError;
+        logoPath = uploadedLogoPath;
+      }
+      const settings = { id: true, clinic_name: values.clinic_name.trim(), responsible_name: values.responsible_name.trim(), phone: values.phone.trim(), email: values.email.trim(), address: values.address.trim(), slot_minutes: Number(values.slot_minutes), slot_capacity: Number(values.slot_capacity), logo_path: logoPath, updated_by: currentAccess.id };
       const [settingsResult, hoursResult] = await Promise.all([supabaseClient.from('clinic_settings').upsert(settings), supabaseClient.from('business_hours').upsert(getConfigurationHours(form), { onConflict: 'day_of_week' })]);
       if (settingsResult.error || hoursResult.error) throw settingsResult.error || hoursResult.error;
+      if (uploadedLogoPath && previousLogoPath && previousLogoPath !== uploadedLogoPath) await supabaseClient.storage.from('clinic-assets').remove([previousLogoPath]);
+      selectedClinicLogoFile = null;
+      const logoInput = document.querySelector('#clinic-logo-input');
+      if (logoInput) logoInput.value = '';
       await loadClinicConfiguration();
       showToast('Configuración guardada. Se aplicará a citas nuevas o modificadas.');
-    } catch (error) { showToast('No se pudo guardar la configuración.'); }
+    } catch (error) {
+      if (uploadedLogoPath) await supabaseClient.storage.from('clinic-assets').remove([uploadedLogoPath]);
+      console.error('No se pudo guardar la configuración.', error);
+      showToast('No se pudo guardar la configuración.');
+    }
   }
   const formKinds = { '#catalog-reason-form': ['reason', '#new-appointment-reason', 'appointment_reasons'], '#catalog-treatment-form': ['treatment', '#new-treatment-catalog', 'treatment_catalog'] };
   const entry = formKinds[`#${event.target.id}`];
@@ -108,7 +168,39 @@ document.addEventListener('input', event => {
   }
 });
 
+document.addEventListener('change', event => {
+  if (event.target.id !== 'clinic-logo-input') return;
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+  if (!allowedTypes.includes(file.type) || file.size > 1048576) {
+    event.target.value = '';
+    selectedClinicLogoFile = null;
+    renderClinicLogoPreview();
+    showToast('El logo debe ser PNG, JPG o WebP y pesar máximo 1 MB.');
+    return;
+  }
+  selectedClinicLogoFile = file;
+  renderClinicLogoPreview(URL.createObjectURL(file));
+});
+
 document.addEventListener('click', async event => {
+  if (event.target.closest('#clinic-logo-remove')) {
+    const previousLogoPath = String(clinicSettings.logo_path || '').trim();
+    if (!previousLogoPath && !selectedClinicLogoFile) return;
+    const { confirmed } = await showConfirmationDialog({ title: 'Quitar logo', message: 'El sistema volverá a mostrar la inicial de la clínica.', confirmLabel: 'Quitar' });
+    if (!confirmed) return;
+    selectedClinicLogoFile = null;
+    const logoInput = document.querySelector('#clinic-logo-input');
+    if (logoInput) logoInput.value = '';
+    if (!previousLogoPath) { renderClinicLogoPreview(); return; }
+    const { error } = await supabaseClient.from('clinic_settings').update({ logo_path: null, updated_by: currentAccess.id }).eq('id', true);
+    if (error) return showToast('No se pudo quitar el logo.');
+    await supabaseClient.storage.from('clinic-assets').remove([previousLogoPath]);
+    await loadClinicConfiguration();
+    showToast('Logo eliminado.');
+    return;
+  }
   const toggle = event.target.closest('[data-toggle-catalog]');
   if (toggle) {
     const table = toggle.dataset.toggleCatalog === 'reason' ? 'appointment_reasons' : 'treatment_catalog';

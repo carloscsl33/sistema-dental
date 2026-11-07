@@ -6,7 +6,8 @@ function receiptClinicDetails() {
     name,
     phone: String(clinicSettings?.phone || '').trim(),
     email: String(clinicSettings?.email || '').trim(),
-    address: String(clinicSettings?.address || '').trim()
+    address: String(clinicSettings?.address || '').trim(),
+    logoUrl: clinicLogoUrl || ''
   };
 }
 
@@ -74,9 +75,12 @@ function receiptContactLine(receipt) {
 
 function receiptMarkup(receipt) {
   const appointmentLine = `${formatDisplayDate(receipt.appointmentDate)}${receipt.appointmentTime ? ` · ${receipt.appointmentTime}` : ''}`;
+  const logo = receipt.clinic.logoUrl
+    ? `<img class="payment-document-logo" src="${escapeHTML(receipt.clinic.logoUrl)}" alt="Logo de ${escapeHTML(receipt.clinic.name)}">`
+    : `<span class="payment-document-monogram" aria-hidden="true">${escapeHTML(receiptMonogram(receipt.clinic.name))}</span>`;
   return `<article class="payment-document-paper">
     <header class="payment-document-brand">
-      <span class="payment-document-monogram" aria-hidden="true">${escapeHTML(receiptMonogram(receipt.clinic.name))}</span>
+      ${logo}
       <div><p>COMPROBANTE DE PAGO</p><h2>${escapeHTML(receipt.clinic.name)}</h2><small>${escapeHTML(receiptContactLine(receipt) || 'Información de contacto no registrada')}</small></div>
     </header>
     <section class="payment-document-meta"><div><small>RECIBO</small><strong>${escapeHTML(receipt.folio)}</strong></div><div><small>FECHA DE PAGO</small><strong>${escapeHTML(formatDisplayDate(receipt.paidOn))}</strong></div></section>
@@ -137,13 +141,43 @@ function pdfBinary(value) {
   return Uint8Array.from(String(value), char => char.charCodeAt(0) & 255);
 }
 
-function createReceiptPdfBlob(receipt) {
+async function receiptLogoPdfImage(url) {
+  if (!url) return null;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('No se pudo descargar el logo.');
+  const blob = await response.blob();
+  const source = await new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = URL.createObjectURL(blob);
+  });
+  const longestSide = Math.max(source.naturalWidth || source.width, source.naturalHeight || source.height, 1);
+  const scale = Math.min(1, 240 / longestSide);
+  const width = Math.max(1, Math.round((source.naturalWidth || source.width) * scale));
+  const height = Math.max(1, Math.round((source.naturalHeight || source.height) * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d');
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, width, height);
+  context.drawImage(source, 0, 0, width, height);
+  const binary = atob(canvas.toDataURL('image/jpeg', .9).split(',')[1]);
+  return { width, height, binary };
+}
+
+async function createReceiptPdfBlob(receipt) {
   const contact = receiptContactLine(receipt) || 'Información de contacto no registrada';
+  let logoImage = null;
+  try { logoImage = await receiptLogoPdfImage(receipt.clinic.logoUrl); } catch (error) { console.warn('El recibo se generará sin el archivo del logo.', error); }
+  const logoDraw = logoImage
+    ? 'q 45 0 0 45 54 728 cm /Im1 Do Q'
+    : '0.18 0.72 0.69 rg 54 728 45 45 re f\n1 1 1 rg BT /F2 25 Tf 68 742 Td (' + pdfText(receiptMonogram(receipt.clinic.name), 1) + ') Tj ET';
   const lines = [
     'q 0.10 0.63 0.61 rg 0 692 595 150 re f Q',
     '1 1 1 rg',
-    '0.18 0.72 0.69 rg 54 728 45 45 re f',
-    '1 1 1 rg BT /F2 25 Tf 68 742 Td (' + pdfText(receiptMonogram(receipt.clinic.name), 1) + ') Tj ET',
+    logoDraw,
     'BT /F2 11 Tf 113 797 Td (COMPROBANTE DE PAGO) Tj ET',
     'BT /F2 25 Tf 113 758 Td (' + pdfText(receipt.clinic.name, 35) + ') Tj ET',
     'BT /F1 9 Tf 113 738 Td (' + pdfText(contact, 66) + ') Tj ET',
@@ -177,11 +211,12 @@ function createReceiptPdfBlob(receipt) {
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>',
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >>${logoImage ? ' /XObject << /Im1 7 0 R >>' : ''} >> /Contents 4 0 R >>`,
     `<< /Length ${pdfBinary(lines).length} >>\nstream\n${lines}\nendstream`,
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'
   ];
+  if (logoImage) objects.push(`<< /Type /XObject /Subtype /Image /Width ${logoImage.width} /Height ${logoImage.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoImage.binary.length} >>\nstream\n${logoImage.binary}\nendstream`);
   let pdf = '%PDF-1.4\n%\xE2\xE3\xCF\xD3\n';
   const offsets = [0];
   objects.forEach((object, index) => { offsets.push(pdfBinary(pdf).length); pdf += `${index + 1} 0 obj\n${object}\nendobj\n`; });
@@ -192,9 +227,9 @@ function createReceiptPdfBlob(receipt) {
   return new Blob([pdfBinary(pdf)], { type: 'application/pdf' });
 }
 
-function downloadReceiptPdf(receipt) {
+async function downloadReceiptPdf(receipt) {
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(createReceiptPdfBlob(receipt));
+  link.href = URL.createObjectURL(await createReceiptPdfBlob(receipt));
   link.download = `${receipt.folio.toLowerCase()}.pdf`;
   document.body.appendChild(link);
   link.click();
@@ -204,7 +239,7 @@ function downloadReceiptPdf(receipt) {
 
 async function shareReceiptPdf(receipt) {
   const filename = `${receipt.folio.toLowerCase()}.pdf`;
-  const file = new File([createReceiptPdfBlob(receipt)], filename, { type: 'application/pdf' });
+  const file = new File([await createReceiptPdfBlob(receipt)], filename, { type: 'application/pdf' });
   if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
     try {
       await navigator.share({ title: `Recibo ${receipt.folio}`, text: `Comprobante de pago de ${receipt.clinic.name}`, files: [file] });
@@ -213,7 +248,7 @@ async function shareReceiptPdf(receipt) {
     }
     return;
   }
-  downloadReceiptPdf(receipt);
+  await downloadReceiptPdf(receipt);
   showToast('Este navegador no puede compartir archivos directamente. Descarga el PDF y adjúntalo en WhatsApp.');
 }
 
@@ -221,6 +256,6 @@ document.addEventListener('click', event => {
   if (event.target.closest('[data-payment-document-close]')) return closePaymentDocument();
   const modal = document.querySelector('#payment-document-modal');
   if (!modal?._receipt) return;
-  if (event.target.closest('#payment-document-download')) downloadReceiptPdf(modal._receipt);
-  if (event.target.closest('#payment-document-share')) shareReceiptPdf(modal._receipt);
+  if (event.target.closest('#payment-document-download')) downloadReceiptPdf(modal._receipt).catch(() => showToast('No se pudo generar el PDF.'));
+  if (event.target.closest('#payment-document-share')) shareReceiptPdf(modal._receipt).catch(() => showToast('No se pudo preparar el PDF para compartir.'));
 });

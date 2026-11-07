@@ -39,6 +39,8 @@ let clinicSettings = {
   slot_minutes: 30,
   slot_capacity: 3
 };
+let clinicLogoUrl = '';
+let selectedClinicLogoFile = null;
 let businessHours = [];
 let appointmentReasons = [];
 let treatmentCatalog = [];

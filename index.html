@@ -16,8 +16,8 @@
   <div id="auth-overlay" hidden>
     <section class="auth-card" aria-labelledby="auth-title">
       <div class="auth-brand">
-        <span class="auth-brand-icon" aria-hidden="true">D</span>
-        <span>Clínica Dental</span>
+        <span class="auth-brand-icon" data-clinic-brand-icon aria-hidden="true">D</span>
+        <span data-clinic-name>Clínica Dental</span>
       </div>
 
       <form id="auth-form" class="auth-view">
@@ -73,7 +73,7 @@
     </section>
   </div>
   <aside class="sidebar">
-    <a class="brand" href="#centro" data-page-link="centro"><span class="brand-icon">D</span><span>Clínica Dental</span></a>
+    <a class="brand" href="#centro" data-page-link="centro"><span class="brand-icon" data-clinic-brand-icon>D</span><span data-clinic-name>Clínica Dental</span></a>
     <nav class="navigation">
       <a class="nav-item active" href="#centro" data-page-link="centro"><i>▥</i>Centro de Mando</a>
       <a class="nav-item" href="#citas" data-page-link="citas"><i>◷</i>Citas</a>
@@ -96,7 +96,7 @@
   <button class="mobile-nav-scrim" id="mobile-nav-scrim" type="button" aria-label="Cerrar menú" aria-hidden="true" tabindex="-1"></button>
   <nav class="mobile-navigation" id="mobile-navigation" aria-label="Navegación principal" aria-hidden="true">
     <div class="mobile-navigation-head">
-      <a class="brand" href="#centro" data-page-link="centro"><span class="brand-icon">D</span><span>Clínica Dental</span></a>
+      <a class="brand" href="#centro" data-page-link="centro"><span class="brand-icon" data-clinic-brand-icon>D</span><span data-clinic-name>Clínica Dental</span></a>
       <button class="mobile-nav-close" id="mobile-nav-close" type="button" aria-label="Cerrar menú">×</button>
     </div>
     <div class="mobile-navigation-links">
@@ -116,7 +116,7 @@
     <header class="topbar">
       <div class="topbar-heading">
         <div class="mobile-appbar">
-          <a class="mobile-brand" href="#centro" data-page-link="centro"><span class="brand-icon">D</span><span>Clínica Dental</span></a>
+          <a class="mobile-brand" href="#centro" data-page-link="centro"><span class="brand-icon" data-clinic-brand-icon>D</span><span data-clinic-name>Clínica Dental</span></a>
           <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-controls="mobile-navigation" aria-expanded="false" aria-label="Abrir menú de navegación">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -268,6 +268,12 @@
           <div class="form-grid">
             <label>Nombre de la clínica:<input name="clinic_name" maxlength="120" required></label>
             <label>Responsable:<input name="responsible_name" maxlength="120"></label>
+          </div>
+          <div class="clinic-logo-control">
+            <div class="clinic-logo-preview" id="clinic-logo-preview" aria-label="Vista previa del logo">T</div>
+            <div class="clinic-logo-copy"><strong>Logo de la clínica</strong><span>PNG, JPG o WebP · máximo 1 MB · recomendado: imagen cuadrada.</span></div>
+            <label class="outline-button clinic-logo-upload">Seleccionar logo<input id="clinic-logo-input" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+            <button class="row-action delete-action" id="clinic-logo-remove" type="button" hidden>Quitar</button>
           </div>
         </section>
         <section class="settings-section">
@@ -626,14 +632,14 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.min.js"></script>
   <script src="js/config.js?v=20261020-2"></script>
   <script src="js/supabase-client.js?v=20261020-2"></script>
-  <script src="js/state.js?v=20261104-finance-1"></script>
+  <script src="js/state.js?v=20261107-clinic-logo-1"></script>
   <script src="js/utils.js?v=20261107-agenda-config-1"></script>
   <script src="js/access.js?v=20261107-session-identity-1"></script>
-  <script src="js/settings.js?v=20261107-settings-inputs-1"></script>
+  <script src="js/settings.js?v=20261107-clinic-logo-1"></script>
   <script src="js/data.js?v=20261105-roles-1"></script>
   <script src="js/appointments.js?v=20261107-followup-refresh-1"></script>
   <script src="js/calendar.js?v=20261107-agenda-config-1"></script>
-  <script src="js/receipts.js?v=20261107-payment-receipts-3"></script>
+  <script src="js/receipts.js?v=20261107-clinic-logo-1"></script>
   <script src="js/payments.js?v=20261107-followup-refresh-1"></script>
   <script src="js/finance.js?v=20261107-finance-chart-2"></script>
   <script src="js/patients.js?v=20261105-roles-1"></script>
