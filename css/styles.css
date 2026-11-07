@@ -3462,6 +3462,13 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 }
 
 .password-toggle:hover { background: #edf8f7; color: #167f7a; }
+.password-requirements { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 10px; margin: -2px 0 4px; padding: 0; list-style: none; color: #8190a4; font-size: 11px; line-height: 1.35; }
+.password-requirements li { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.password-requirements li::before { content: '○'; color: #a3afbe; font-size: 14px; line-height: 1; }
+.password-requirements li.is-met { color: #167f7a; }
+.password-requirements li.is-met::before { content: '✓'; color: var(--teal); font-weight: 800; }
+.password-requirements .password-requirement-note { grid-column: 1 / -1; color: #718098; }
+.password-requirements .password-requirement-note::before { content: '•'; font-size: 15px; }
 .auth-actions-row { display: flex; justify-content: flex-end; margin: 2px 0 5px; }
 .auth-link {
   width: fit-content;
@@ -3716,4 +3723,5 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
   #auth-overlay { padding: 14px; align-items: start; }
   .auth-card { margin: 10px 0; padding: 25px 20px; border-radius: 16px; }
   .auth-card h1 { font-size: 25px; }
+  .password-requirements { grid-template-columns: 1fr; }
 }

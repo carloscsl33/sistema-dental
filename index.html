@@ -48,15 +48,23 @@
 
       <form id="reset-password-form" class="auth-view" hidden>
         <h1>Crea una contraseña segura</h1>
-        <p class="auth-copy">Usa al menos 8 caracteres y combina letras, números y símbolos.</p>
+        <p class="auth-copy">Crea una contraseña de al menos 12 caracteres. Incluye tres o más tipos de caracteres.</p>
         <label for="new-password">Nueva contraseña*</label>
         <div class="password-field">
-          <input id="new-password" type="password" autocomplete="new-password" spellcheck="false" minlength="8" maxlength="128" required>
+          <input id="new-password" type="password" autocomplete="new-password" spellcheck="false" minlength="12" maxlength="128" required aria-describedby="password-requirements">
           <button class="password-toggle" type="button" data-password-toggle="new-password" aria-label="Mostrar contraseña" aria-controls="new-password" aria-pressed="false">Mostrar</button>
         </div>
+        <ul class="password-requirements" id="password-requirements" aria-live="polite">
+          <li data-password-requirement="length">12 caracteres como mínimo</li>
+          <li data-password-requirement="lowercase">Una letra minúscula</li>
+          <li data-password-requirement="uppercase">Una letra mayúscula</li>
+          <li data-password-requirement="number">Un número</li>
+          <li data-password-requirement="symbol">Un símbolo</li>
+          <li class="password-requirement-note">Cumple al menos 3 de los 4 últimos requisitos.</li>
+        </ul>
         <label for="confirm-password">Confirmar contraseña*</label>
         <div class="password-field">
-          <input id="confirm-password" type="password" autocomplete="new-password" spellcheck="false" minlength="8" maxlength="128" required>
+          <input id="confirm-password" type="password" autocomplete="new-password" spellcheck="false" minlength="12" maxlength="128" required>
           <button class="password-toggle" type="button" data-password-toggle="confirm-password" aria-label="Mostrar contraseña" aria-controls="confirm-password" aria-pressed="false">Mostrar</button>
         </div>
         <p class="auth-message" id="reset-message" role="status" aria-live="polite"></p>
@@ -634,7 +642,7 @@
   <script src="js/events.js?v=20261106-qr-uppercase-1"></script>
   <script src="js/admin.js?v=20261105-ui-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
-  <script src="js/auth.js?v=20261106-invite-password-1"></script>
+  <script src="js/auth.js?v=20261107-password-requirements-1"></script>
   <script src="js/pwa.js?v=20261020-2"></script>
 </body>
 </html>

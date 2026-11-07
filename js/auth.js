@@ -26,6 +26,7 @@ function setSubmitState(form, loading, label) {
 function showAuthView(view, focusSelector) {
   Object.entries(authViews).forEach(([name, form]) => form?.toggleAttribute('hidden', name !== view));
   ['#auth-message', '#recovery-message', '#reset-message'].forEach(id => setAuthMessage(id));
+  if (view === 'reset') updatePasswordRequirements();
   window.setTimeout(() => document.querySelector(focusSelector || ({ login: '#auth-email', recovery: '#recovery-email', reset: '#new-password' }[view]))?.focus(), 0);
 }
 
@@ -88,6 +89,24 @@ function passwordIsStrong(password) {
   return password.length >= 12 && groups >= 3;
 }
 
+function updatePasswordRequirements() {
+  const password = document.querySelector('#new-password')?.value || '';
+  const requirements = {
+    length: password.length >= 12,
+    lowercase: /[a-z]/.test(password),
+    uppercase: /[A-Z]/.test(password),
+    number: /\d/.test(password),
+    symbol: /[^A-Za-z\d]/.test(password)
+  };
+  document.querySelectorAll('[data-password-requirement]').forEach(item => {
+    const fulfilled = Boolean(requirements[item.dataset.passwordRequirement]);
+    item.classList.toggle('is-met', fulfilled);
+    item.setAttribute('aria-label', `${item.textContent}: ${fulfilled ? 'cumplido' : 'pendiente'}`);
+  });
+  const submit = document.querySelector('#reset-password-form button[type="submit"]');
+  if (submit) submit.disabled = !passwordIsStrong(password);
+}
+
 async function initializeAuth() {
   // Mantiene el contenido clínico bloqueado hasta conocer el estado real de la sesión.
   applyAuthState(null);
@@ -136,6 +155,10 @@ document.addEventListener('click', event => {
   if (event.target.closest('#show-recovery')) return showAuthView('recovery');
   if (event.target.closest('[data-auth-back]')) return showAuthView('login');
   if (event.target.closest('[data-logout-button]') && supabaseClient) supabaseClient.auth.signOut();
+});
+
+document.addEventListener('input', event => {
+  if (event.target.matches('#new-password')) updatePasswordRequirements();
 });
 
 document.addEventListener('submit', async event => {
@@ -205,6 +228,7 @@ document.addEventListener('submit', async event => {
     showAuthView('login');
     setAuthMessage('#auth-message', 'Contraseña actualizada. Inicia sesión con tu nueva contraseña.', true);
     setSubmitState(form, false);
+    updatePasswordRequirements();
   }
 });
 
