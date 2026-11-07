@@ -552,12 +552,15 @@ function closeModal() {
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
   
+  const wasSchedulingFollowUp = Boolean(followUpAppointmentId);
   editingAppointment = null;
   rescheduleAppointmentId = null;
+  followUpAppointmentId = null;
   selectedPatientId = null;
   
   const patientIdInput = document.querySelector('#modal-patient-id');
   if (patientIdInput) patientIdInput.value = '';
+  if (wasSchedulingFollowUp) renderLists();
   
   updatePageScrollLock();
 }

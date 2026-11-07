@@ -849,6 +849,7 @@ document.addEventListener('submit', async event => {
   addAppointmentToDateCollection(appointment, true);
   cacheAppointmentsLocally();
   if (isCloudConnected() && !(await syncAppointmentsToCloud())) return;
+  followUpAppointmentId = null;
   renderLists();
   refreshPatientDetails(patient);
   closeModal();
