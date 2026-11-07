@@ -553,6 +553,15 @@ function closeModal() {
   modal.setAttribute('aria-hidden', 'true');
   
   const wasSchedulingFollowUp = Boolean(followUpAppointmentId);
+  const cancelledAppointmentId = rescheduleAppointmentId;
+  const cancelledAppointment = cancelledAppointmentId
+    ? getAppointments().find(({ appointment }) => appointment.id === cancelledAppointmentId)?.appointment
+    : null;
+  const cancelledPatient = cancelledAppointment ? resolveAppointmentPatient(cancelledAppointment) : null;
+  if (cancelledAppointment?.status === 'Cancelada') {
+    cancelledAppointment.status = 'En espera';
+    saveAppointments();
+  }
   editingAppointment = null;
   rescheduleAppointmentId = null;
   followUpAppointmentId = null;
@@ -560,7 +569,8 @@ function closeModal() {
   
   const patientIdInput = document.querySelector('#modal-patient-id');
   if (patientIdInput) patientIdInput.value = '';
-  if (wasSchedulingFollowUp) renderLists();
+  if (wasSchedulingFollowUp || cancelledAppointment) renderLists();
+  if (cancelledPatient) refreshPatientDetails(cancelledPatient);
   
   updatePageScrollLock();
 }

@@ -89,7 +89,7 @@ document.addEventListener('submit', async event => {
         showToast(String(error?.message || '').includes('overpayment') ? 'El monto excede el saldo pendiente actual.' : 'No se pudo registrar el pago. Verifica el saldo e inténtalo de nuevo.');
         return;
       }
-      closePaymentReceipt();
+      closePaymentReceipt(shouldScheduleFollowUp);
       openPaymentDocument(paymentReceipt);
       refreshFinanceModule?.();
       if (shouldScheduleFollowUp) {
@@ -120,7 +120,7 @@ document.addEventListener('submit', async event => {
 
     if (shouldScheduleFollowUp) appointment.status = 'Finalizada';
 
-    closePaymentReceipt();
+    closePaymentReceipt(shouldScheduleFollowUp);
     openPaymentDocument(paymentReceipt);
     savePatients();
     saveAppointments();

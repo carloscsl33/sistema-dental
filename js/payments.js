@@ -71,7 +71,7 @@ function updatePaymentReceiptAmountState() {
   }
 }
 
-function closePaymentReceipt() {
+function closePaymentReceipt(preserveFollowUp = false) {
   const modal = document.querySelector('#payment-receipt-modal');
   if (!modal) return;
   
@@ -80,7 +80,10 @@ function closePaymentReceipt() {
   
   const form = document.querySelector('#payment-receipt-form');
   if (form) form.reset();
-  followUpAppointmentId = null;
+  if (!preserveFollowUp) {
+    followUpAppointmentId = null;
+    renderLists();
+  }
   
   updatePageScrollLock();
 }
