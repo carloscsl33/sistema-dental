@@ -82,7 +82,7 @@ function receiptMarkup(receipt) {
     <section class="payment-document-meta"><div><small>RECIBO</small><strong>${escapeHTML(receipt.folio)}</strong></div><div><small>FECHA DE PAGO</small><strong>${escapeHTML(formatDisplayDate(receipt.paidOn))}</strong></div></section>
     <section class="payment-document-person"><small>RECIBIMOS DE</small><strong>${escapeHTML(receipt.patientName)}</strong><span>Cita: ${escapeHTML(appointmentLine)}</span></section>
     <section class="payment-document-concept"><div><small>CONCEPTO</small><strong>${escapeHTML(receipt.concept)}</strong></div><strong>${formatCurrency(receipt.amount)}</strong></section>
-    <section class="payment-document-totals"><div><small>Costo de la cita</small><strong>${formatCurrency(receipt.total)}</strong></div><div><small>Pago recibido</small><strong>${formatCurrency(receipt.amount)}</strong></div><div class="payment-document-balance"><small>Saldo de esta cita</small><strong>${formatCurrency(receipt.balanceAfter)}</strong></div></section>
+    <section class="payment-document-totals"><div><small>Total de la cita</small><strong>${formatCurrency(receipt.total)}</strong></div><div><small>Pago recibido</small><strong>${formatCurrency(receipt.amount)}</strong></div><div class="payment-document-balance"><small>Saldo pendiente</small><strong>${formatCurrency(receipt.balanceAfter)}</strong></div></section>
     <footer>Comprobante informativo de pago. No sustituye una factura fiscal.</footer>
   </article>`;
 }
@@ -93,7 +93,7 @@ function createPaymentDocumentModal() {
   modal.id = 'payment-document-modal';
   modal.className = 'modal-backdrop payment-document-backdrop';
   modal.setAttribute('aria-hidden', 'true');
-  modal.innerHTML = `<div class="modal-card payment-document-card" role="dialog" aria-modal="true" aria-labelledby="payment-document-title"><header class="payment-document-modal-head"><div><h2 id="payment-document-title">Comprobante de pago</h2><p class="modal-copy">Guárdalo en PDF o compártelo con el paciente.</p></div><button type="button" class="modal-close" data-payment-document-close aria-label="Cerrar">×</button></header><div id="payment-document-content"></div><footer class="payment-document-actions"><button type="button" class="modal-secondary-button" data-payment-document-close>Cerrar</button><button type="button" class="modal-secondary-button" id="payment-document-whatsapp">Enviar por WhatsApp</button><button type="button" class="modal-primary-button" id="payment-document-download">Descargar PDF</button></footer></div>`;
+  modal.innerHTML = `<div class="modal-card payment-document-card" role="dialog" aria-modal="true" aria-labelledby="payment-document-title"><header class="payment-document-modal-head"><div><h2 id="payment-document-title">Comprobante de pago</h2><p class="modal-copy">Guárdalo en PDF o compártelo con el paciente.</p></div><button type="button" class="modal-close" data-payment-document-close aria-label="Cerrar">×</button></header><div id="payment-document-content"></div><footer class="payment-document-actions"><button type="button" class="modal-secondary-button" data-payment-document-close>Cerrar</button><button type="button" class="modal-secondary-button" id="payment-document-share">Compartir PDF</button><button type="button" class="modal-primary-button" id="payment-document-download">Descargar PDF</button></footer></div>`;
   document.body.appendChild(modal);
 }
 
@@ -137,14 +137,16 @@ function pdfBinary(value) {
   return Uint8Array.from(String(value), char => char.charCodeAt(0) & 255);
 }
 
-function downloadReceiptPdf(receipt) {
+function createReceiptPdfBlob(receipt) {
   const contact = receiptContactLine(receipt) || 'Información de contacto no registrada';
   const lines = [
     'q 0.10 0.63 0.61 rg 0 692 595 150 re f Q',
     '1 1 1 rg',
-    'BT /F2 11 Tf 54 797 Td (COMPROBANTE DE PAGO) Tj ET',
-    'BT /F2 25 Tf 54 758 Td (' + pdfText(receipt.clinic.name, 35) + ') Tj ET',
-    'BT /F1 9 Tf 54 738 Td (' + pdfText(contact, 78) + ') Tj ET',
+    '0.18 0.72 0.69 rg 54 728 45 45 re f',
+    '1 1 1 rg BT /F2 25 Tf 68 742 Td (' + pdfText(receiptMonogram(receipt.clinic.name), 1) + ') Tj ET',
+    'BT /F2 11 Tf 113 797 Td (COMPROBANTE DE PAGO) Tj ET',
+    'BT /F2 25 Tf 113 758 Td (' + pdfText(receipt.clinic.name, 35) + ') Tj ET',
+    'BT /F1 9 Tf 113 738 Td (' + pdfText(contact, 66) + ') Tj ET',
     '0.06 0.13 0.23 rg',
     'BT /F2 9 Tf 54 660 Td (RECIBO) Tj ET',
     'BT /F2 12 Tf 54 641 Td (' + pdfText(receipt.folio, 55) + ') Tj ET',
@@ -159,16 +161,18 @@ function downloadReceiptPdf(receipt) {
     'BT /F2 9 Tf 54 470 Td (CONCEPTO) Tj ET',
     'BT /F2 15 Tf 54 442 Td (' + pdfText(receipt.concept, 55) + ') Tj ET',
     'BT /F2 18 Tf 425 442 Td (' + pdfText(formatCurrency(receipt.amount), 22) + ') Tj ET',
-    '0.94 0.97 0.97 rg 54 310 487 92 re f',
     '0.06 0.13 0.23 rg',
-    'BT /F1 9 Tf 76 372 Td (Costo de la cita) Tj ET',
-    'BT /F2 15 Tf 76 344 Td (' + pdfText(formatCurrency(receipt.total), 20) + ') Tj ET',
-    'BT /F1 9 Tf 242 372 Td (Pago recibido) Tj ET',
-    'BT /F2 15 Tf 242 344 Td (' + pdfText(formatCurrency(receipt.amount), 20) + ') Tj ET',
-    'BT /F1 9 Tf 403 372 Td (Saldo de esta cita) Tj ET',
-    'BT /F2 15 Tf 403 344 Td (' + pdfText(formatCurrency(receipt.balanceAfter), 20) + ') Tj ET',
+    '0.82 0.88 0.88 RG 1 w 54 385 m 541 385 l S',
+    'BT /F1 10 Tf 54 363 Td (Total de la cita) Tj ET',
+    'BT /F2 14 Tf 456 363 Td (' + pdfText(formatCurrency(receipt.total), 20) + ') Tj ET',
+    '0.88 0.91 0.93 RG 1 w 54 336 m 541 336 l S',
+    'BT /F1 10 Tf 54 314 Td (Pago recibido) Tj ET',
+    'BT /F2 14 Tf 456 314 Td (' + pdfText(formatCurrency(receipt.amount), 20) + ') Tj ET',
+    '0.88 0.91 0.93 RG 1 w 54 287 m 541 287 l S',
+    'BT /F2 10 Tf 54 265 Td (Saldo pendiente) Tj ET',
+    'BT /F2 15 Tf 450 265 Td (' + pdfText(formatCurrency(receipt.balanceAfter), 20) + ') Tj ET',
     '0.45 0.50 0.58 rg',
-    'BT /F1 9 Tf 54 264 Td (Comprobante informativo de pago. No sustituye una factura fiscal.) Tj ET'
+    'BT /F1 9 Tf 54 220 Td (Comprobante informativo de pago. No sustituye una factura fiscal.) Tj ET'
   ].join('\n');
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
@@ -185,8 +189,12 @@ function downloadReceiptPdf(receipt) {
   pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
   offsets.slice(1).forEach(offset => { pdf += `${String(offset).padStart(10, '0')} 00000 n \n`; });
   pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return new Blob([pdfBinary(pdf)], { type: 'application/pdf' });
+}
+
+function downloadReceiptPdf(receipt) {
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([pdfBinary(pdf)], { type: 'application/pdf' }));
+  link.href = URL.createObjectURL(createReceiptPdfBlob(receipt));
   link.download = `${receipt.folio.toLowerCase()}.pdf`;
   document.body.appendChild(link);
   link.click();
@@ -194,11 +202,19 @@ function downloadReceiptPdf(receipt) {
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
-function sendReceiptByWhatsapp(receipt) {
-  const phone = /^\d{10}$/.test(String(receipt.patientPhone || '')) ? `52${receipt.patientPhone}` : '';
-  const message = [`${receipt.clinic.name}`, 'COMPROBANTE DE PAGO', `Folio: ${receipt.folio}`, `Paciente: ${receipt.patientName}`, `Concepto: ${receipt.concept}`, `Pago recibido: ${formatCurrency(receipt.amount)}`, `Saldo de esta cita: ${formatCurrency(receipt.balanceAfter)}`].join('\n');
-  const windowRef = window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
-  if (!windowRef) showToast('Permite las ventanas emergentes para abrir WhatsApp.');
+async function shareReceiptPdf(receipt) {
+  const filename = `${receipt.folio.toLowerCase()}.pdf`;
+  const file = new File([createReceiptPdfBlob(receipt)], filename, { type: 'application/pdf' });
+  if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+    try {
+      await navigator.share({ title: `Recibo ${receipt.folio}`, text: `Comprobante de pago de ${receipt.clinic.name}`, files: [file] });
+    } catch (error) {
+      if (error?.name !== 'AbortError') showToast('No se pudo abrir el menú para compartir el PDF.');
+    }
+    return;
+  }
+  downloadReceiptPdf(receipt);
+  showToast('Este navegador no puede compartir archivos directamente. Descarga el PDF y adjúntalo en WhatsApp.');
 }
 
 document.addEventListener('click', event => {
@@ -206,5 +222,5 @@ document.addEventListener('click', event => {
   const modal = document.querySelector('#payment-document-modal');
   if (!modal?._receipt) return;
   if (event.target.closest('#payment-document-download')) downloadReceiptPdf(modal._receipt);
-  if (event.target.closest('#payment-document-whatsapp')) sendReceiptByWhatsapp(modal._receipt);
+  if (event.target.closest('#payment-document-share')) shareReceiptPdf(modal._receipt);
 });
