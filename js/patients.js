@@ -469,6 +469,7 @@ function renderPatientFinancialHistory(patient) {
           <span><small>Monto pagado</small><strong>${formatCurrency(payment.monto)}</strong></span>
           <span><small>Saldo restante</small><strong>${formatCurrency(balance)}</strong></span>
           <span><small>Monto establecido</small><strong>${formatCurrency(total)}</strong></span>
+          <button type="button" class="row-action" data-payment-receipt-patient="${escapeHTML(patient.id)}" data-payment-receipt="${escapeHTML(payment.id)}">Recibo</button>
         </div>
       </article>`;
   }).join('');

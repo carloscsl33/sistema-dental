@@ -12,6 +12,7 @@ function unlockPageScroll() {
 
 function updatePageScrollLock() {
   const paymentReceiptOpen = document.querySelector('#payment-receipt-modal')?.classList.contains('open');
+  const paymentDocumentOpen = document.querySelector('#payment-document-modal')?.classList.contains('open');
   const appointmentOpen = document.querySelector('#appointment-modal')?.classList.contains('open');
   const appointmentNotesOpen = document.querySelector('#appointment-notes-modal')?.classList.contains('open');
   const patientAppointmentsOpen = document.querySelector('#patient-appointments-modal')?.classList.contains('open');
@@ -22,7 +23,7 @@ function updatePageScrollLock() {
   const patientQrScannerOpen = document.querySelector('#patient-qr-scanner')?.classList.contains('open');
   const confirmationOpen = document.querySelector('#confirmation-modal')?.classList.contains('open');
   
-  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || dailyAgendaOpen || adminUserOpen || patientQrOpen || patientQrScannerOpen || confirmationOpen) {
+  if (appointmentOpen || appointmentNotesOpen || patientAppointmentsOpen || patientOpen || paymentReceiptOpen || paymentDocumentOpen || dailyAgendaOpen || adminUserOpen || patientQrOpen || patientQrScannerOpen || confirmationOpen) {
     lockPageScroll();
   } else {
     unlockPageScroll();

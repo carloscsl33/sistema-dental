@@ -27,12 +27,10 @@ document.addEventListener('submit', async event => {
     }
     
     const appointmentId = document.querySelector('#receipt-appointment-id')?.value;
-    const paymentStatus = document.querySelector('#receipt-payment-status')?.value;
     const paymentAmountInput = document.querySelector('#receipt-payment-amount');
-    const paymentDate = document.querySelector('#receipt-payment-date')?.value;
     const paymentMethod = document.querySelector('#receipt-payment-method')?.value;
-    const reference = document.querySelector('#receipt-reference')?.value.trim();
-    const notes = document.querySelector('#receipt-notes')?.value.trim();
+    const paymentDate = getISODate(0);
+    const receiptFolio = document.querySelector('#receipt-folio')?.value || createReceiptFolio();
     
     if (!appointmentId) {
       showToast('No se identificó la cita.');
@@ -61,11 +59,6 @@ document.addEventListener('submit', async event => {
       showToast('No se encontró el paciente de la cita.');
       return;
     }
-    if (!paymentDate) {
-      showToast('Selecciona la fecha del pago.');
-      return;
-    }
-    
     const totalAmount = getNumericAmount(appointment.total ?? appointment.balance);
     const currentBalance = getNumericAmount(appointment.balance);
     const paymentAmount = getNumericAmount(paymentAmountInput.value);
@@ -78,31 +71,26 @@ document.addEventListener('submit', async event => {
     }
 
     const shouldScheduleFollowUp = followUpAppointmentId === appointmentId;
+    const receiptBalanceAfter = Math.max(currentBalance - Math.min(paymentAmount, currentBalance), 0);
+    const paymentReceipt = createReceiptPayload({
+      patient,
+      appointment,
+      amount: paymentAmount,
+      paidOn: paymentDate,
+      folio: receiptFolio,
+      balanceAfter: receiptBalanceAfter,
+      total: totalAmount
+    });
     if (isCloudConnected() && paymentAmount > 0) {
       try {
-        await recordPaymentSafely({ appointmentId, amount: paymentAmount, method: paymentMethod, paidOn: paymentDate, reference, notes, finalize: shouldScheduleFollowUp });
+        await recordPaymentSafely({ appointmentId, amount: paymentAmount, method: paymentMethod, paidOn: paymentDate, reference: receiptFolio, notes: '', finalize: shouldScheduleFollowUp });
       } catch (error) {
         console.error('No se pudo registrar el pago:', error);
         showToast(String(error?.message || '').includes('overpayment') ? 'El monto excede el saldo pendiente actual.' : 'No se pudo registrar el pago. Verifica el saldo e inténtalo de nuevo.');
         return;
       }
-      if (event.submitter?.id === 'payment-receipt-whatsapp') {
-        const refreshedPatient = patients.find(item => item.id === patient.id) || patient;
-        const pendingAfter = getPatientPendingAppointments(refreshedPatient).reduce((sum, item) => sum + getNumericAmount(item.balance), 0);
-        const receiptMessage = [
-          '____________________________', 'RECIBO DE PAGO',
-          `Paciente: ${getPatientFullName(refreshedPatient) || appointment.name}`,
-          `Fecha de la cita: ${formatDisplayDate(appointment.date)}`,
-          `Motivo: ${appointment.reason || 'Consulta'}`,
-          `Costo de la cita: ${formatCurrency(totalAmount)}`,
-          `Pago recibido: ${formatCurrency(paymentAmount)} (${paymentMethod})`,
-          `Saldo pendiente total: ${formatCurrency(pendingAfter)}`
-        ].join('\n');
-        const phone = /^\d{10}$/.test(refreshedPatient.telefono) ? `52${refreshedPatient.telefono}` : '';
-        const whatsappWindow = window.open(`https://wa.me/${phone}?text=${encodeURIComponent(receiptMessage)}`, '_blank');
-        if (!whatsappWindow) showToast('Permite las ventanas emergentes para abrir WhatsApp.');
-      }
       closePaymentReceipt();
+      openPaymentDocument(paymentReceipt);
       refreshFinanceModule?.();
       if (shouldScheduleFollowUp) {
         showToast(`Pago de ${formatCurrency(paymentAmount)} registrado. Agenda la siguiente cita.`);
@@ -125,29 +113,15 @@ document.addEventListener('submit', async event => {
       if (!Array.isArray(patient.historialFinanciero)) patient.historialFinanciero = [];
       patient.historialFinanciero.push({
         id: generateId('payment'), fecha: paymentDate, monto: amount, concepto: item.reason || 'Pago de consulta',
-        metodo: paymentMethod, estado: item.paymentStatus, citaId: item.id, fechaCita: item.date, horaCita: item.time, referencia: reference,
-        notas: notes, saldoAnterior: before, saldoRestante: after, montoTotal: itemTotal, createdAt: new Date().toISOString()
+        metodo: paymentMethod, estado: item.paymentStatus, citaId: item.id, fechaCita: item.date, horaCita: item.time, referencia: receiptFolio,
+        notas: '', saldoAnterior: before, saldoRestante: after, montoTotal: itemTotal, createdAt: new Date().toISOString()
       });
     });
 
     if (shouldScheduleFollowUp) appointment.status = 'Finalizada';
 
-    if (event.submitter?.id === 'payment-receipt-whatsapp') {
-      const pendingAfter = getPatientPendingAppointments(patient).reduce((sum, item) => sum + getNumericAmount(item.balance), 0);
-      const receiptMessage = [
-        '____________________________', 'RECIBO DE PAGO',
-        `Paciente: ${getPatientFullName(patient) || appointment.name}`,
-        `Fecha de la cita: ${formatDisplayDate(appointment.date)}`,
-        `Motivo: ${appointment.reason || 'Consulta'}`,
-        `Costo de la cita: ${formatCurrency(totalAmount)}`,
-        `Pago recibido: ${formatCurrency(paymentAmount)} (${paymentMethod})`,
-        `Saldo pendiente total: ${formatCurrency(pendingAfter)}`
-      ].join('\n');
-      const phone = /^\d{10}$/.test(patient.telefono) ? `52${patient.telefono}` : '';
-      const whatsappWindow = window.open(`https://wa.me/${phone}?text=${encodeURIComponent(receiptMessage)}`, '_blank');
-      if (!whatsappWindow) showToast('Permite las ventanas emergentes para abrir WhatsApp.');
-    }
     closePaymentReceipt();
+    openPaymentDocument(paymentReceipt);
     savePatients();
     saveAppointments();
     renderLists();
@@ -164,9 +138,7 @@ document.addEventListener('submit', async event => {
 });
 
 document.addEventListener('change', event => {
-  if (event.target.matches('#receipt-payment-status')) {
-    updatePaymentReceiptAmountState();
-  }
+  if (event.target.matches('#receipt-payment-status')) updatePaymentReceiptAmountState();
 });
 
 document.addEventListener('click', async event => {
@@ -548,6 +520,12 @@ document.addEventListener('click', async event => {
   
   if (event.target.closest('#payment-receipt-close') || event.target.closest('#payment-receipt-cancel')) {
     closePaymentReceipt();
+    return;
+  }
+
+  const receiptButton = event.target.closest('[data-payment-receipt]');
+  if (receiptButton) {
+    openStoredPaymentReceipt(receiptButton.dataset.paymentReceiptPatient, receiptButton.dataset.paymentReceipt);
     return;
   }
 
@@ -971,6 +949,7 @@ document.addEventListener('keydown', event => {
     ['#appointment-notes-modal', closeAppointmentNotes],
     ['#daily-agenda-modal', closeDailyAgenda],
     ['#payment-receipt-modal', closePaymentReceipt],
+    ['#payment-document-modal', closePaymentDocument],
     ['#appointment-modal', closeModal],
     ['#patient-modal', closePatientModal]
   ];

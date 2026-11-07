@@ -32,14 +32,12 @@ function openPaymentReceipt(appointmentId) {
   setFieldValue('#receipt-treatment', appointment.reason || 'Consulta');
   setFieldValue('#receipt-total', formatCurrency(totalAmount));
   setFieldValue('#receipt-balance', formatCurrency(balanceAmount));
+  setFieldValue('#receipt-folio', createReceiptFolio());
+  setFieldValue('#receipt-payment-date', formatDisplayDate(getISODate(0)));
   
   updatePaymentReceiptSummary();
   const previousDisplay = document.querySelector('#receipt-previous-display');
   if (previousDisplay) previousDisplay.textContent = formatCurrency(getPatientPendingAppointments(patient).filter(item => item.id !== appointment.id).reduce((sum, item) => sum + getNumericAmount(item.balance), 0));
-  
-  setFieldValue('#receipt-payment-date', getISODate(0));
-  setFieldValue('#receipt-reference', '');
-  setFieldValue('#receipt-notes', '');
   
   const paymentStatus = document.querySelector('#receipt-payment-status');
   const paymentAmount = document.querySelector('#receipt-payment-amount');
@@ -106,11 +104,12 @@ function createPaymentReceiptModal() {
       </div>
       <form id="payment-receipt-form">
         <input type="hidden" id="receipt-appointment-id">
+        <input type="hidden" id="receipt-folio">
         <div class="payment-receipt-grid">
           <label><span>Paciente</span><input type="text" id="receipt-patient" readonly></label>
           <label><span>Fecha de la cita</span><input type="text" id="receipt-appointment-date" readonly></label>
           <label><span>Tratamiento / concepto</span><input type="text" id="receipt-treatment" readonly></label>
-          <label><span>Fecha del pago</span><input type="date" id="receipt-payment-date" required></label>
+          <label><span>Fecha del pago</span><input type="text" id="receipt-payment-date" readonly></label>
         </div>
         <div class="payment-summary">
           <div><small>Costo de esta cita</small><strong id="receipt-total-display">$0</strong></div>
@@ -132,18 +131,9 @@ function createPaymentReceiptModal() {
               <option value="Transferencia">Transferencia</option>
             </select>
           </label>
-          <label>
-            <span>Referencia / comprobante</span>
-            <input type="text" id="receipt-reference" maxlength="100" placeholder="Número de transferencia, folio, etc.">
-          </label>
         </div>
-        <label>
-          <span>Notas</span>
-          <textarea id="receipt-notes" rows="3" placeholder="Observaciones del pago..."></textarea>
-        </label>
         <div class="payment-receipt-actions">
           <button type="button" class="modal-secondary-button" id="payment-receipt-cancel">Cancelar</button>
-          <button type="submit" class="modal-secondary-button" id="payment-receipt-whatsapp">Guardar y enviar recibo por WhatsApp</button>
           <button type="submit" class="modal-primary-button">Guardar recibo y nueva cita</button>
         </div>
       </form>

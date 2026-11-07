@@ -3603,6 +3603,85 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .finance-movement:last-child, .finance-debtor:last-child { border-bottom: 0; }
 .finance-movement-icon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; font-weight: 800; }.finance-movement-icon.payment { background: #e7f7f5; color: #15827c; }.finance-movement-icon.refund { background: #fff0f0; color: #b74242; }
 .finance-movement strong, .finance-debtor strong { color: var(--ink); font-size: 13px; }.finance-movement small, .finance-debtor small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+
+/* Vista y descarga de comprobantes: comparte los colores y la jerarquía de los modales clínicos. */
+#payment-document-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1010;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto;
+  background: rgba(32, 43, 69, 0.48);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+#payment-document-modal.open { display: flex; }
+#payment-document-modal .payment-document-card {
+  width: min(650px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 18px 55px rgba(21, 32, 57, 0.25);
+}
+.payment-document-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 25px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.payment-document-modal-head h2 { margin: 0; color: var(--ink); font-family: "Nunito Sans", sans-serif; font-size: 20px; }
+.payment-document-modal-head .modal-copy { margin: 5px 0 0; }
+.payment-document-paper { margin: 22px 25px; overflow: hidden; border: 1px solid #dbe8e8; border-radius: 14px; background: #fff; color: var(--ink); }
+.payment-document-brand { display: flex; align-items: center; gap: 14px; padding: 24px; background: var(--teal); color: #fff; }
+.payment-document-monogram { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border-radius: 13px; background: rgba(255,255,255,.19); color: #fff; font-size: 25px; font-weight: 800; }
+.payment-document-brand p, .payment-document-brand h2, .payment-document-brand small { margin: 0; color: #fff; }
+.payment-document-brand p { margin-bottom: 3px; font-size: 10px; font-weight: 800; letter-spacing: .09em; }
+.payment-document-brand h2 { font-family: "Nunito Sans", sans-serif; font-size: 22px; line-height: 1.2; }
+.payment-document-brand small { display: block; margin-top: 5px; font-size: 11px; line-height: 1.4; opacity: .9; }
+.payment-document-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 21px 24px; border-bottom: 1px solid #e9eef1; }
+.payment-document-meta div:last-child { text-align: right; }
+.payment-document-meta small, .payment-document-person small, .payment-document-concept small, .payment-document-totals small { display: block; color: #7c899b; font-size: 10px; font-weight: 800; letter-spacing: .07em; }
+.payment-document-meta strong { display: block; margin-top: 5px; color: var(--ink); font-size: 13px; }
+.payment-document-person { margin: 20px 24px; padding: 17px; border-radius: 11px; background: #f3fbfa; }
+.payment-document-person strong { display: block; margin-top: 6px; color: var(--ink); font-family: "Nunito Sans", sans-serif; font-size: 18px; }
+.payment-document-person span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+.payment-document-concept { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 0 24px; padding: 18px 0; border-top: 1px solid #e9eef1; border-bottom: 1px solid #e9eef1; }
+.payment-document-concept div { min-width: 0; }
+.payment-document-concept div strong { display: block; margin-top: 5px; color: var(--ink); font-size: 14px; }
+.payment-document-concept > strong { flex: 0 0 auto; color: var(--teal-dark, #137f7a); font-family: "Nunito Sans", sans-serif; font-size: 21px; }
+.payment-document-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 20px 24px; border: 1px solid #d9eeee; border-radius: 11px; overflow: hidden; }
+.payment-document-totals > div { min-width: 0; padding: 15px 13px; background: #fbfefe; }
+.payment-document-totals > div + div { border-left: 1px solid #d9eeee; }
+.payment-document-totals strong { display: block; margin-top: 6px; color: var(--ink); font-size: 15px; }
+.payment-document-totals .payment-document-balance { background: #eaf8f6; }
+.payment-document-totals .payment-document-balance strong { color: #087f78; }
+.payment-document-paper footer { padding: 0 24px 20px; color: #8491a2; font-size: 10px; text-align: center; }
+.payment-document-actions { display: flex; justify-content: flex-end; gap: 9px; padding: 15px 25px 22px; border-top: 1px solid var(--line); }
+.payment-document-actions button { min-height: 41px; padding: 9px 14px; }
+@media (min-width: 1000px) { .finance-movement { grid-template-columns: auto minmax(0, 1fr) auto auto auto; } }
+@media (max-width: 640px) {
+  #payment-document-modal { align-items: flex-start; padding: 14px; }
+  #payment-document-modal .payment-document-card { max-height: calc(100dvh - 28px); }
+  .payment-document-modal-head { padding: 20px 18px 13px; }
+  .payment-document-paper { margin: 16px 18px; border-radius: 12px; }
+  .payment-document-brand { align-items: flex-start; padding: 19px 17px; }
+  .payment-document-brand h2 { font-size: 19px; }
+  .payment-document-meta { gap: 10px; padding: 17px; }
+  .payment-document-person { margin: 16px 17px; padding: 14px; }
+  .payment-document-concept { margin: 0 17px; }
+  .payment-document-totals { margin: 16px 17px; grid-template-columns: 1fr; }
+  .payment-document-totals > div + div { border-top: 1px solid #d9eeee; border-left: 0; }
+  .payment-document-paper footer { padding: 0 17px 16px; }
+  .payment-document-actions { flex-wrap: wrap; padding: 13px 18px 18px; }
+  .payment-document-actions button { flex: 1 1 140px; }
+}
 .finance-amount.positive { color: #15827c; }.finance-refund-button { min-height: 31px; white-space: nowrap; }
 .finance-modal-backdrop { z-index: 1300; background: rgba(27, 37, 62, 0.45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 .finance-modal { position: relative; width: min(560px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); overflow-y: auto; padding: 26px; border: 1px solid #edf0f4; border-radius: 16px; background: #fff; box-shadow: 0 20px 60px rgba(21, 32, 57, 0.24); }.finance-modal h2 { margin: 0 0 5px; color: var(--ink); }.finance-modal .form-grid { margin: 18px 0; }.finance-modal > label { margin: 16px 0; }
