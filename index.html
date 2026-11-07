@@ -84,7 +84,7 @@
     </nav>
     <div class="sidebar-footer">
       <div class="profile">
-        <div><strong>Clínica Dental</strong><small id="session-status" class="session-status">Sesión no iniciada</small></div>
+        <div class="session-identity"><strong class="session-email">Sesión no iniciada</strong><small id="session-status" class="session-status"></small></div>
         <button class="logout-button" id="logout-button" data-logout-button type="button" aria-label="Cerrar sesión" title="Cerrar sesión" hidden>
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7M13 3v5m0 8v5m-4-9h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -108,7 +108,7 @@
       <a class="nav-item" href="#configuracion" data-page-link="configuracion" data-roles="admin" hidden><i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06-2.1 2.1-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V20.3h-3v-.11A1.7 1.7 0 0 0 10.7 18.63a1.7 1.7 0 0 0-1.87.34l-.06.06-2.1-2.1.06-.06A1.7 1.7 0 0 0 7.07 15a1.7 1.7 0 0 0-1.56-1.03H5.4v-3h.11A1.7 1.7 0 0 0 7.07 9.94a1.7 1.7 0 0 0-.34-1.87l-.06-.06 2.1-2.1.06.06a1.7 1.7 0 0 0 1.87.34 1.7 1.7 0 0 0 1.03-1.56V4.64h3v.11a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06 2.1 2.1-.06.06a1.7 1.7 0 0 0-.34 1.87 1.7 1.7 0 0 0 1.56 1.03h.11v3h-.11A1.7 1.7 0 0 0 19.4 15Z"/></svg></i>Configuración</a>
     </div>
     <div class="mobile-navigation-footer">
-      <small class="mobile-navigation-status session-status" id="mobile-session-status">Sesión no iniciada</small>
+      <div class="mobile-session-identity"><strong class="session-email">Sesión no iniciada</strong><small class="mobile-navigation-status session-status" id="mobile-session-status"></small></div>
       <button class="mobile-logout-button" data-logout-button type="button" hidden>Cerrar sesión</button>
     </div>
   </nav>
@@ -628,7 +628,7 @@
   <script src="js/supabase-client.js?v=20261020-2"></script>
   <script src="js/state.js?v=20261104-finance-1"></script>
   <script src="js/utils.js?v=20261107-agenda-config-1"></script>
-  <script src="js/access.js?v=20261105-roles-1"></script>
+  <script src="js/access.js?v=20261107-session-identity-1"></script>
   <script src="js/settings.js?v=20261107-settings-inputs-1"></script>
   <script src="js/data.js?v=20261105-roles-1"></script>
   <script src="js/appointments.js?v=20261105-roles-1"></script>
@@ -642,7 +642,7 @@
   <script src="js/events.js?v=20261106-qr-uppercase-1"></script>
   <script src="js/admin.js?v=20261105-ui-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
-  <script src="js/auth.js?v=20261107-password-requirements-1"></script>
+  <script src="js/auth.js?v=20261107-session-identity-1"></script>
   <script src="js/pwa.js?v=20261020-2"></script>
 </body>
 </html>

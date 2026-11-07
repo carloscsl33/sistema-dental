@@ -23,6 +23,13 @@ function setSubmitState(form, loading, label) {
   button.textContent = loading ? label : button.dataset.label;
 }
 
+function renderSessionIdentity(session = null) {
+  const email = currentAccess?.email || session?.user?.email || 'Sesión no iniciada';
+  const role = currentAccess?.role ? (ROLE_LABELS[currentAccess.role] || currentAccess.role) : '';
+  document.querySelectorAll('.session-email').forEach(element => { element.textContent = email; });
+  document.querySelectorAll('.session-status').forEach(element => { element.textContent = role; });
+}
+
 function showAuthView(view, focusSelector) {
   Object.entries(authViews).forEach(([name, form]) => form?.toggleAttribute('hidden', name !== view));
   ['#auth-message', '#recovery-message', '#reset-message'].forEach(id => setAuthMessage(id));
@@ -35,9 +42,7 @@ function applyAuthState(session) {
   document.querySelector('#auth-overlay')?.toggleAttribute('hidden', !showOverlay);
   document.body.classList.toggle('auth-locked', showOverlay);
   document.querySelectorAll('[data-logout-button]').forEach(button => button.toggleAttribute('hidden', !session));
-  document.querySelectorAll('.session-status').forEach(status => {
-    status.textContent = session ? 'Sesión activa' : 'Sesión no iniciada';
-  });
+  renderSessionIdentity(session);
 }
 
 let cloudSessionReady = false;

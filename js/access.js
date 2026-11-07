@@ -4,7 +4,7 @@ const ROLE_LABELS = {
   doctor: 'Doctor/a'
 };
 
-let currentAccess = { id: null, role: null, status: null, fullName: '' };
+let currentAccess = { id: null, role: null, status: null, fullName: '', email: '' };
 
 function getCurrentRole() { return currentAccess.role; }
 
@@ -29,11 +29,7 @@ function applyRoleAccess() {
     const allowedRoles = element.dataset.roles.split(/\s+/).filter(Boolean);
     element.hidden = !allowedRoles.includes(currentAccess.role);
   });
-  document.querySelectorAll('.session-status').forEach(status => {
-    status.textContent = currentAccess.role
-      ? `Sesión activa · ${ROLE_LABELS[currentAccess.role]}`
-      : 'Sesión activa';
-  });
+  renderSessionIdentity();
 }
 
 async function loadCurrentAccess(session) {
@@ -44,13 +40,13 @@ async function loadCurrentAccess(session) {
     .eq('id', session.user.id)
     .maybeSingle();
   if (error || !data || data.status !== 'approved' || !ROLE_LABELS[data.role]) return null;
-  currentAccess = { id: session.user.id, role: data.role, status: data.status, fullName: data.full_name || '' };
+  currentAccess = { id: session.user.id, role: data.role, status: data.status, fullName: data.full_name || '', email: session.user.email || '' };
   applyRoleAccess();
   return currentAccess;
 }
 
 function clearCurrentAccess() {
-  currentAccess = { id: null, role: null, status: null, fullName: '' };
+  currentAccess = { id: null, role: null, status: null, fullName: '', email: '' };
   document.documentElement.dataset.role = '';
 }
 

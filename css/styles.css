@@ -177,12 +177,16 @@ a {
 
 .profile strong {
   font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile small {
   color: var(--muted);
   font-size: 10px;
 }
+.session-identity { min-width: 0; flex: 1; }
 
 .logout-button {
   width: 30px;
@@ -2801,6 +2805,8 @@ main {
   .mobile-nav-close { width: 38px; height: 38px; border-radius: 9px; background: #f4f7fa; color: #53637b; font-size: 28px; font-weight: 400; line-height: 1; }
   .mobile-navigation-links { display: grid; gap: 8px; padding-top: 20px; }
   .mobile-navigation .nav-item { min-height: 54px; font-size: 16px; }
+  .mobile-session-identity { display: grid; min-width: 0; gap: 3px; }
+  .mobile-session-identity .session-email { overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
   .mobile-navigation-status { margin: 0; padding: 0; color: var(--muted); font-size: 12px; }
   .mobile-navigation-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding: 16px 4px 0; border-top: 1px solid var(--line); }
   .mobile-logout-button { min-height: 36px; padding: 7px 10px; border: 1px solid #bfe8e3; border-radius: 8px; background: #e7f7f5; color: #147e78; font-size: 12px; font-weight: 700; cursor: pointer; }
