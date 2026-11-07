@@ -3601,7 +3601,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .finance-movement { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid #edf1f4; }
 .finance-debtor { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid #edf1f4; }
 .finance-movement:last-child, .finance-debtor:last-child { border-bottom: 0; }
-.finance-movement-icon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; font-weight: 800; }.finance-movement-icon.payment { background: #e7f7f5; color: #15827c; }.finance-movement-icon.refund { background: #fff0f0; color: #b74242; }
+.finance-movement-icon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; font-weight: 800; }.finance-movement-icon.payment { background: #e7f7f5; color: #15827c; }
 .finance-movement strong, .finance-debtor strong { color: var(--ink); font-size: 13px; }.finance-movement small, .finance-debtor small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 1.35; }
 
 /* Vista y descarga de comprobantes: comparte los colores y la jerarquía de los modales clínicos. */
@@ -3669,7 +3669,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .payment-document-actions button { min-height: 41px; padding: 9px 14px; }
 .payment-document-actions .outline-button,
 .payment-document-actions .new-button { margin: 0; min-height: 42px; }
-@media (min-width: 1000px) { .finance-movement { grid-template-columns: auto minmax(0, 1fr) auto auto auto; } }
+@media (min-width: 1000px) { .finance-movement { grid-template-columns: auto minmax(0, 1fr) auto auto; } }
 @media (max-width: 640px) {
   #payment-document-modal { align-items: flex-start; padding: 14px; }
   #payment-document-modal .payment-document-card { max-height: calc(100dvh - 28px); }
@@ -3736,7 +3736,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .finance-modal::-webkit-scrollbar-thumb:hover,
 .finance-debt-list::-webkit-scrollbar-thumb:hover,
 #confirmation-modal .confirmation-modal::-webkit-scrollbar-thumb:hover { background-color: #aeb9c7; }
-.finance-amount.positive { color: #15827c; }.finance-refund-button { min-height: 31px; white-space: nowrap; }
+.finance-amount.positive { color: #15827c; }
 .finance-modal-backdrop { z-index: 1300; background: rgba(27, 37, 62, 0.45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 .finance-modal { position: relative; width: min(560px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); overflow-y: auto; padding: 26px; border: 1px solid #edf0f4; border-radius: 16px; background: #fff; box-shadow: 0 20px 60px rgba(21, 32, 57, 0.24); }.finance-modal h2 { margin: 0 0 5px; color: var(--ink); }.finance-modal .form-grid { margin: 18px 0; }.finance-modal > label { margin: 16px 0; }
 .settings-form { padding: 0 24px 22px; }
@@ -3855,7 +3855,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
   .patient-list-actions .row-action { min-height: 34px; }
   .backup-selected-file { grid-template-columns: 1fr; align-items: stretch; }
   .backup-selected-file .new-button { width: 100%; }
-  .finance-toolbar { align-items: stretch; flex-direction: column; }.finance-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }.finance-toolbar-actions > button { flex: 1; }.finance-kpis, .finance-columns { grid-template-columns: 1fr; }.finance-movement { grid-template-columns: auto minmax(0, 1fr) auto; }.finance-movement .finance-refund-button { grid-column: 2 / -1; width: 100%; }.finance-debtor { grid-template-columns: minmax(0, 1fr) auto; }.finance-debtor button { grid-column: 1 / -1; width: 100%; }
+  .finance-toolbar { align-items: stretch; flex-direction: column; }.finance-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }.finance-toolbar-actions > button { flex: 1; }.finance-kpis, .finance-columns { grid-template-columns: 1fr; }.finance-movement { grid-template-columns: auto minmax(0, 1fr) auto; }.finance-movement .row-action { grid-column: 2 / -1; width: 100%; }.finance-debtor { grid-template-columns: minmax(0, 1fr) auto; }.finance-debtor button { grid-column: 1 / -1; width: 100%; }
 }
 
 @media (max-width: 480px) {
