@@ -42,7 +42,7 @@ function renderBusinessHoursRow(name, day) {
   const row = businessHours.find(item => Number(item.day_of_week) === day) || { is_open: true, opens_at: '09:00', closes_at: '19:00' };
   const opens = String(row.opens_at || '09:00').slice(0, 5);
   const closes = String(row.closes_at || '19:00').slice(0, 5);
-  return `<div class="hours-row"><label class="hours-day-toggle"><input type="checkbox" data-hours-open="${day}" ${row.is_open ? 'checked' : ''}><span>${name}</span></label><input aria-label="Apertura ${name}" type="time" data-hours-open-at="${day}" value="${opens}" ${row.is_open ? '' : 'disabled'}><span class="hours-separator">a</span><input aria-label="Cierre ${name}" type="time" data-hours-close-at="${day}" value="${closes}" ${row.is_open ? '' : 'disabled'}></div>`;
+  return `<div class="hours-row"><label class="hours-day-toggle"><input type="checkbox" data-hours-open="${day}" ${row.is_open ? 'checked' : ''}><span>${name}</span></label><label class="hours-time-field"><span>Apertura</span><input aria-label="Apertura ${name}" type="time" data-hours-open-at="${day}" value="${opens}" ${row.is_open ? '' : 'disabled'}></label><label class="hours-time-field"><span>Cierre</span><input aria-label="Cierre ${name}" type="time" data-hours-close-at="${day}" value="${closes}" ${row.is_open ? '' : 'disabled'}></label></div>`;
 }
 
 function renderCatalogList(selector, rows, kind) {
@@ -69,6 +69,10 @@ document.addEventListener('submit', async event => {
   if (event.target.matches('#clinic-settings-form')) {
     event.preventDefault();
     const form = event.target;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
     const values = Object.fromEntries(new FormData(form));
     const settings = { id: true, clinic_name: values.clinic_name.trim(), responsible_name: values.responsible_name.trim(), phone: values.phone.trim(), email: values.email.trim(), address: values.address.trim(), slot_minutes: Number(values.slot_minutes), slot_capacity: Number(values.slot_capacity), updated_by: currentAccess.id };
     try {
@@ -96,6 +100,12 @@ document.addEventListener('change', event => {
   const day = event.target.dataset.hoursOpen;
   if (day === undefined) return;
   document.querySelectorAll(`[data-hours-open-at="${day}"], [data-hours-close-at="${day}"]`).forEach(input => { input.disabled = !event.target.checked; });
+});
+
+document.addEventListener('input', event => {
+  if (event.target.matches('#clinic-settings-form input[name="phone"]')) {
+    event.target.value = event.target.value.replace(/\D/g, '').slice(0, 10);
+  }
 });
 
 document.addEventListener('click', async event => {

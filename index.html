@@ -266,8 +266,8 @@
           <h3>Datos para recibo</h3>
           <p>Se utilizarán en los comprobantes de pago</p>
           <div class="form-grid">
-            <label>Teléfono:<input name="phone" maxlength="30"></label>
-            <label>Correo:<input name="email" type="email" maxlength="254"></label>
+            <label>Teléfono:<input name="phone" type="tel" inputmode="numeric" autocomplete="tel" minlength="10" maxlength="10" pattern="[0-9]{10}" title="Ingresa 10 dígitos" placeholder="10 dígitos"></label>
+            <label>Correo:<input name="email" type="email" autocomplete="email" maxlength="254" placeholder="correo@ejemplo.com"></label>
             <label class="full-width">Dirección:<input name="address" maxlength="250"></label>
           </div>
         </section>
@@ -329,7 +329,7 @@
         <div class="backup-selected-file" id="backup-restore-selection" hidden aria-live="polite">
           <span class="backup-selected-file-label">Archivo seleccionado</span>
           <strong id="backup-restore-filename"></strong>
-          <button class="outline-button" type="button" id="backup-restore-confirm">Restaurar esta copia</button>
+          <button class="new-button" type="button" id="backup-restore-confirm">Restaurar esta copia</button>
         </div>
         <div class="settings-actions settings-maintenance-actions">
           <button class="new-button" type="button" id="backup-download">Descargar copia de seguridad</button>
@@ -621,7 +621,7 @@
   <script src="js/state.js?v=20261104-finance-1"></script>
   <script src="js/utils.js?v=20261107-agenda-config-1"></script>
   <script src="js/access.js?v=20261105-roles-1"></script>
-  <script src="js/settings.js?v=20261105-ui-1"></script>
+  <script src="js/settings.js?v=20261107-settings-inputs-1"></script>
   <script src="js/data.js?v=20261105-roles-1"></script>
   <script src="js/appointments.js?v=20261105-roles-1"></script>
   <script src="js/calendar.js?v=20261107-agenda-config-1"></script>

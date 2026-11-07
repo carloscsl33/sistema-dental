@@ -3618,16 +3618,19 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 #page-configuracion input:not([type="checkbox"]):focus,
 #page-configuracion select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31, 167, 160, .14); }
 .business-hours-list { display: grid; gap: 8px; max-width: 720px; }
-.hours-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(116px, .72fr) 14px minmax(116px, .72fr); align-items: center; gap: 10px; }
+.hours-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(132px, .8fr) minmax(132px, .8fr); align-items: end; gap: 10px; padding: 10px 12px; border: 1px solid #e6edf2; border-radius: 9px; background: #fbfcfd; }
 .hours-day-toggle { display: flex; align-items: center; gap: 8px; color: #53637b; font-size: 13px; font-weight: 700; }
+.hours-time-field { display: grid; gap: 5px; min-width: 0; color: #617088; font-size: 11px; font-weight: 700; }
 .hours-row input { min-width: 0; }
-.hours-separator { color: var(--muted); text-align: center; }
+.hours-row input[type="time"] { min-height: 38px !important; padding: 7px 9px !important; }
+.hours-row:has(input[type="checkbox"]:not(:checked)) { background: #f7f8fa; }
+.hours-row:has(input[type="checkbox"]:not(:checked)) .hours-time-field { opacity: .55; }
 .settings-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
 .settings-maintenance { margin-top: 18px; padding: 0 24px 22px; }
 .settings-maintenance .card-head { margin: 0 -24px; padding: 20px 20px 18px; border-bottom: 1px solid var(--line); }
 .settings-maintenance .field-help { margin: 18px 0 0; }
 .settings-maintenance-actions { justify-content: flex-start; }
-.settings-maintenance-actions .new-button, .settings-maintenance-actions .outline-button, .backup-selected-file .outline-button { min-height: 38px; border-radius: 8px; padding: 8px 12px; }
+.settings-maintenance-actions .new-button, .settings-maintenance-actions .outline-button, .backup-selected-file .new-button { min-height: 38px; border-radius: 8px; padding: 8px 12px; }
 .backup-selected-file { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 18px; padding: 12px 14px; border: 1px solid #cbeae7; border-radius: 9px; background: #f2fbfa; color: #53637b; }
 .backup-selected-file-label { color: #15827c; font-size: 11px; font-weight: 800; text-transform: uppercase; }
 .backup-selected-file strong { overflow: hidden; color: var(--ink); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
@@ -3699,13 +3702,13 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
   .admin-header .new-button { width: 100%; }
   .admin-users-table { min-width: 640px; }
   .settings-catalogs, .appointment-schedule { grid-template-columns: 1fr; }
-  .hours-row { grid-template-columns: minmax(120px, 1fr) minmax(96px, .72fr) 12px minmax(96px, .72fr); gap: 6px; }
+  .hours-row { grid-template-columns: minmax(106px, 1fr) minmax(96px, .8fr) minmax(96px, .8fr); gap: 6px; padding: 9px; }
   #clinic-settings-form .form-grid > label { grid-template-columns: 1fr; gap: 6px; }
   #appointment-modal .appointment-modal { width: calc(100vw - 24px); }
   .patient-list-actions { gap: 4px; }
   .patient-list-actions .row-action { min-height: 34px; }
   .backup-selected-file { grid-template-columns: 1fr; align-items: stretch; }
-  .backup-selected-file .outline-button { width: 100%; }
+  .backup-selected-file .new-button { width: 100%; }
   .finance-toolbar { align-items: stretch; flex-direction: column; }.finance-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }.finance-toolbar-actions > button { flex: 1; }.finance-kpis, .finance-columns { grid-template-columns: 1fr; }.finance-movement { grid-template-columns: auto minmax(0, 1fr) auto; }.finance-movement .finance-refund-button { grid-column: 2 / -1; width: 100%; }.finance-debtor { grid-template-columns: minmax(0, 1fr) auto; }.finance-debtor button { grid-column: 1 / -1; width: 100%; }
 }
 
