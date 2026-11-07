@@ -25,8 +25,12 @@ function renderClinicLogoPreview(url = clinicLogoUrl) {
 }
 
 function renderClinicBranding() {
-  document.querySelectorAll('[data-clinic-name]').forEach(node => { node.textContent = clinicSettings.clinic_name || 'Thera-dent'; });
+  const clinicName = clinicSettings.clinic_name || 'Thera-dent';
+  document.title = `${clinicName} | Gestión`;
+  document.querySelectorAll('[data-clinic-name]').forEach(node => { node.textContent = clinicName; });
   document.querySelectorAll('[data-clinic-brand-icon]').forEach(node => setClinicLogo(node, clinicLogoUrl));
+  const favicon = document.querySelector('link[rel="icon"]');
+  if (favicon) favicon.href = clinicLogoUrl || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2321a69b'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'%3E${encodeURIComponent(clinicLogoFallback())}%3C/text%3E%3C/svg%3E`;
   renderClinicLogoPreview();
 }
 
