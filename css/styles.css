@@ -3752,6 +3752,8 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .settings-section > p { margin: -6px 0 16px; color: var(--muted); font-size: 13px; line-height: 1.4; }
 .settings-section .field-help { margin: -6px 0 16px; }
 .clinic-logo-control { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+.clinic-logo-preview { display: grid; width: 46px; height: 46px; flex: 0 0 46px; place-items: center; overflow: hidden; border: 1px solid #c8e7e3; border-radius: 10px; background: #e7f7f5; color: var(--teal); font: 800 20px "Nunito Sans", sans-serif; }
+.clinic-logo-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .clinic-logo-upload { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; cursor: pointer; white-space: nowrap; }
 .clinic-logo-upload input { display: none !important; }
 #clinic-settings-form .form-grid > label { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 0 12px; min-width: 0; color: #617088; font-size: 12px; font-weight: 700; }
