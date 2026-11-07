@@ -3597,6 +3597,7 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .settings-card-head { margin: 0 -24px; padding: 20px 20px 18px; border-bottom: 1px solid var(--line); }
 .settings-section { padding: 22px 0; border-bottom: 1px solid var(--line); }
 .settings-section h3 { margin: 0 0 14px; color: var(--ink); font: 800 15px "Nunito Sans", sans-serif; }
+.settings-section > p { margin: -6px 0 16px; color: var(--muted); font-size: 13px; line-height: 1.4; }
 .settings-section .field-help { margin: -6px 0 16px; }
 #clinic-settings-form .form-grid > label { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 0 12px; min-width: 0; color: #617088; font-size: 12px; font-weight: 700; }
 #page-configuracion input:not([type="checkbox"]),
