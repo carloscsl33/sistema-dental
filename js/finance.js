@@ -25,9 +25,10 @@ function financeMonths(year = financeChartYear) {
 }
 
 function renderFinanceChart(months) {
-  const data = months.map(month => ({ month, income: financePayments.filter(item => item.paid_on?.startsWith(month)).reduce((sum, item) => sum + Number(item.amount), 0) }));
+  const currentMonth = getISODate(0).slice(0, 7);
+  const data = months.map(month => ({ month, income: financePayments.filter(item => item.paid_on?.startsWith(month)).reduce((sum, item) => sum + (Number(item.amount) || 0), 0) }));
   const max = Math.max(1, ...data.map(item => item.income));
-  return `<div class="finance-chart finance-year-chart" aria-label="Ingresos del año seleccionado">${data.map(item => { const label = MONTH_NAMES[Number(item.month.slice(5)) - 1].slice(0, 3); const height = Math.max(5, Math.round(item.income / max * 140)); return `<div class="finance-chart-month"><div class="finance-bars"><span class="finance-bar finance-bar-income" style="height:${height}px" title="Ingresos ${formatCurrency(item.income)}"></span></div><small>${label}</small></div>`; }).join('')}</div><p class="finance-legend"><span><i class="finance-dot income"></i>Ingresos cobrados</span></p>`;
+  return `<div class="finance-chart finance-year-chart" aria-label="Ingresos del año seleccionado">${data.map(item => { const label = MONTH_NAMES[Number(item.month.slice(5)) - 1].slice(0, 3); const hasIncome = item.income > 0; const height = hasIncome ? Math.max(24, Math.round(item.income / max * 140)) : 5; return `<div class="finance-chart-month${item.month === currentMonth ? ' is-current' : ''}" aria-label="${escapeHTML(MONTH_NAMES[Number(item.month.slice(5)) - 1])}: ${formatCurrency(item.income)}"><small class="finance-chart-value">${hasIncome ? formatCurrency(item.income) : '&nbsp;'}</small><div class="finance-bars"><span class="finance-bar finance-bar-income" style="height:${height}px" title="Ingresos ${formatCurrency(item.income)}"></span></div><small class="finance-chart-label">${label}</small></div>`; }).join('')}</div><p class="finance-legend"><span><i class="finance-dot income"></i>Ingresos cobrados</span><span>Los montos se actualizan con cada pago.</span></p>`;
 }
 
 function renderFinanceMovements(movements) {
