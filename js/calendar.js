@@ -17,9 +17,16 @@ function openDailyAgenda(date) {
   dateLabel.textContent = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(dateObject);
   const appointments = getCalendarAppointments(date);
   const canManage = canManageAppointments();
+  if (!isClinicOpenOnDate(date)) {
+    list.innerHTML = `<p class="daily-agenda-empty">La clínica no tiene atención este día.</p>`;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    lockPageScroll();
+    return;
+  }
   const slots = [];
-  for (let minutes = 9 * 60; minutes <= 19 * 60; minutes += 30) {
-    const time = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+  for (const time of createAppointmentTimeSlots(date)) {
+    const minutes = toMinutes(time);
     const matches = appointments.filter(appointment => toMinutes(appointment.time) === minutes);
     const blockedCount = getBlockedAppointmentSlotCount(date, time);
     const availableCount = Math.max(MAX_PATIENTS_PER_SLOT - matches.length - blockedCount, 0);
@@ -34,7 +41,7 @@ function openDailyAgenda(date) {
       <div class="daily-agenda-slot-actions">${canManage && canBook ? `<button type="button" class="daily-agenda-book" data-agenda-book="${date}" data-agenda-time="${time}">Agendar</button>` : ''}${canManage && hasSpace && !isPastDate && !isPastTime ? `<button type="button" class="daily-agenda-block" data-agenda-block="${date}" data-agenda-time="${time}">Deshabilitar</button>` : ''}${canManage && blocked ? `<button type="button" class="daily-agenda-unblock" data-agenda-unblock="${date}" data-agenda-time="${time}">Liberar 1 lugar</button>` : ''}</div>
     </div>`);
   }
-  list.innerHTML = slots.join('');
+  list.innerHTML = slots.join('') || `<p class="daily-agenda-empty">No hay horarios configurados para este día.</p>`;
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
   lockPageScroll();

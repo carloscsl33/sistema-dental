@@ -102,6 +102,16 @@ function createAppointmentTimeSlots(date = getISODate(0)) {
   return slots;
 }
 
+function getBusinessHoursForDate(date = getISODate(0)) {
+  const weekday = new Date(`${date}T12:00:00`).getDay();
+  return businessHours.find(item => Number(item.day_of_week) === weekday) || null;
+}
+
+function isClinicOpenOnDate(date = getISODate(0)) {
+  const configuredHours = getBusinessHoursForDate(date);
+  return !configuredHours || Boolean(configuredHours.is_open);
+}
+
 function getCurrentMinutes() {
   const now = new Date();
   return now.getHours() * 60 + now.getMinutes();
