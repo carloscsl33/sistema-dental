@@ -96,6 +96,32 @@ function renderCatalogList(selector, rows, kind) {
   host.innerHTML = rows.length ? rows.map(row => `<li><span>${escapeHTML(row.name)}</span><span class="catalog-row-actions"><button type="button" class="catalog-status-button ${row.is_active ? 'is-active' : 'is-inactive'}" data-toggle-catalog="${kind}" data-catalog-id="${row.id}" data-active="${row.is_active}">${row.is_active ? 'Activo' : 'Inactivo'}</button><button type="button" class="row-action delete-action catalog-delete-button" data-delete-catalog="${kind}" data-catalog-id="${row.id}" data-catalog-name="${escapeHTML(row.name)}">Eliminar</button></span></li>`).join('') : '<li class="empty-state">Aún no hay opciones.</li>';
 }
 
+async function renderDriveConnection() {
+  const status = document.querySelector('#drive-connection-status');
+  const connect = document.querySelector('#drive-connect');
+  const disconnect = document.querySelector('#drive-disconnect');
+  if (!status || !connect || !disconnect || !hasRole('admin')) return;
+  status.classList.remove('is-connected');
+  status.textContent = 'Comprobando conexión…';
+  try {
+    const { data, error } = await supabaseClient.functions.invoke('google-drive', { body: { action: 'status' } });
+    if (error || data?.error) throw error || new Error(data.error);
+    if (data.connected) {
+      status.classList.add('is-connected');
+      status.textContent = `Conectado${data.account_email ? ` con ${data.account_email}` : ''}. Los archivos nuevos se prepararán para esta carpeta.`;
+      connect.hidden = true;
+      disconnect.hidden = false;
+    } else {
+      status.textContent = 'Aún no hay una cuenta de Google Drive conectada.';
+      connect.hidden = false;
+      disconnect.hidden = true;
+    }
+  } catch (error) {
+    console.warn('No se pudo consultar Google Drive.', error);
+    status.textContent = 'No se pudo comprobar la conexión de Google Drive.';
+  }
+}
+
 async function renderConfigurationModule() {
   const form = document.querySelector('#clinic-settings-form');
   if (!form || !hasRole('admin')) return;
@@ -105,6 +131,7 @@ async function renderConfigurationModule() {
   document.querySelector('#business-hours-list').innerHTML = WEEKDAY_NAMES.map(renderBusinessHoursRow).join('');
   renderCatalogList('#appointment-reasons-list', appointmentReasons, 'reason');
   renderCatalogList('#treatment-catalog-list', treatmentCatalog, 'treatment');
+  renderDriveConnection();
 }
 
 function getConfigurationHours(form) {
@@ -189,6 +216,25 @@ document.addEventListener('change', event => {
 });
 
 document.addEventListener('click', async event => {
+  if (event.target.closest('#drive-connect')) {
+    try {
+      const { data, error } = await supabaseClient.functions.invoke('google-drive', { body: { action: 'connect' } });
+      if (error || !data?.url) throw error || new Error(data?.error || 'No se pudo iniciar la conexión.');
+      window.location.assign(data.url);
+    } catch (error) { showToast('No se pudo iniciar la conexión con Google Drive.'); }
+    return;
+  }
+  if (event.target.closest('#drive-disconnect')) {
+    const { confirmed } = await showConfirmationDialog({ title: 'Desconectar Google Drive', message: 'Los archivos que ya existen en Drive no se eliminarán. Podrás conectar otra cuenta después.', confirmLabel: 'Desconectar' });
+    if (!confirmed) return;
+    try {
+      const { data, error } = await supabaseClient.functions.invoke('google-drive', { body: { action: 'disconnect' } });
+      if (error || data?.error) throw error || new Error(data.error);
+      await renderDriveConnection();
+      showToast('Google Drive se desconectó.');
+    } catch (error) { showToast('No se pudo desconectar Google Drive.'); }
+    return;
+  }
   if (event.target.closest('#clinic-logo-remove')) {
     const previousLogoPath = String(clinicSettings.logo_path || '').trim();
     if (!previousLogoPath && !selectedClinicLogoFile) return;

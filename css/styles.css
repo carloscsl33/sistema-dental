@@ -3787,6 +3787,10 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 .hours-row:has(input[type="checkbox"]:not(:checked)) .hours-time-field { opacity: .55; }
 .settings-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
 .settings-maintenance { margin-top: 18px; padding: 0 24px 22px; }
+.settings-drive { margin-top: 18px; padding: 0 24px 22px; }
+.settings-drive .card-head { margin: 0 -24px; padding: 20px 20px 18px; border-bottom: 1px solid var(--line); }
+.drive-connection-status { margin-top: 18px; padding: 12px 14px; border: 1px solid #dce7eb; border-radius: 9px; background: #f8fafc; color: #617088; font-size: 13px; }
+.drive-connection-status.is-connected { border-color: #bce6e1; background: #effaf8; color: #147e78; }
 .settings-maintenance .card-head { margin: 0 -24px; padding: 20px 20px 18px; border-bottom: 1px solid var(--line); }
 .settings-maintenance .field-help { margin: 18px 0 0; }
 .settings-maintenance-actions { justify-content: flex-start; }

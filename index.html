@@ -332,6 +332,16 @@
           </form>
         </section>
       </div>
+      <section class="card settings-drive" aria-labelledby="drive-title">
+        <header class="card-head">
+          <div><h2 id="drive-title">Google Drive</h2><p>Conecta la carpeta segura donde Thera-dent organizará los archivos de expedientes.</p></div>
+        </header>
+        <div class="drive-connection-status" id="drive-connection-status" role="status">Comprobando conexión…</div>
+        <div class="settings-actions settings-maintenance-actions">
+          <button class="new-button" type="button" id="drive-connect">Conectar Google Drive</button>
+          <button class="outline-button danger-button" type="button" id="drive-disconnect" hidden>Desconectar</button>
+        </div>
+      </section>
       <section class="card settings-maintenance">
         <header class="card-head">
           <div>
@@ -635,7 +645,7 @@
   <script src="js/state.js?v=20261107-clinic-logo-1"></script>
   <script src="js/utils.js?v=20261107-agenda-config-1"></script>
   <script src="js/access.js?v=20261107-session-identity-1"></script>
-  <script src="js/settings.js?v=20261107-logo-picker-3"></script>
+  <script src="js/settings.js?v=20261108-google-drive-1"></script>
   <script src="js/data.js?v=20261105-roles-1"></script>
   <script src="js/appointments.js?v=20261107-followup-refresh-1"></script>
   <script src="js/calendar.js?v=20261107-agenda-config-1"></script>
