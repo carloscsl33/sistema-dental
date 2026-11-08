@@ -269,6 +269,12 @@ document.addEventListener('click', async event => {
     return;
   }
 
+  const deleteClinicalFileButton = event.target.closest('[data-delete-clinical-file]');
+  if (deleteClinicalFileButton) {
+    await removeClinicalFile(deleteClinicalFileButton.dataset.deleteClinicalFile);
+    return;
+  }
+
   const viewClinicalFileButton = event.target.closest('[data-view-clinical-file]');
   if (viewClinicalFileButton) {
     const fileId = viewClinicalFileButton.dataset.viewClinicalFile;

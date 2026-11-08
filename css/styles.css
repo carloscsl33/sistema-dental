@@ -2486,6 +2486,13 @@ main {
   padding: 5px 10px;
 }
 
+#patient-modal .clinical-file-delete,
+.patient-file-item .clinical-file-delete {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 5px 10px;
+}
+
 #patient-modal .selected-file small,
 .patient-file-item small {
   flex: 1 0 100%;

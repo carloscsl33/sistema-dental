@@ -399,6 +399,7 @@ function renderPatientFiles(patient) {
     <div class="patient-file-item">
       <span class="clinical-file-name">${escapeHTML(file.name)}</span>
       <button type="button" class="outline-button clinical-file-view" data-view-clinical-file="${escapeHTML(file.id || '')}" data-file-name="${escapeHTML(file.name)}">Ver</button>
+      <button type="button" class="outline-button danger-button clinical-file-delete" data-delete-clinical-file="${escapeHTML(file.id || '')}" data-file-name="${escapeHTML(file.name)}">Eliminar</button>
       <small>${escapeHTML(file.type || 'Archivo')} · ${formatFileSize(file.size)}</small>
     </div>
   `).join('');
@@ -801,11 +802,53 @@ function renderSelectedFiles(files) {
       <div class="selected-file">
         <span class="clinical-file-name">${escapeHTML(file.name)}</span>
         <button type="button" class="outline-button clinical-file-view" data-view-clinical-file="${escapeHTML(file.id || '')}" data-file-name="${escapeHTML(file.name)}">Ver</button>
+        <button type="button" class="outline-button danger-button clinical-file-delete" data-delete-clinical-file="${escapeHTML(file.id || '')}" data-file-name="${escapeHTML(file.name)}">Eliminar</button>
         <small>${escapeHTML(file.type || 'Archivo')} · ${formatFileSize(file.size)}</small>
       </div>
     `).join('');
   const addFilesButton = document.querySelector('#add-clinical-files');
   if (addFilesButton) addFilesButton.textContent = hasFiles ? '+ Agregar más archivos' : '+ Agregar archivo';
+}
+
+async function removeClinicalFile(fileId) {
+  const pendingIndex = pendingClinicalFiles.findIndex(item => item.id === fileId);
+  if (pendingIndex !== -1) {
+    pendingClinicalFiles.splice(pendingIndex, 1);
+    renderSelectedFiles([...(editingPatient?.archivosClinicos || []), ...pendingClinicalFiles.map(({ id, file }) => ({ id, name: file.name, type: file.type, size: file.size }))]);
+    showToast('Archivo quitado antes de guardar.');
+    return;
+  }
+
+  const patient = patients.find(item => (item.archivosClinicos || []).some(file => file.id === fileId));
+  const file = patient?.archivosClinicos?.find(item => item.id === fileId);
+  if (!patient || !file) {
+    showToast('No se encontró el archivo seleccionado.');
+    return;
+  }
+  const { confirmed } = await showConfirmationDialog({
+    title: '¿Eliminar archivo?',
+    message: `Se eliminará "${file.name}" del expediente y de su almacenamiento. Esta acción no se puede deshacer.`,
+    confirmLabel: 'Eliminar archivo'
+  });
+  if (!confirmed) return;
+
+  try {
+    await deleteClinicalFiles([file]);
+    if (isCloudConnected()) {
+      const { error } = await supabaseClient.from('patient_files').delete().eq('id', file.id);
+      if (error) throw error;
+    }
+    patient.archivosClinicos = patient.archivosClinicos.filter(item => item.id !== fileId);
+    if (isCloudConnected()) lastSyncedPatients.set(patient.id, cloneDeep(patient));
+    cachePatientsLocally();
+    renderSelectedFiles([...(editingPatient?.archivosClinicos || []), ...pendingClinicalFiles.map(({ id, file: pendingFile }) => ({ id, name: pendingFile.name, type: pendingFile.type, size: pendingFile.size }))]);
+    if (selectedPatientId === patient.id) showPatientDetails('id:' + patient.id);
+    renderPatientDirectory(globalSearchQuery);
+    showToast('Archivo eliminado correctamente.');
+  } catch (error) {
+    console.error('No se pudo eliminar el archivo clínico:', error);
+    showToast('No se pudo eliminar el archivo. Inténtalo de nuevo.');
+  }
 }
 
 function clinicalRecordExists(patient, record) {
