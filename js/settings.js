@@ -101,6 +101,7 @@ async function renderDriveConnection() {
   const connect = document.querySelector('#drive-connect');
   const disconnect = document.querySelector('#drive-disconnect');
   if (!status || !connect || !disconnect || !hasRole('admin')) return;
+  const driveResult = new URLSearchParams(window.location.search).get('drive');
   status.classList.remove('is-connected');
   status.textContent = 'Comprobando conexión…';
   try {
@@ -115,6 +116,16 @@ async function renderDriveConnection() {
       status.textContent = 'Aún no hay una cuenta de Google Drive conectada.';
       connect.hidden = false;
       disconnect.hidden = true;
+    }
+    if (driveResult) {
+      window.history.replaceState({}, '', `${window.location.pathname}${window.location.hash}`);
+      const messages = {
+        connected: 'Google Drive se conectó correctamente.',
+        denied: 'La conexión con Google Drive fue cancelada.',
+        expired: 'La conexión con Google Drive expiró. Inténtalo de nuevo.',
+        error: 'No se pudo completar la conexión con Google Drive.',
+      };
+      showToast(messages[driveResult] || 'No se pudo completar la conexión con Google Drive.');
     }
   } catch (error) {
     console.warn('No se pudo consultar Google Drive.', error);
