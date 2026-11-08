@@ -51,14 +51,27 @@ function savePatients() {
   return result;
 }
 
-function deleteClinicalFiles(fileIds) {
-  if (!fileIds.length) return Promise.resolve();
+function findClinicalFile(fileId) {
+  return patients.flatMap(patient => patient.archivosClinicos || []).find(file => file.id === fileId) || null;
+}
+
+async function deleteClinicalFiles(filesOrIds) {
+  const files = (filesOrIds || []).map(item => typeof item === 'string' ? findClinicalFile(item) : item).filter(Boolean);
+  if (!files.length) return;
   if (isCloudConnected()) {
-    return Promise.all([
-      supabaseClient.storage.from('clinical-files').remove(fileIds),
-      supabaseClient.from('patient_files').delete().in('id', fileIds)
-    ]);
+    const driveFileIds = files.filter(file => file.provider === 'google_drive').map(file => file.id);
+    if (driveFileIds.length) {
+      const { data, error } = await supabaseClient.functions.invoke('google-drive', { body: { action: 'delete_files', file_ids: driveFileIds } });
+      if (error || data?.error) throw error || new Error(data.error);
+    }
+    const storagePaths = files.filter(file => file.provider !== 'google_drive').map(file => file.storagePath || file.id);
+    if (storagePaths.length) {
+      const { error } = await supabaseClient.storage.from('clinical-files').remove(storagePaths);
+      if (error) throw error;
+    }
+    return;
   }
+  const fileIds = files.map(file => file.id).filter(Boolean);
   return openClinicalFilesDatabase().then(database => new Promise((resolve, reject) => {
     const transaction = database.transaction(CLINICAL_FILES_STORE, 'readwrite');
     const store = transaction.objectStore(CLINICAL_FILES_STORE);
@@ -93,12 +106,22 @@ function openClinicalFilesDatabase() {
   return clinicalFilesDatabasePromise;
 }
 
-async function storeClinicalFile(id, file) {
+async function storeClinicalFile(id, file, patient) {
   if (isCloudConnected()) {
-    const { error } = await supabaseClient.storage.from('clinical-files')
+    const payload = new FormData();
+    payload.append('action', 'upload');
+    payload.append('patient_id', patient.id);
+    payload.append('patient_name', getPatientFullName(patient));
+    payload.append('file', file, file.name);
+    const { data, error: driveError } = await supabaseClient.functions.invoke('google-drive', { body: payload });
+    if (!driveError && data?.provider === 'google_drive' && data.external_file_id) {
+      return { provider: 'google_drive', storagePath: data.storage_path, externalFileId: data.external_file_id, driveFolderId: data.drive_folder_id };
+    }
+    if (driveError || data?.error) throw driveError || new Error(data.error);
+    const { error: storageError } = await supabaseClient.storage.from('clinical-files')
       .upload(id, file, { contentType: mimeFromExtension(file.name, file.type), upsert: false });
-    if (error) throw error;
-    return;
+    if (storageError) throw storageError;
+    return { provider: 'supabase', storagePath: id };
   }
   const database = await openClinicalFilesDatabase();
   await new Promise((resolve, reject) => {
@@ -108,11 +131,31 @@ async function storeClinicalFile(id, file) {
     transaction.onerror = () => reject(transaction.error || new Error('No se pudo guardar el archivo.'));
     transaction.onabort = () => reject(transaction.error || new Error('Se canceló el guardado del archivo.'));
   });
+  return { provider: 'local', storagePath: id };
+}
+
+async function getDriveClinicalFile(fileId) {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const config = window.SUPABASE_CONFIG || {};
+  const publicKey = config.publishableKey || config.anonKey;
+  if (!session?.access_token || !config.url || !publicKey) throw new Error('No hay una sesión activa para abrir el archivo.');
+  const response = await fetch(`${config.url}/functions/v1/google-drive`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${session.access_token}`, apikey: publicKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'download', file_id: fileId })
+  });
+  if (!response.ok) {
+    const details = await response.json().catch(() => ({}));
+    throw new Error(details.error || 'No se pudo abrir el archivo de Google Drive.');
+  }
+  return response.blob();
 }
 
 async function getClinicalFile(id) {
   if (isCloudConnected()) {
-    const { data, error } = await supabaseClient.storage.from('clinical-files').download(id);
+    const file = findClinicalFile(id);
+    if (file?.provider === 'google_drive') return getDriveClinicalFile(id);
+    const { data, error } = await supabaseClient.storage.from('clinical-files').download(file?.storagePath || id);
     if (error) throw error;
     return data;
   }
@@ -574,7 +617,7 @@ function rowToPatient(row, treatmentRows, fileRows) {
     tratamientoServicios: activeTreatments.map(t => ({ tratamiento: t.name, diagnostico: t.diagnosis })),
     fechaRegistroClinico: treatmentRows[0]?.recorded_on || '',
     historialClinico: treatmentRows.map(t => ({ id: t.id, fecha: t.recorded_on, tratamiento: t.name, diagnostico: t.diagnosis })),
-    archivosClinicos: fileRows.map(f => ({ id: f.id, name: f.file_name, type: f.mime_type, size: f.size_bytes, date: (f.uploaded_at || '').slice(0, 10) })),
+    archivosClinicos: fileRows.map(f => ({ id: f.id, name: f.file_name, type: f.mime_type, size: f.size_bytes, date: (f.uploaded_at || '').slice(0, 10), provider: f.storage_provider || 'supabase', storagePath: f.storage_path || f.id, externalFileId: f.external_file_id || '', driveFolderId: f.drive_folder_id || '' })),
     historialFinanciero: [],
     createdAt: row.created_at
   });
@@ -668,10 +711,13 @@ async function syncPatientsToCloud() {
       const fileRows = (patient.archivosClinicos || []).map(file => ({
         id: file.id,
         patient_id: patient.id,
-        storage_path: file.id,
+        storage_path: file.storagePath || file.id,
         file_name: file.name || 'archivo',
         mime_type: mimeFromExtension(file.name, file.type),
-        size_bytes: Math.max(1, Number(file.size) || 1)
+        size_bytes: Math.max(1, Number(file.size) || 1),
+        storage_provider: file.provider === 'google_drive' ? 'google_drive' : 'supabase',
+        external_file_id: file.externalFileId || null,
+        drive_folder_id: file.driveFolderId || null
       }));
       if (fileRows.length) {
         const { error: filesInsertError } = await supabaseClient.from('patient_files').insert(fileRows);

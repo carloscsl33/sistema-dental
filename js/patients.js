@@ -649,10 +649,7 @@ function closePatientModal() {
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
   editingPatient = null;
-  if (pendingClinicalFiles.length) {
-    deleteClinicalFiles(pendingClinicalFiles.map(item => item.id)).catch(() => {});
-    pendingClinicalFiles = [];
-  }
+  pendingClinicalFiles = [];
   updatePageScrollLock();
 }
 
@@ -782,11 +779,12 @@ function collectPatientForm() {
   return patient;
 }
 
-function processPatientFiles(patient) {
-  pendingClinicalFiles.forEach(({ file, id }) => {
-    if (patient.archivosClinicos.some(existing => existing.name === file.name && existing.size === file.size && existing.type === file.type)) return;
-    patient.archivosClinicos.push({ id, name: file.name, type: file.type, size: file.size, date: getISODate(0) });
-  });
+async function processPatientFiles(patient) {
+  for (const { file, id } of pendingClinicalFiles) {
+    if (patient.archivosClinicos.some(existing => existing.name === file.name && existing.size === file.size && existing.type === file.type)) continue;
+    const stored = await storeClinicalFile(id, file, patient);
+    patient.archivosClinicos.push({ id, name: file.name, type: file.type, size: file.size, date: getISODate(0), ...stored });
+  }
   
   renderSelectedFiles(patient.archivosClinicos);
   pendingClinicalFiles = [];
@@ -842,7 +840,7 @@ async function savePatientForm(generateAppointment = false) {
     return false;
   }
   
-  processPatientFiles(patient);
+  await processPatientFiles(patient);
   
   const clinicalServices = patient.tratamientoServicios.length
     ? patient.tratamientoServicios
@@ -919,7 +917,14 @@ async function deletePatient(patientId) {
   });
   if (!confirmed) return;
 
-  const fileIds = (patient.archivosClinicos || []).map(file => file.id).filter(Boolean);
+  const files = (patient.archivosClinicos || []).filter(file => file?.id);
+  try {
+    await deleteClinicalFiles(files);
+  } catch (error) {
+    console.error(`No se pudieron eliminar los archivos clínicos de ${patientName}:`, error);
+    showToast('No se eliminó el expediente porque no se pudieron borrar todos sus archivos adjuntos.');
+    return;
+  }
   const normalizedPatientName = normalizeName(patientName);
   const currentPatientIndex = patients.findIndex(item => item.id === patientId);
   if (currentPatientIndex === -1) {
@@ -947,10 +952,6 @@ async function deletePatient(patientId) {
   renderLists();
   showToast(`Expediente de ${patientName} eliminado.`);
 
-  deleteClinicalFiles(fileIds).catch(error => {
-    console.error(`No se pudieron eliminar los archivos clínicos de ${patientName}:`, error);
-    showToast('El expediente se eliminó, pero no se pudieron borrar todos sus archivos adjuntos.');
-  });
 }
 
 function openPatientRecordFromSearch(patientId) {

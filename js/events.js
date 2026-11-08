@@ -858,7 +858,7 @@ document.addEventListener('submit', async event => {
   if (patientIdInput) patientIdInput.value = '';
 });
 
-document.addEventListener('submit', event => {
+document.addEventListener('submit', async event => {
   if (event.target.matches('#patient-form')) {
     event.preventDefault();
     const generateAppointment = event.submitter?.id === 'patient-save-appointment';
@@ -866,12 +866,12 @@ document.addEventListener('submit', event => {
       showToast('Tu rol no puede generar citas.');
       return;
     }
-    Promise.all(pendingClinicalFiles.map(item => item.persistence))
-      .then(() => savePatientForm(generateAppointment))
-      .catch(error => {
-        console.error('No se pudieron guardar los archivos clínicos:', error);
-        showToast('No se pudieron guardar los archivos. Intenta adjuntarlos de nuevo.');
-      });
+    try {
+      await savePatientForm(generateAppointment);
+    } catch (error) {
+      console.error('No se pudieron guardar los archivos clínicos:', error);
+      showToast('No se pudieron guardar los archivos. Intenta adjuntarlos de nuevo.');
+    }
   }
 });
 
@@ -907,12 +907,7 @@ document.addEventListener('change', event => {
     );
     if (!alreadySelected && !alreadyAttached) {
       const id = generateId('file');
-      const persistence = storeClinicalFile(id, file);
-      persistence.catch(error => {
-        console.error(`No se pudo guardar el archivo "${file.name}":`, error);
-        showToast(`No se pudo preparar "${file.name}" para guardarlo.`);
-      });
-      pendingClinicalFiles.push({ id, file, persistence });
+      pendingClinicalFiles.push({ id, file });
     }
   });
   renderSelectedFiles([
