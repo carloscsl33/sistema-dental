@@ -152,6 +152,7 @@
             <span>Hora</span>
             <span>Paciente</span>
             <span>Cobro</span>
+            <span>Expediente</span>
             <span>Estatus</span>
           </div>
           <div class="appointment-list" id="today-list"></div>
@@ -220,6 +221,7 @@
             <h2>Directorio de pacientes</h2>
             <p>Busca un paciente y consulta su expediente</p>
           </div>
+          <button type="button" class="outline-button patient-directory-export" id="patients-export" data-roles="admin receptionist" hidden>Descargar CSV</button>
         </header>
         <div class="patient-directory-layout">
           <div class="patient-list" id="patient-list" aria-label="Lista de pacientes"></div>
@@ -643,17 +645,17 @@
   <script src="js/access.js?v=20261107-session-identity-1"></script>
   <script src="js/settings.js?v=20261108-google-drive-2"></script>
   <script src="js/data.js?v=20261108-google-drive-files-1"></script>
-  <script src="js/appointments.js?v=20261107-followup-refresh-1"></script>
+  <script src="js/appointments.js?v=20261110-dashboard-expedient-1"></script>
   <script src="js/clinical-progress.js?v=20261110-3"></script>
   <script src="js/calendar.js?v=20261107-agenda-config-1"></script>
   <script src="js/receipts.js?v=20261107-clinic-logo-1"></script>
   <script src="js/payments.js?v=20261107-followup-refresh-1"></script>
   <script src="js/finance.js?v=20261107-finance-chart-2"></script>
-  <script src="js/patients.js?v=20261110-clinical-progress-1"></script>
+  <script src="js/patients.js?v=20261110-patient-export-1"></script>
   <script src="js/qr.js?v=20261106-qr-standard-2"></script>
   <script src="js/patient-qr.js?v=20261106-qr-card-1"></script>
   <script src="js/backup.js?v=20261106-backup-restore-1"></script>
-  <script src="js/events.js?v=20261108-file-delete-1"></script>
+  <script src="js/events.js?v=20261110-patient-export-1"></script>
   <script src="js/admin.js?v=20261105-ui-1"></script>
   <script src="js/main.js?v=20261020-2"></script>
   <script src="js/auth.js?v=20261107-session-identity-1"></script>

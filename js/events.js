@@ -412,6 +412,11 @@ document.addEventListener('click', async event => {
     openPatientModal();
     return;
   }
+
+  if (event.target.closest('#patients-export')) {
+    downloadPatientsCsv();
+    return;
+  }
   
   const editPatientBtn = event.target.closest('[data-edit-patient]');
   if (editPatientBtn) {

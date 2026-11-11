@@ -47,6 +47,38 @@ function patientMatchesSearch(patient) {
   return !globalSearchQuery || getSearchablePatientText(patient).includes(globalSearchQuery);
 }
 
+function downloadPatientsCsv() {
+  if (!hasRole('admin', 'receptionist')) {
+    showToast('Tu rol no tiene permiso para exportar pacientes.');
+    return;
+  }
+
+  const rows = [[
+    'ID de paciente', 'Nombre(s)', 'Apellidos', 'Fecha de nacimiento', 'Sexo',
+    'Teléfono', 'Correo', 'Dirección', 'Contacto de emergencia', 'Parentesco',
+    'Teléfono de emergencia', 'Fecha de registro'
+  ]];
+  patients
+    .slice()
+    .sort((a, b) => getPatientFullName(a).localeCompare(getPatientFullName(b), 'es-MX', { sensitivity: 'base' }))
+    .forEach(patient => rows.push([
+      patient.id, patient.nombre, patient.apellidos, patient.fechaNacimiento, patient.sexo,
+      patient.telefono, patient.correo, patient.direccion, patient.contactoEmergencia,
+      patient.parentescoEmergencia, patient.telefonoEmergencia, patient.createdAt ? String(patient.createdAt).slice(0, 10) : ''
+    ]));
+
+  const csv = '\uFEFF' + rows.map(row => row.map(value => `"${String(value || '').replaceAll('"', '""')}"`).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `thera-dent-pacientes-${getISODate(0)}.csv`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast(`${patients.length} ${patients.length === 1 ? 'paciente exportado' : 'pacientes exportados'} en CSV.`);
+}
+
 function renderGlobalPatientSearch(query) {
   const results = document.querySelector('#patient-search-results');
   const input = document.querySelector('#patient-search');

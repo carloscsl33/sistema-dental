@@ -195,15 +195,15 @@ function todayMarkup(item) {
       <div class="time">${escapeHTML(time)}</div>
       <div class="person">
         <div>
-          <div class="today-person-heading">
-            <strong>${escapeHTML(name)}</strong>
-            <button type="button" class="patient-info-button today-expedient-button" data-patient-info="${escapeHTML(patientReference)}" aria-label="Abrir expediente de ${escapeHTML(name)}">Expediente</button>
-          </div>
+          <strong>${escapeHTML(name)}</strong>
           <small>${escapeHTML(treatment)}</small>
         </div>
       </div>
       <div class="charge">
         ${formatCurrency(balance)}
+      </div>
+      <div class="today-expedient-action">
+        <button type="button" class="patient-info-button today-expedient-button" data-patient-info="${escapeHTML(patientReference)}" aria-label="Abrir expediente de ${escapeHTML(name)}">Expediente</button>
       </div>
       ${statusActions(name, appointmentId)}
     </div>
