@@ -241,11 +241,16 @@ function openAppointmentNotes(appointmentId) {
 function closeAppointmentNotes() {
   const modal = document.querySelector('#appointment-notes-modal');
   if (!modal) return;
+  if (modal.contains(document.activeElement)) document.activeElement.blur();
   modal.classList.remove('open');
   modal.classList.remove('is-viewing-observation');
   const form = document.querySelector('#appointment-notes-form');
   form?.classList.remove('is-viewing-observation');
   if (form) form.dataset.editingObservation = 'false';
+  if (form) {
+    delete form.dataset.progressPatientId;
+    delete form.dataset.progressId;
+  }
   modal.setAttribute('aria-hidden', 'true');
   document.querySelector('#appointment-notes-form')?.reset();
   updatePageScrollLock();

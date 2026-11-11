@@ -2080,6 +2080,31 @@ main {
   overflow-wrap: anywhere;
 }
 
+[data-progress-list] {
+  display: grid;
+  gap: 12px;
+}
+
+[data-progress-list] .appointment-observation {
+  background: #fff;
+}
+
+[data-progress-list] summary {
+  cursor: pointer;
+  color: var(--ink);
+}
+
+[data-progress-list] .progress-preview {
+  display: inline;
+  margin-left: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+[data-progress-list] .patient-info-button {
+  margin-top: 14px;
+}
+
 .appointment-notes-modal label {
   margin: 0;
   font-size: 14px;

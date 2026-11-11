@@ -961,6 +961,7 @@ function finishCloudRefresh() {
   updateAttendedCount();
   updateDashboardIncome();
   if (document.querySelector('#page-pacientes')?.classList.contains('active')) renderPatientDirectory(globalSearchQuery);
+  if (document.querySelector('[data-patient-panel="evolucion"].active')) refreshClinicalProgress?.();
 }
 
 function disconnectFromCloud() {
@@ -1005,6 +1006,7 @@ function subscribeRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'patients' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'treatments' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'appointment_notes' }, scheduleRealtimeRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'clinical_progress' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'payment_refunds' }, scheduleRealtimeRefresh)

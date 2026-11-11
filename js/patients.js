@@ -270,21 +270,11 @@ function sortPatientAppointments(appointments) {
 function renderPatientAppointmentRows(appointments) {
   return appointments.map(appointment => {
     const isToday = appointment.date === getISODate(0);
-    const hasObservation = Array.isArray(appointment.observations) && appointment.observations.length > 0;
-    const canAddObservation = canRecordClinicalProgress() && appointment.date === getISODate(0) && appointment.status !== 'Cancelada';
     return `<div class="patient-appointment-entry ${isToday ? 'is-today-appointment' : ''}">
       <span>
         <strong>${escapeHTML(appointment.reason)}${isToday ? ' <span class="today-appointment-badge">HOY</span>' : ''}</strong>
         <small>${formatDisplayDate(appointment.date)} · ${escapeHTML(appointment.time)} · ${escapeHTML(appointment.status || 'En espera')}</small>
-        ${hasObservation ? '<small class="appointment-observation-count">Avance registrado</small>' : ''}
       </span>
-      <div class="patient-appointment-actions">
-        ${hasObservation
-          ? `<button type="button" class="patient-info-button" data-appointment-notes="${escapeHTML(appointment.id)}">Ver avance</button>`
-          : canAddObservation
-            ? `<button type="button" class="patient-info-button" data-appointment-notes="${escapeHTML(appointment.id)}">Agregar avance</button>`
-            : ''}
-      </div>
     </div>`;
   }).join('');
 }
@@ -515,9 +505,6 @@ function showPatientDetails(ref) {
   const patientOutstandingBalance = Math.max(outstandingBalance, 0);
   const financialTotal = (patient.historialFinanciero || []).reduce((sum, payment) => sum + getNumericAmount(payment.monto), 0);
   const orderedAppointments = sortPatientAppointments(appointments);
-  const appointmentForToday = appointments.find(appointment =>
-    appointment.date === getISODate(0) && appointment.status !== 'Cancelada'
-  );
   
   details.innerHTML = `
     <div class="patient-details-heading">
@@ -534,6 +521,7 @@ function showPatientDetails(ref) {
       <button type="button" class="patient-folder-tab active" role="tab" aria-selected="true" data-patient-tab="generales"><span aria-hidden="true">▤</span>Datos generales</button>
       <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="medico"><span aria-hidden="true">✚</span>Expediente médico</button>
       <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="clinico"><span aria-hidden="true">◉</span>Historial clínico</button>
+      <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="evolucion"><span aria-hidden="true">✎</span>Evolución clínica</button>
       <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="citas"><span aria-hidden="true">◷</span>Historial de citas</button>
       <button type="button" class="patient-folder-tab" role="tab" aria-selected="false" data-patient-tab="financiero"><span aria-hidden="true">$</span>Historial financiero</button>
     </nav>
@@ -551,13 +539,6 @@ function showPatientDetails(ref) {
         <h4>Contacto de emergencia</h4>
         <p><strong>Nombre:</strong> ${escapeHTML(patient.contactoEmergencia || 'No registrado')} <span>· <strong>Parentesco:</strong> ${escapeHTML(patient.parentescoEmergencia || 'No registrado')} · <strong>Teléfono:</strong> ${escapeHTML(patient.telefonoEmergencia || 'No registrado')}</span></p>
       </div>
-      ${appointmentForToday ? `<div class="patient-general-appointment-action">
-        <div class="patient-general-appointment-details">
-          <span>Cita de hoy · ${escapeHTML(appointmentForToday.time)}</span>
-          <strong>${escapeHTML(appointmentForToday.reason || 'Cita')}</strong>
-        </div>
-        <button type="button" class="patient-info-button patient-general-add-advance" data-appointment-notes="${escapeHTML(ensureAppointmentId(appointmentForToday))}">${Array.isArray(appointmentForToday.observations) && appointmentForToday.observations.length ? 'Ver avance' : 'Agregar avance'}</button>
-      </div>` : ''}
     </section>
     <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="medico" hidden>
       <div class="patient-record-heading"><h2>Expediente médico</h2></div>
@@ -574,6 +555,10 @@ function showPatientDetails(ref) {
       <div class="patient-current-treatment"><strong>Tratamientos actuales</strong></div>
       <div class="patient-clinical-history">${renderPatientHistory(patient)}</div>
       <div class="patient-files"><h4>Documentos y fotografías</h4>${renderPatientFiles(patient)}</div>
+    </section>
+    <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="evolucion" hidden>
+      <div class="patient-record-heading"><h2>Evolución clínica</h2>${canRecordClinicalProgress() && patient.id ? '<button type="button" class="new-button" data-progress-create>+ Registrar avance</button>' : ''}</div>
+      <div data-progress-list><p class="empty-history">Selecciona esta pestaña para cargar los avances.</p></div>
     </section>
     <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="citas" hidden>
       <div class="patient-record-heading"><span class="eyebrow">AGENDA</span><h2>Historial de citas</h2></div>
