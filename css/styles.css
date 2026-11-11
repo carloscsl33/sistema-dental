@@ -1525,7 +1525,7 @@ main {
 
 .patient-detail-stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin: 24px 0;
 }
@@ -2086,12 +2086,9 @@ main {
 .clinical-progress-content section + section { padding-top: 16px; border-top: 1px solid #dce8e6; }
 .clinical-progress-content h3 { margin: 0; color: var(--ink); font-size: 14px; }
 .clinical-progress-content p { margin: 0; color: #26374f; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
-.clinical-progress-treatment h3::before { content: '✧'; margin-right: 8px; color: var(--teal); }
 .clinical-progress-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 16px; border-top: 1px solid #dce8e6; }
 .clinical-progress-actions .patient-info-button { margin: 0; }
-.clinical-progress-modal label + label { margin-top: 16px; }
-.clinical-progress-modal input, .clinical-progress-modal select { width: 100%; min-height: 44px; margin-top: 8px; border: 1px solid #cbd8e5; border-radius: 8px; padding: 10px 12px; background: #fff; color: var(--ink); font: inherit; }
-.clinical-progress-modal .field-optional { color: var(--muted); font-weight: 400; }
+.clinical-progress-toolbar { display: flex; justify-content: flex-start; margin: 8px 0 24px; }
 
 .clinical-progress-modal label {
   margin: 0;
@@ -3079,7 +3076,7 @@ main {
     font-size: 18px;
   }
   .patient-detail-stats {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     margin: 18px 0;
   }
@@ -3287,7 +3284,7 @@ main {
     font-size: 11px;
   }
   .patient-detail-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .dashboard-calendar .week-head,
   .dashboard-calendar .calendar-grid {

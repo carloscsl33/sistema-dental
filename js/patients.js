@@ -557,7 +557,8 @@ function showPatientDetails(ref) {
       <div class="patient-files"><h4>Documentos y fotografías</h4>${renderPatientFiles(patient)}</div>
     </section>
     <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="evolucion" hidden>
-      <div class="patient-record-heading"><h2>Evolución clínica</h2>${canRecordClinicalProgress() && patient.id ? '<button type="button" class="new-button" data-progress-create>+ Registrar avance</button>' : ''}</div>
+      <div class="patient-record-heading"><h2>Evolución clínica</h2></div>
+      ${canRecordClinicalProgress() && patient.id ? '<div class="clinical-progress-toolbar"><button type="button" class="new-button" data-progress-create>+ Registrar avance</button></div>' : ''}
       <div data-progress-list><p class="empty-history">Selecciona esta pestaña para cargar los avances.</p></div>
     </section>
     <section class="patient-record-section patient-folder-panel" role="tabpanel" data-patient-panel="citas" hidden>

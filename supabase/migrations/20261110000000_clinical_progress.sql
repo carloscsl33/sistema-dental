@@ -18,8 +18,9 @@ as $$
 begin
   if tg_op = 'INSERT' and current_setting('theradent.restore_mode', true) is distinct from 'on' then
     new.author_id := auth.uid();
-    select full_name into new.author_name from public.profiles where id = auth.uid();
-    new.author_name := coalesce(new.author_name, '');
+    select coalesce(nullif(btrim(p.full_name), ''), u.email, '') into new.author_name
+    from auth.users u left join public.profiles p on p.id = u.id
+    where u.id = auth.uid();
   end if;
   new.updated_at := now();
   return new;
