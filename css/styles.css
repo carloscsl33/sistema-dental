@@ -2088,7 +2088,8 @@ main {
 .clinical-progress-content p { margin: 0; color: #26374f; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
 .clinical-progress-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 16px; border-top: 1px solid #dce8e6; }
 .clinical-progress-actions .patient-info-button { margin: 0; }
-.clinical-progress-toolbar { display: flex; justify-content: flex-end; margin: 8px 0 24px; }
+.clinical-progress-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 24px; }
+.clinical-progress-toolbar h2 { margin: 0; }
 
 .clinical-progress-modal label {
   margin: 0;
