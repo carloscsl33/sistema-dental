@@ -83,6 +83,16 @@ async function loadClinicConfiguration() {
   applyClinicConfiguration(settings.data, hours.data, reasons.data, catalog.data);
 }
 
+async function loadPublicClinicBranding() {
+  if (!supabaseClient) return;
+  const { data, error } = await supabaseClient.functions.invoke('public-branding', { body: {} });
+  if (error) throw error;
+  if (!data) return;
+  clinicSettings = { ...clinicSettings, clinic_name: data.clinic_name || clinicSettings.clinic_name };
+  clinicLogoUrl = String(data.logo_url || '');
+  renderClinicBranding();
+}
+
 function renderBusinessHoursRow(name, day) {
   const row = businessHours.find(item => Number(item.day_of_week) === day) || { is_open: true, opens_at: '09:00', closes_at: '19:00' };
   const opens = String(row.opens_at || '09:00').slice(0, 5);

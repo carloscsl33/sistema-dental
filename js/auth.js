@@ -121,6 +121,8 @@ async function initializeAuth() {
     return;
   }
 
+  await loadPublicClinicBranding().catch(error => console.warn('No se pudo cargar la identidad pública de la clínica.', error));
+
   if (isRecoveryLink() || isInvitationLink()) {
     passwordRecoveryActive = true;
     invitationPasswordSetupActive = isInvitationLink();
