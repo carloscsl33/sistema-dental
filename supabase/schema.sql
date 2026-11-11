@@ -149,15 +149,6 @@ end $$;
 create trigger blocked_slots_capacity before insert or update of slot_date, slot_time, places on public.blocked_slots
   for each row execute function public.enforce_blocked_slot_capacity();
 
-create table public.appointment_notes (
-  appointment_id uuid primary key references public.appointments (id) on delete cascade,
-  body           text not null check (char_length(btrim(body)) between 1 and 3000),
-  created_at     timestamptz not null default now(),
-  updated_at     timestamptz not null default now(),
-  created_by     uuid default auth.uid() references auth.users (id) on delete set null
-);
-create trigger notes_touch before update on public.appointment_notes for each row execute function public.touch_updated_at();
-
 -- ---------- Pagos (solo se pueden crear, nunca editar ni borrar: no hay grant de update/delete) ----------
 create table public.payments (
   id             uuid primary key default gen_random_uuid(),
@@ -284,17 +275,17 @@ grant execute on function private.is_approved() to authenticated;
 grant execute on function public.dashboard_summary(date) to authenticated;
 
 do $$ declare t text; begin
-  foreach t in array array['profiles','patients','treatments','blocked_slots','appointments','appointment_notes','payments','patient_files','audit_log'] loop
+  foreach t in array array['profiles','patients','treatments','blocked_slots','appointments','payments','patient_files','audit_log'] loop
     execute format('alter table public.%I enable row level security', t);
   end loop;
-  foreach t in array array['patients','treatments','blocked_slots','appointments','appointment_notes','payments','patient_files'] loop
+  foreach t in array array['patients','treatments','blocked_slots','appointments','payments','patient_files'] loop
     execute format('create policy %I on public.%I for select to authenticated using ((select private.is_approved()))', t || '_select', t);
   end loop;
-  foreach t in array array['patients','treatments','blocked_slots','appointments','appointment_notes'] loop
+  foreach t in array array['patients','treatments','blocked_slots','appointments'] loop
     execute format('create policy %I on public.%I for insert to authenticated with check ((select private.is_approved()))', t || '_insert', t);
     execute format('create policy %I on public.%I for update to authenticated using ((select private.is_approved())) with check ((select private.is_approved()))', t || '_update', t);
   end loop;
-  foreach t in array array['treatments','blocked_slots','appointment_notes','patient_files'] loop
+  foreach t in array array['treatments','blocked_slots','patient_files'] loop
     execute format('create policy %I on public.%I for delete to authenticated using ((select private.is_approved()))', t || '_delete', t);
   end loop;
 end $$;
@@ -306,9 +297,9 @@ create policy audit_select         on public.audit_log     for select to authent
 create policy payments_insert      on public.payments      for insert to authenticated with check ((select private.is_approved()));
 
 grant select on public.profiles, public.patients, public.treatments, public.blocked_slots, public.appointments,
-                public.appointment_notes, public.payments, public.patient_files to authenticated;
+                public.payments, public.patient_files to authenticated;
 grant select on public.audit_log to authenticated;
-grant insert, update, delete on public.patients, public.treatments, public.blocked_slots, public.appointment_notes to authenticated;
+grant insert, update, delete on public.patients, public.treatments, public.blocked_slots to authenticated;
 grant insert (id, patient_id, appt_date, appt_time, motive, total, paid, status) on public.appointments to authenticated;
 grant update (patient_id, appt_date, appt_time, motive, total, status, paid) on public.appointments to authenticated;
 grant delete on public.appointments, public.patient_files to authenticated;
@@ -317,7 +308,7 @@ grant insert (id, patient_id, appointment_id, amount, method, paid_on, concept, 
 
 -- Tiempo real para que 3-4 personas vean los cambios al instante (respeta RLS)
 alter publication supabase_realtime add table public.patients, public.treatments, public.blocked_slots,
-  public.appointments, public.appointment_notes, public.payments, public.patient_files;
+  public.appointments, public.payments, public.patient_files;
 
 -- ---------- Quitar acceso a alguien ----------
 -- update public.profiles set status = 'blocked' where id = (select id from auth.users where email = 'correo@ejemplo.com');

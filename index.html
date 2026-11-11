@@ -445,21 +445,17 @@
     </section>
   </div>
 
-  <div class="modal-backdrop appointment-notes-backdrop" id="appointment-notes-modal" aria-hidden="true">
-    <form class="appointment-modal appointment-notes-modal" id="appointment-notes-form">
-      <button type="button" class="modal-close" id="appointment-notes-close" aria-label="Cerrar">×</button>
-      <h2 id="appointment-notes-title">Registrar avance</h2>
-      <p class="modal-copy" id="appointment-notes-appointment"></p>
-      <input id="appointment-notes-id" type="hidden">
-      <section class="appointment-notes-history" id="appointment-notes-history" aria-live="polite"></section>
-      <label id="appointment-notes-label">Registrar avance u observación*
-        <textarea id="appointment-notes-text" rows="4" maxlength="3000" placeholder="Describe el avance, procedimiento u observación de esta cita..." required></textarea>
+  <div class="modal-backdrop clinical-progress-backdrop" id="clinical-progress-modal" aria-hidden="true">
+    <form class="appointment-modal clinical-progress-modal" id="clinical-progress-form">
+      <button type="button" class="modal-close" id="clinical-progress-close" aria-label="Cerrar">×</button>
+      <h2 id="clinical-progress-title">Registrar avance</h2>
+      <p class="modal-copy" id="clinical-progress-patient"></p>
+      <label>Registrar avance clínico*
+        <textarea id="clinical-progress-text" rows="4" maxlength="3000" placeholder="Describe el avance, procedimiento u observación..." required></textarea>
       </label>
       <div class="appointment-notes-actions">
-        <button type="button" class="modal-secondary-button" id="appointment-notes-cancel">Cerrar</button>
-        <button type="button" class="modal-secondary-button" id="appointment-notes-edit" hidden>Editar avance</button>
-        <button type="button" class="modal-secondary-button" id="appointment-notes-cancel-edit" hidden>Cancelar edición</button>
-        <button type="submit" class="modal-primary-button" id="appointment-notes-save">Guardar avance</button>
+        <button type="button" class="modal-secondary-button" id="clinical-progress-cancel">Cancelar</button>
+        <button type="submit" class="modal-primary-button" id="clinical-progress-save">Guardar avance</button>
       </div>
     </form>
   </div>
@@ -468,7 +464,7 @@
     <section class="appointment-modal patient-appointments-modal" role="dialog" aria-modal="true" aria-labelledby="patient-appointments-title">
       <button type="button" class="modal-close" id="patient-appointments-close" aria-label="Cerrar">×</button>
       <h2 id="patient-appointments-title">Todas las citas</h2>
-      <p class="modal-copy">Consulta las citas de este paciente y abre sus avances u observaciones.</p>
+      <p class="modal-copy">Consulta las citas registradas de este paciente.</p>
       <div class="patient-appointments-list" id="patient-appointments-list"></div>
       <div class="appointment-notes-actions">
         <button type="button" class="modal-secondary-button" id="patient-appointments-cancel">Cerrar</button>

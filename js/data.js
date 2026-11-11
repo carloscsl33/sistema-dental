@@ -263,7 +263,7 @@ function normalizePatient(patient) {
 function normalizeAppointment(raw) {
   const row = Array.isArray(raw) ? raw : null;
   const source = row
-    ? { time: row[0], name: row[1], reason: row[2], balance: row[3], date: row[4], status: row[5], id: row[6], patientId: row[7], total: row[8], paid: row[9], observations: row[11] }
+    ? { time: row[0], name: row[1], reason: row[2], balance: row[3], date: row[4], status: row[5], id: row[6], patientId: row[7], total: row[8], paid: row[9] }
     : raw;
   if (!source || typeof source !== 'object') return null;
   const balance = getNumericAmount(source.balance);
@@ -281,13 +281,7 @@ function normalizeAppointment(raw) {
     total,
     paid,
     balance: pending,
-    paymentStatus: pending <= 0 && total > 0 ? 'Completo' : paid > 0 ? 'Parcial' : 'No pagado',
-    observations: Array.isArray(source.observations)
-      ? source.observations.filter(entry => entry && typeof entry.text === 'string' && entry.text.trim()).map(entry => ({
-        id: String(entry.id || generateId('observation')), text: entry.text.trim(), createdAt: String(entry.createdAt || ''),
-        ...(entry.updatedAt ? { updatedAt: String(entry.updatedAt) } : {})
-      }))
-      : []
+    paymentStatus: pending <= 0 && total > 0 ? 'Completo' : paid > 0 ? 'Parcial' : 'No pagado'
   };
 }
 
@@ -642,7 +636,7 @@ function appointmentToUpdateRow(appointment) {
   return row;
 }
 
-function rowToAppointment(row, patientsById, note) {
+function rowToAppointment(row, patientsById) {
   const patient = patientsById.get(row.patient_id);
   return normalizeAppointment({
     id: row.id,
@@ -653,8 +647,7 @@ function rowToAppointment(row, patientsById, note) {
     reason: row.motive,
     status: APPOINTMENT_STATUS_FROM_DB[row.status] || 'En espera',
     total: Number(row.total),
-    paid: Number(row.paid),
-    observations: note && note.body ? [{ id: row.id, text: note.body, createdAt: note.created_at, updatedAt: note.updated_at }] : []
+    paid: Number(row.paid)
   });
 }
 
@@ -783,19 +776,6 @@ async function syncAppointmentsToCloud() {
         : await supabaseClient.from('appointments').insert(appointmentToRow(appointment));
       if (error) throw error;
 
-      // Recepción puede actualizar la cita, pero nunca debe tocar los avances
-      // existentes al sincronizarla. Solo Administración y Doctor/a los alteran.
-      if (canRecordClinicalProgress()) {
-        const note = appointment.observations && appointment.observations[0];
-        if (note && note.text) {
-          const { error: noteError } = await supabaseClient.from('appointment_notes')
-            .upsert({ appointment_id: appointment.id, body: note.text });
-          if (noteError) throw noteError;
-        } else {
-          const { error: noteDeleteError } = await supabaseClient.from('appointment_notes').delete().eq('appointment_id', appointment.id);
-          if (noteDeleteError) throw noteDeleteError;
-        }
-      }
       lastSyncedAppointments.set(appointment.id, cloneDeep(appointment));
     }
     return true;
@@ -845,13 +825,12 @@ async function syncBlockedSlotsToCloud() {
 async function connectToCloud() {
   if (!isCloudConnected()) return;
   try {
-    const [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, notesResult, blockedResult] = await Promise.all([
+    const [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, blockedResult] = await Promise.all([
       supabaseClient.from('patients').select('*'),
       supabaseClient.from('treatments').select('*').order('recorded_on'),
       supabaseClient.from('patient_files').select('*'),
       supabaseClient.from('payments').select('*'),
       supabaseClient.from('appointments').select('*'),
-      supabaseClient.from('appointment_notes').select('*'),
       supabaseClient.from('blocked_slots').select('*')
     ]);
     // Pacientes y citas son la agenda base: si alguno falla no se muestra una
@@ -861,7 +840,7 @@ async function connectToCloud() {
       .map(result => result.error).find(Boolean);
     if (essentialError) throw essentialError;
 
-    const optionalError = [treatmentsResult, filesResult, paymentsResult, notesResult, blockedResult]
+    const optionalError = [treatmentsResult, filesResult, paymentsResult, blockedResult]
       .map(result => result.error).find(Boolean);
     if (optionalError) console.warn('Algunos datos complementarios no se pudieron cargar.', optionalError);
 
@@ -931,8 +910,7 @@ async function connectToCloud() {
     });
 
     const patientsById = new Map(patients.map(patient => [patient.id, patient]));
-    const notesByAppointment = new Map((notesResult.error ? [] : notesResult.data || []).map(note => [note.appointment_id, note]));
-    rebuildAppointmentCollections(appointmentRows.map(row => rowToAppointment(row, patientsById, notesByAppointment.get(row.id))));
+    rebuildAppointmentCollections(appointmentRows.map(row => rowToAppointment(row, patientsById)));
 
     blockedAppointmentSlots = (blockedResult.error ? [] : blockedResult.data || []).map(row => ({
       date: row.slot_date, time: row.slot_time.slice(0, 5), count: row.places
@@ -1005,7 +983,6 @@ function subscribeRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'blocked_slots' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'patients' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'treatments' }, scheduleRealtimeRefresh)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'appointment_notes' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'clinical_progress' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, scheduleRealtimeRefresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, scheduleRealtimeRefresh)

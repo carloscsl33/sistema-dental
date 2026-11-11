@@ -9,8 +9,8 @@ const headers = {
   "Vary": "Origin"
 };
 
-const tables = ["clinic_settings", "business_hours", "clinic_closures", "appointment_reasons", "treatment_catalog", "patients", "patient_clinical_records", "treatments", "patient_files", "appointments", "appointment_notes", "clinical_progress", "payments", "payment_refunds", "expenses", "blocked_slots", "patient_qr_tokens"] as const;
-const deleteOrder = ["payment_refunds", "payments", "expenses", "appointment_notes", "clinical_progress", "appointments", "patient_qr_tokens", "patient_files", "treatments", "patient_clinical_records", "patients", "blocked_slots", "clinic_closures", "business_hours", "appointment_reasons", "treatment_catalog", "clinic_settings"] as const;
+const tables = ["clinic_settings", "business_hours", "clinic_closures", "appointment_reasons", "treatment_catalog", "patients", "patient_clinical_records", "treatments", "patient_files", "appointments", "clinical_progress", "payments", "payment_refunds", "expenses", "blocked_slots", "patient_qr_tokens"] as const;
+const deleteOrder = ["payment_refunds", "payments", "expenses", "clinical_progress", "appointments", "patient_qr_tokens", "patient_files", "treatments", "patient_clinical_records", "patients", "blocked_slots", "clinic_closures", "business_hours", "appointment_reasons", "treatment_catalog", "clinic_settings"] as const;
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
@@ -87,7 +87,6 @@ Deno.serve(async req => {
       business_hours: "day_of_week",
       clinic_closures: "closed_on",
       blocked_slots: "slot_date",
-      appointment_notes: "appointment_id",
       patient_clinical_records: "patient_id",
       patient_qr_tokens: "patient_id"
     };

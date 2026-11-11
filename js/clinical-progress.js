@@ -73,27 +73,35 @@ async function refreshClinicalProgress() {
 }
 
 function openClinicalProgressEditor(item = null) {
-  const modal = document.querySelector('#appointment-notes-modal');
-  const form = document.querySelector('#appointment-notes-form');
-  const input = document.querySelector('#appointment-notes-text');
+  const modal = document.querySelector('#clinical-progress-modal');
+  const form = document.querySelector('#clinical-progress-form');
+  const input = document.querySelector('#clinical-progress-text');
   if (!modal || !form || !input || !selectedPatientId || !canRecordClinicalProgress()) return;
   form.dataset.progressPatientId = selectedPatientId;
   form.dataset.progressId = item?.id || '';
-  form.classList.remove('is-viewing-observation');
-  modal.classList.remove('is-viewing-observation');
-  document.querySelector('#appointment-notes-title').textContent = item ? 'Editar avance' : 'Registrar avance';
-  document.querySelector('#appointment-notes-appointment').textContent = getPatientFullName(findPatientById(selectedPatientId));
-  document.querySelector('#appointment-notes-history').hidden = true;
-  document.querySelector('#appointment-notes-label').hidden = false;
-  document.querySelector('#appointment-notes-save').hidden = false;
-  document.querySelector('#appointment-notes-edit').hidden = true;
-  document.querySelector('#appointment-notes-cancel-edit').hidden = true;
+  document.querySelector('#clinical-progress-title').textContent = item ? 'Editar avance' : 'Registrar avance';
+  document.querySelector('#clinical-progress-patient').textContent = getPatientFullName(findPatientById(selectedPatientId));
   input.placeholder = 'Describe el avance, procedimiento u observación...';
   input.value = item?.body || '';
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
   lockPageScroll();
   input.focus();
+}
+
+function closeClinicalProgressModal() {
+  const modal = document.querySelector('#clinical-progress-modal');
+  const form = document.querySelector('#clinical-progress-form');
+  if (!modal) return;
+  if (modal.contains(document.activeElement)) document.activeElement.blur();
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  form?.reset();
+  if (form) {
+    delete form.dataset.progressPatientId;
+    delete form.dataset.progressId;
+  }
+  updatePageScrollLock();
 }
 
 document.addEventListener('click', async event => {
@@ -122,20 +130,20 @@ document.addEventListener('click', async event => {
 
 document.addEventListener('submit', async event => {
   const form = event.target;
-  if (!form.matches('#appointment-notes-form') || !form.dataset.progressPatientId) return;
+  if (!form.matches('#clinical-progress-form') || !form.dataset.progressPatientId) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   const patientId = form.dataset.progressPatientId;
   const progressId = form.dataset.progressId;
-  const body = document.querySelector('#appointment-notes-text').value;
-  const button = document.querySelector('#appointment-notes-save');
+  const body = document.querySelector('#clinical-progress-text').value;
+  const button = document.querySelector('#clinical-progress-save');
   button.disabled = true;
   try {
     if (progressId) await updateClinicalProgress(patientId, progressId, body);
     else await createClinicalProgress(patientId, body);
     delete form.dataset.progressPatientId;
     delete form.dataset.progressId;
-    closeAppointmentNotes();
+    closeClinicalProgressModal();
     if (selectedPatientId === patientId) await refreshClinicalProgress();
     showToast(progressId ? 'Avance actualizado.' : 'Avance registrado.');
   } catch (error) {

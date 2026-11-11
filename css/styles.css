@@ -2028,35 +2028,20 @@ main {
   font-weight: 500;
 }
 
-.appointment-notes-backdrop {
+.clinical-progress-backdrop {
   z-index: 24;
 }
 
-.appointment-notes-modal {
+.clinical-progress-modal {
   width: min(820px, 100%);
-  min-height: 440px;
   max-height: calc(100vh - 48px);
   padding: 36px;
 }
 
-.appointment-notes-modal .modal-copy {
+.clinical-progress-modal .modal-copy {
   margin: 9px 40px 24px 0;
   font-size: 14px;
   line-height: 1.6;
-}
-
-.appointment-notes-history {
-  display: grid;
-  gap: 14px;
-  max-height: min(40vh, 340px);
-  margin-bottom: 22px;
-  overflow-y: auto;
-}
-
-.appointment-notes-history .empty-state {
-  padding: 18px 10px;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
 }
 
 .appointment-observation {
@@ -2105,39 +2090,17 @@ main {
   margin-top: 14px;
 }
 
-.appointment-notes-modal label {
+.clinical-progress-modal label {
   margin: 0;
   font-size: 14px;
 }
 
-.appointment-notes-modal #appointment-notes-text {
+.clinical-progress-modal #clinical-progress-text {
   min-height: 210px;
   margin-top: 9px;
   padding: 14px 16px;
   font-size: 16px;
   line-height: 1.65;
-}
-
-.appointment-notes-modal.is-viewing-observation {
-  min-height: 0;
-}
-
-.appointment-notes-modal.is-viewing-observation .modal-copy {
-  margin-bottom: 18px;
-}
-
-.appointment-notes-modal.is-viewing-observation .appointment-notes-history {
-  max-height: none;
-  margin: 0;
-  overflow: visible;
-}
-
-.appointment-notes-modal.is-viewing-observation .appointment-observation {
-  padding: 26px 28px;
-}
-
-.appointment-notes-modal [hidden] {
-  display: none;
 }
 
 .appointment-notes-actions {
@@ -3728,7 +3691,6 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 /* Todos los desplazamientos internos usan el mismo carril discreto del expediente. */
 .appointment-modal,
 .daily-agenda-list,
-.appointment-notes-history,
 #patient-modal .patient-form-scroll,
 #payment-receipt-modal .payment-receipt-card,
 #payment-document-modal .payment-document-card,
@@ -3740,7 +3702,6 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 }
 .appointment-modal::-webkit-scrollbar,
 .daily-agenda-list::-webkit-scrollbar,
-.appointment-notes-history::-webkit-scrollbar,
 #patient-modal .patient-form-scroll::-webkit-scrollbar,
 #payment-receipt-modal .payment-receipt-card::-webkit-scrollbar,
 #payment-document-modal .payment-document-card::-webkit-scrollbar,
@@ -3749,7 +3710,6 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 #confirmation-modal .confirmation-modal::-webkit-scrollbar { width: 8px; }
 .appointment-modal::-webkit-scrollbar-track,
 .daily-agenda-list::-webkit-scrollbar-track,
-.appointment-notes-history::-webkit-scrollbar-track,
 #patient-modal .patient-form-scroll::-webkit-scrollbar-track,
 #payment-receipt-modal .payment-receipt-card::-webkit-scrollbar-track,
 #payment-document-modal .payment-document-card::-webkit-scrollbar-track,
@@ -3758,7 +3718,6 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 #confirmation-modal .confirmation-modal::-webkit-scrollbar-track { background: transparent; }
 .appointment-modal::-webkit-scrollbar-thumb,
 .daily-agenda-list::-webkit-scrollbar-thumb,
-.appointment-notes-history::-webkit-scrollbar-thumb,
 #patient-modal .patient-form-scroll::-webkit-scrollbar-thumb,
 #payment-receipt-modal .payment-receipt-card::-webkit-scrollbar-thumb,
 #payment-document-modal .payment-document-card::-webkit-scrollbar-thumb,
@@ -3767,7 +3726,6 @@ body.auth-locked > :not(#auth-overlay):not(script) { display: none; }
 #confirmation-modal .confirmation-modal::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 10px; background: #cbd5df; background-clip: padding-box; }
 .appointment-modal::-webkit-scrollbar-thumb:hover,
 .daily-agenda-list::-webkit-scrollbar-thumb:hover,
-.appointment-notes-history::-webkit-scrollbar-thumb:hover,
 #patient-modal .patient-form-scroll::-webkit-scrollbar-thumb:hover,
 #payment-receipt-modal .payment-receipt-card::-webkit-scrollbar-thumb:hover,
 #payment-document-modal .payment-document-card::-webkit-scrollbar-thumb:hover,

@@ -370,46 +370,6 @@ document.addEventListener('click', async event => {
     return;
   }
 
-  const appointmentNotesButton = event.target.closest('[data-appointment-notes]');
-  if (appointmentNotesButton) {
-    openAppointmentNotes(appointmentNotesButton.dataset.appointmentNotes);
-    return;
-  }
-
-  if (event.target.closest('#appointment-notes-edit')) {
-    if (!canRecordClinicalProgress()) return showToast('Tu rol no puede modificar avances clínicos.');
-    const appointmentId = document.querySelector('#appointment-notes-id')?.value;
-    const appointment = getAppointments().find(({ appointment: item }) => item.id === appointmentId)?.appointment;
-    const observation = appointment?.observations?.[0];
-    if (!appointment || !observation) {
-      showToast('No se encontró el avance para editar.');
-      return;
-    }
-    const form = document.querySelector('#appointment-notes-form');
-    const modal = document.querySelector('#appointment-notes-modal');
-    const history = document.querySelector('#appointment-notes-history');
-    const notesInput = document.querySelector('#appointment-notes-text');
-    if (!form || !modal || !history || !notesInput) return;
-    form.dataset.editingObservation = 'true';
-    form.classList.remove('is-viewing-observation');
-    modal.classList.remove('is-viewing-observation');
-    history.hidden = true;
-    notesInput.value = observation.text || '';
-    document.querySelector('#appointment-notes-label').hidden = false;
-    document.querySelector('#appointment-notes-save').hidden = false;
-    document.querySelector('#appointment-notes-edit').hidden = true;
-    document.querySelector('#appointment-notes-cancel-edit').hidden = false;
-    document.querySelector('#appointment-notes-cancel').textContent = 'Cerrar';
-    notesInput.focus();
-    return;
-  }
-
-  if (event.target.closest('#appointment-notes-cancel-edit')) {
-    const appointmentId = document.querySelector('#appointment-notes-id')?.value;
-    openAppointmentNotes(appointmentId);
-    return;
-  }
-
   const patientAppointmentsButton = event.target.closest('[data-patient-appointments]');
   if (patientAppointmentsButton) {
     openPatientAppointments(patientAppointmentsButton.dataset.patientAppointments);
@@ -535,8 +495,8 @@ document.addEventListener('click', async event => {
     return;
   }
 
-  if (event.target.closest('#appointment-notes-close') || event.target.closest('#appointment-notes-cancel')) {
-    closeAppointmentNotes();
+  if (event.target.closest('#clinical-progress-close') || event.target.closest('#clinical-progress-cancel')) {
+    closeClinicalProgressModal();
     return;
   }
 
@@ -680,62 +640,6 @@ document.addEventListener('submit', async event => {
     await resolvePatientQr(document.querySelector('#patient-qr-manual')?.value);
     return;
   }
-  if (event.target.matches('#appointment-notes-form')) {
-    event.preventDefault();
-    if (!canRecordClinicalProgress()) {
-      showToast('Tu rol no puede registrar avances clínicos.');
-      return;
-    }
-    const appointmentId = document.querySelector('#appointment-notes-id')?.value;
-    const notesInput = document.querySelector('#appointment-notes-text');
-    const observationText = notesInput?.value.trim();
-    const notesForm = document.querySelector('#appointment-notes-form');
-    const isEditingObservation = notesForm?.dataset.editingObservation === 'true';
-    const appointment = getAppointments().find(({ appointment: item }) => item.id === appointmentId)?.appointment;
-    if (!appointment) {
-      showToast('No se encontró la cita para guardar el avance.');
-      closeAppointmentNotes();
-      return;
-    }
-    if (Array.isArray(appointment.observations) && appointment.observations.length && !isEditingObservation) {
-      showToast('Esta cita ya tiene un avance registrado.');
-      openAppointmentNotes(appointmentId);
-      return;
-    }
-    if (!observationText) {
-      showToast('Escribe el avance u observación antes de guardar.');
-      return;
-    }
-    if (isEditingObservation && Array.isArray(appointment.observations) && appointment.observations.length) {
-      appointment.observations[0] = {
-        ...appointment.observations[0],
-        text: observationText,
-        updatedAt: new Date().toISOString()
-      };
-    } else {
-      appointment.observations = [{
-        id: generateId('observation'),
-        text: observationText,
-        createdAt: new Date().toISOString()
-      }];
-    }
-    if (!saveAppointments()) return;
-    renderLists();
-    const patient = resolveAppointmentPatient(appointment);
-    if (patient) {
-      refreshPatientDetails(patient);
-      document.querySelectorAll('[data-appointment-notes]').forEach(button => {
-        if (button.dataset.appointmentNotes === appointmentId) button.textContent = 'Ver avance';
-      });
-    }
-    if (patient && document.querySelector('#patient-appointments-modal.open')) {
-      renderPatientAppointmentsModal(patient.id);
-    }
-    closeAppointmentNotes();
-    showToast('Avance registrado correctamente.');
-    return;
-  }
-
   if (!event.target.matches('#appointment-form')) return;
   event.preventDefault();
   if (!canManageAppointments()) {
@@ -848,7 +752,7 @@ document.addEventListener('submit', async event => {
   const appointment = {
     id: generateId('appointment'), patientId: patient.id, name: getPatientFullName(patient), time: formattedTime,
     date: appointmentDate, reason: treatment, status: 'En espera', total: totalAmount, paid: 0, balance: totalAmount,
-    paymentStatus: 'No pagado', observations: []
+    paymentStatus: 'No pagado'
   };
   
   rescheduleAppointmentId = null;
@@ -948,7 +852,7 @@ document.addEventListener('keydown', event => {
   }
   const closers = [
     ['#patient-appointments-modal', closePatientAppointments],
-    ['#appointment-notes-modal', closeAppointmentNotes],
+    ['#clinical-progress-modal', closeClinicalProgressModal],
     ['#daily-agenda-modal', closeDailyAgenda],
     ['#payment-receipt-modal', closePaymentReceipt],
     ['#payment-document-modal', closePaymentDocument],
