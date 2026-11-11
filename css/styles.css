@@ -2065,30 +2065,33 @@ main {
   overflow-wrap: anywhere;
 }
 
-[data-progress-list] {
-  display: grid;
-  gap: 12px;
-}
-
-[data-progress-list] .appointment-observation {
-  background: #fff;
-}
-
-[data-progress-list] summary {
-  cursor: pointer;
-  color: var(--ink);
-}
-
-[data-progress-list] .progress-preview {
-  display: inline;
-  margin-left: 8px;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-[data-progress-list] .patient-info-button {
-  margin-top: 14px;
-}
+[data-progress-list] { display: grid; gap: 16px; }
+.clinical-progress-card { border: 1px solid #dce5ee; border-radius: 13px; background: #fff; overflow: hidden; transition: border-color .2s ease, box-shadow .2s ease; }
+.clinical-progress-card[open] { border-color: var(--teal); box-shadow: 0 10px 28px rgba(21, 130, 124, .1); }
+.clinical-progress-card summary { display: grid; grid-template-columns: 210px minmax(0, 1fr) auto; align-items: center; gap: 20px; min-height: 96px; padding: 18px 22px; cursor: pointer; list-style: none; color: var(--ink); }
+.clinical-progress-card summary::-webkit-details-marker { display: none; }
+.clinical-progress-date { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.clinical-progress-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: #e6f7f4; color: var(--teal); font-size: 20px; }
+.clinical-progress-date strong, .clinical-progress-date small, .clinical-progress-summary strong, .clinical-progress-summary span { display: block; }
+.clinical-progress-date strong { font-size: 15px; }
+.clinical-progress-date small { margin-top: 4px; color: #62728b; font-size: 12px; }
+.clinical-progress-summary { min-width: 0; padding-left: 20px; border-left: 1px solid #cfdae4; }
+.clinical-progress-summary strong { font-size: 14px; }
+.clinical-progress-summary span { margin-top: 6px; overflow: hidden; color: #526179; font-size: 13px; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
+.clinical-progress-toggle { display: inline-flex; align-items: center; gap: 7px; color: #12877f; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.clinical-progress-toggle > span { font-size: 24px; line-height: .7; transition: transform .2s ease; }
+.clinical-progress-card[open] .clinical-progress-toggle > span { transform: rotate(90deg); }
+.clinical-progress-content { border-top: 1px solid #e4ebf1; background: linear-gradient(90deg, #fbfefd, #f4fcfa); padding: 22px 28px 20px 70px; }
+.clinical-progress-content section { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 14px; padding: 0 0 16px; }
+.clinical-progress-content section + section { padding-top: 16px; border-top: 1px solid #dce8e6; }
+.clinical-progress-content h3 { margin: 0; color: var(--ink); font-size: 14px; }
+.clinical-progress-content p { margin: 0; color: #26374f; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.clinical-progress-treatment h3::before { content: '✧'; margin-right: 8px; color: var(--teal); }
+.clinical-progress-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 16px; border-top: 1px solid #dce8e6; }
+.clinical-progress-actions .patient-info-button { margin: 0; }
+.clinical-progress-modal label + label { margin-top: 16px; }
+.clinical-progress-modal input, .clinical-progress-modal select { width: 100%; min-height: 44px; margin-top: 8px; border: 1px solid #cbd8e5; border-radius: 8px; padding: 10px 12px; background: #fff; color: var(--ink); font: inherit; }
+.clinical-progress-modal .field-optional { color: var(--muted); font-weight: 400; }
 
 .clinical-progress-modal label {
   margin: 0;
@@ -2101,6 +2104,18 @@ main {
   padding: 14px 16px;
   font-size: 16px;
   line-height: 1.65;
+}
+
+@media (max-width: 760px) {
+  .clinical-progress-card summary { grid-template-columns: 1fr auto; gap: 13px; padding: 16px; }
+  .clinical-progress-summary { grid-column: 1 / -1; padding: 12px 0 0; border-top: 1px solid #e5ebf0; border-left: 0; }
+  .clinical-progress-toggle { grid-column: 2; grid-row: 1; }
+  .clinical-progress-toggle { font-size: 0; }
+  .clinical-progress-toggle > span { font-size: 24px; }
+  .clinical-progress-content { padding: 18px 16px; }
+  .clinical-progress-content section { grid-template-columns: 1fr; gap: 7px; }
+  .clinical-progress-actions { justify-content: stretch; }
+  .clinical-progress-actions .patient-info-button { flex: 1; min-height: 42px; }
 }
 
 .appointment-notes-actions {

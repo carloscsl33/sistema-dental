@@ -4,34 +4,39 @@ async function loadClinicalProgress(patientId) {
   }
   const { data, error } = await supabaseClient
     .from('clinical_progress')
-    .select('id,patient_id,body,created_at,updated_at,author_name')
+    .select('id,patient_id,body,progress_on,treatment_name,created_at,updated_at,author_name')
     .eq('patient_id', patientId)
+    .order('progress_on', { ascending: false })
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data || [];
 }
 
-async function createClinicalProgress(patientId, body) {
+async function createClinicalProgress(patientId, body, progressOn, treatmentName) {
   if (!isCloudConnected() || !canRecordClinicalProgress()) {
     throw new Error('clinical_progress_access_denied');
   }
   const text = String(body || '').trim();
   if (!text || text.length > 3000) throw new Error('clinical_progress_invalid_body');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(progressOn || '')) throw new Error('clinical_progress_invalid_date');
   const { error } = await supabaseClient.from('clinical_progress').insert({
     patient_id: patientId,
-    body: text
+    body: text,
+    progress_on: progressOn,
+    treatment_name: String(treatmentName || '').trim() || null
   });
   if (error) throw error;
 }
 
-async function updateClinicalProgress(patientId, progressId, body) {
+async function updateClinicalProgress(patientId, progressId, body, progressOn, treatmentName) {
   if (!isCloudConnected() || !canRecordClinicalProgress()) {
     throw new Error('clinical_progress_access_denied');
   }
   const text = String(body || '').trim();
   if (!text || text.length > 3000) throw new Error('clinical_progress_invalid_body');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(progressOn || '')) throw new Error('clinical_progress_invalid_date');
   const { data, error } = await supabaseClient.from('clinical_progress')
-    .update({ body: text }).eq('id', progressId).eq('patient_id', patientId)
+    .update({ body: text, progress_on: progressOn, treatment_name: String(treatmentName || '').trim() || null }).eq('id', progressId).eq('patient_id', patientId)
     .select('id').maybeSingle();
   if (error) throw error;
   if (!data) throw new Error('clinical_progress_not_found');
@@ -65,7 +70,11 @@ async function refreshClinicalProgress() {
     if (selectedPatientId !== patientId || !host.isConnected) return;
     clinicalProgressItems = items;
     clinicalProgressPatientId = patientId;
-    host.innerHTML = items.length ? items.map(item => `<details class="appointment-observation"><summary><strong>${escapeHTML(new Date(item.created_at).toLocaleDateString('es-MX'))}</strong> · ${escapeHTML(item.author_name || 'Usuario')}<span class="progress-preview">${escapeHTML(item.body.slice(0, 160))}${item.body.length > 160 ? '…' : ''}</span></summary><p>${escapeHTML(item.body)}</p><button type="button" class="patient-info-button" data-progress-edit="${escapeHTML(item.id)}">Editar</button> <button type="button" class="patient-info-button" data-progress-delete="${escapeHTML(item.id)}">Eliminar</button></details>`).join('') : '<p class="empty-history">Aún no hay avances registrados.</p>';
+    host.innerHTML = items.length ? items.map(item => {
+      const date = item.progress_on || String(item.created_at || '').slice(0, 10);
+      const preview = item.body.slice(0, 145);
+      return `<details class="clinical-progress-card"><summary><span class="clinical-progress-date"><span class="clinical-progress-icon" aria-hidden="true">▣</span><span><strong>${escapeHTML(formatDisplayDate(date))}</strong><small>${escapeHTML(item.author_name || 'Usuario')}</small></span></span><span class="clinical-progress-summary"><strong>${escapeHTML(item.treatment_name || 'Evolución clínica')}</strong><span>${escapeHTML(preview)}${item.body.length > preview.length ? '…' : ''}</span></span><span class="clinical-progress-toggle">Ver completo <span aria-hidden="true">›</span></span></summary><div class="clinical-progress-content"><section><h3>Nota clínica</h3><p>${escapeHTML(item.body)}</p></section>${item.treatment_name ? `<section class="clinical-progress-treatment"><h3>Tratamiento</h3><p>${escapeHTML(item.treatment_name)}</p></section>` : ''}<div class="clinical-progress-actions"><button type="button" class="patient-info-button" data-progress-edit="${escapeHTML(item.id)}">Editar</button><button type="button" class="patient-info-button delete-action" data-progress-delete="${escapeHTML(item.id)}">Eliminar</button></div></div></details>`;
+    }).join('') : '<p class="empty-history">Aún no hay avances registrados.</p>';
   } catch (error) {
     console.error('No se pudieron cargar los avances:', error);
     host.textContent = 'No se pudieron cargar los avances. Inténtalo de nuevo.';
@@ -76,11 +85,20 @@ function openClinicalProgressEditor(item = null) {
   const modal = document.querySelector('#clinical-progress-modal');
   const form = document.querySelector('#clinical-progress-form');
   const input = document.querySelector('#clinical-progress-text');
-  if (!modal || !form || !input || !selectedPatientId || !canRecordClinicalProgress()) return;
+  const dateInput = document.querySelector('#clinical-progress-date');
+  const treatmentInput = document.querySelector('#clinical-progress-treatment');
+  if (!modal || !form || !input || !dateInput || !treatmentInput || !selectedPatientId || !canRecordClinicalProgress()) return;
   form.dataset.progressPatientId = selectedPatientId;
   form.dataset.progressId = item?.id || '';
   document.querySelector('#clinical-progress-title').textContent = item ? 'Editar avance' : 'Registrar avance';
   document.querySelector('#clinical-progress-patient').textContent = getPatientFullName(findPatientById(selectedPatientId));
+  const patient = findPatientById(selectedPatientId);
+  const treatments = [...new Set([...(patient?.tratamientoServicios || []).map(service => service.tratamiento), ...(patient?.historialClinico || []).map(record => record.tratamiento)].map(value => String(value || '').trim()).filter(Boolean))];
+  const selectedTreatment = item?.treatment_name || '';
+  if (selectedTreatment && !treatments.includes(selectedTreatment)) treatments.unshift(selectedTreatment);
+  treatmentInput.innerHTML = `<option value="">Sin tratamiento específico</option>${treatments.map(treatment => `<option value="${escapeHTML(treatment)}">${escapeHTML(treatment)}</option>`).join('')}`;
+  treatmentInput.value = selectedTreatment;
+  dateInput.value = item?.progress_on || getISODate(0);
   input.placeholder = 'Describe el avance, procedimiento u observación...';
   input.value = item?.body || '';
   modal.classList.add('open');
@@ -136,11 +154,13 @@ document.addEventListener('submit', async event => {
   const patientId = form.dataset.progressPatientId;
   const progressId = form.dataset.progressId;
   const body = document.querySelector('#clinical-progress-text').value;
+  const progressOn = document.querySelector('#clinical-progress-date').value;
+  const treatmentName = document.querySelector('#clinical-progress-treatment').value;
   const button = document.querySelector('#clinical-progress-save');
   button.disabled = true;
   try {
-    if (progressId) await updateClinicalProgress(patientId, progressId, body);
-    else await createClinicalProgress(patientId, body);
+    if (progressId) await updateClinicalProgress(patientId, progressId, body, progressOn, treatmentName);
+    else await createClinicalProgress(patientId, body, progressOn, treatmentName);
     delete form.dataset.progressPatientId;
     delete form.dataset.progressId;
     closeClinicalProgressModal();

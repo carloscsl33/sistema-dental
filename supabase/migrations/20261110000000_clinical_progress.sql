@@ -2,6 +2,8 @@ create table if not exists public.clinical_progress (
   id uuid primary key default gen_random_uuid(),
   patient_id uuid not null references public.patients(id) on delete cascade,
   body text not null check (char_length(btrim(body)) between 1 and 3000),
+  progress_on date not null default (now() at time zone 'America/Mexico_City')::date,
+  treatment_name text check (char_length(treatment_name) <= 160),
   author_id uuid not null default auth.uid() references auth.users(id) on delete restrict,
   author_name text not null default '',
   created_at timestamptz not null default now(),
@@ -32,8 +34,8 @@ alter table public.clinical_progress enable row level security;
 revoke all on public.clinical_progress from anon;
 revoke insert, update on public.clinical_progress from authenticated;
 grant select, delete on public.clinical_progress to authenticated;
-grant insert (patient_id, body) on public.clinical_progress to authenticated;
-grant update (body) on public.clinical_progress to authenticated;
+grant insert (patient_id, body, progress_on, treatment_name) on public.clinical_progress to authenticated;
+grant update (body, progress_on, treatment_name) on public.clinical_progress to authenticated;
 
 create policy clinical_progress_select on public.clinical_progress for select to authenticated using ((select private.current_role()) in ('admin'::public.app_role, 'doctor'::public.app_role));
 create policy clinical_progress_insert on public.clinical_progress for insert to authenticated with check ((select private.current_role()) in ('admin'::public.app_role, 'doctor'::public.app_role));
