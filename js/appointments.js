@@ -193,17 +193,14 @@ function todayMarkup(item) {
   return `
     <div class="appointment-row is-today-appointment" data-type="today">
       <div class="time">${escapeHTML(time)}</div>
-      <div class="person">
+      <button type="button" class="person today-person-button" data-patient-info="${escapeHTML(patientReference)}" aria-label="Abrir expediente de ${escapeHTML(name)}">
         <div>
           <strong>${escapeHTML(name)}</strong>
           <small>${escapeHTML(treatment)}</small>
         </div>
-      </div>
+      </button>
       <div class="charge">
         ${formatCurrency(balance)}
-      </div>
-      <div class="today-expedient-action">
-        <button type="button" class="patient-info-button today-expedient-button" data-patient-info="${escapeHTML(patientReference)}" aria-label="Abrir expediente de ${escapeHTML(name)}">Expediente</button>
       </div>
       ${statusActions(name, appointmentId)}
     </div>

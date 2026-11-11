@@ -492,7 +492,7 @@ main {
 .today-table-head,
 .appointment-card .appointment-row {
   display: grid;
-  grid-template-columns: 62px minmax(120px, 1.4fr) 68px 92px minmax(190px, 1fr);
+  grid-template-columns: 62px minmax(120px, 1.4fr) 68px minmax(190px, 1fr);
   gap: 10px;
   align-items: center;
 }
@@ -507,7 +507,6 @@ main {
   letter-spacing: 0.06em;
 }
 
-.today-table-head span:nth-child(4),
 .today-table-head span:last-child {
   text-align: center;
 }
@@ -585,29 +584,21 @@ main {
   text-overflow: ellipsis;
 }
 
-.today-expedient-button {
-  flex: 0 0 auto;
-  min-height: 28px;
-  border-color: #bfe8e3;
-  background: #e7f7f5;
-  color: #0f766e;
-  white-space: nowrap;
+.today-person-button {
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
-.today-expedient-action {
-  display: flex;
-  justify-content: center;
-}
-
-.today-expedient-button:hover {
-  background: #d9f2ef;
-  border-color: #8dd6cf;
-}
-
-.today-expedient-button:focus-visible {
-  outline: 2px solid #0f766e;
-  outline-offset: 2px;
-}
+.today-person-button:hover { background: #eefaf8; }
+.today-person-button:hover strong { color: #0f766e; }
+.today-person-button:focus-visible { outline: 2px solid #0f766e; outline-offset: 2px; }
 
 .charge {
   display: flex;
@@ -2923,14 +2914,9 @@ main {
     grid-row: 1;
     font-size: 12px;
   }
-  .appointment-card .today-expedient-action {
-    grid-column: 2 / -1;
-    grid-row: 2;
-    justify-content: flex-start;
-  }
   .appointment-card .appointment-status {
     grid-column: 1 / -1;
-    grid-row: 3;
+    grid-row: 2;
     margin-top: 2px;
   }
   .appointment-card .appointment-status-current {
