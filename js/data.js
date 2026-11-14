@@ -699,8 +699,13 @@ async function syncPatientsToCloud() {
         if (treatmentsInsertError) throw treatmentsInsertError;
       }
 
-      const { error: filesDeleteError } = await supabaseClient.from('patient_files').delete().eq('patient_id', patient.id);
-      if (filesDeleteError) throw filesDeleteError;
+      const previousFiles = lastSyncedPatients.get(patient.id)?.archivosClinicos || [];
+      const currentFileIds = new Set((patient.archivosClinicos || []).map(file => file.id).filter(Boolean));
+      const deletedFileIds = previousFiles.map(file => file.id).filter(id => id && !currentFileIds.has(id));
+      if (deletedFileIds.length) {
+        const { error: filesDeleteError } = await supabaseClient.from('patient_files').delete().in('id', deletedFileIds);
+        if (filesDeleteError) throw filesDeleteError;
+      }
       const fileRows = (patient.archivosClinicos || []).map(file => ({
         id: file.id,
         patient_id: patient.id,
@@ -713,8 +718,8 @@ async function syncPatientsToCloud() {
         drive_folder_id: file.driveFolderId || null
       }));
       if (fileRows.length) {
-        const { error: filesInsertError } = await supabaseClient.from('patient_files').insert(fileRows);
-        if (filesInsertError) throw filesInsertError;
+        const { error: filesUpsertError } = await supabaseClient.from('patient_files').upsert(fileRows);
+        if (filesUpsertError) throw filesUpsertError;
       }
 
       const newPayments = (patient.historialFinanciero || []).filter(payment => payment.id && !cloudSyncedPaymentIds.has(payment.id));
