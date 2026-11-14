@@ -6,21 +6,21 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 
 ### 1.1 Pago antes de finalizar: convertirlo formalmente en anticipo
 
-- **Estado:** corrección implementada y validada localmente; pendiente de validación integrada antes de publicar.
+- **Estado:** corregido, probado localmente y publicado.
 - **Hallazgo:** una cita puede recibir un cobro antes de marcarse como finalizada.
 - **Corrección aplicada:** el recibo se presenta como **“Registrar pago / anticipo”** cuando no se está finalizando la cita. Mantiene **“Finalizar cita”** como acción clínica independiente y conserva el saldo posterior.
 - **Prueba de aceptación:** registrar un anticipo parcial, ver el saldo pendiente, finalizar después y registrar solamente el saldo restante.
 
 ### 1.2 Cancelación de una cita ya pagada
 
-- **Estado:** corrección implementada y validada localmente; pendiente de aplicar la migración y validar contra Supabase antes de publicar.
+- **Estado:** corregido, protegido también en Supabase y publicado.
 - **Hallazgo:** si se cancela una cita con pago previo y no se agenda otra, la cita puede eliminarse mientras el pago queda sin cita asociada.
 - **Corrección aplicada:** una cita con pagos queda en estado `Cancelada`, no se elimina desde la interfaz y el importe ya pagado se conserva al reagendarla. La política de Supabase preparada también bloquea su eliminación desde la base. El reembolso seguirá siendo un flujo separado y explícito.
 - **Prueba de aceptación:** cancelar una cita con anticipo y comprobar que ningún pago queda huérfano y que el saldo/crédito es trazable.
 
 ### 1.3 Finalizar una cita con saldo cero
 
-- **Estado:** corrección implementada y validada localmente; pendiente de validación integrada antes de publicar.
+- **Estado:** corregido, probado localmente y publicado.
 - **Hallazgo:** al finalizar una cita ya cubierta, se abre un comprobante adicional de `$0`.
 - **Corrección aplicada:** si el saldo es cero, se finaliza directamente sin abrir recibo ni crear movimiento financiero adicional.
 - **Prueba de aceptación:** finalizar una cita pagada por completo y verificar que no se crea recibo de $0.
@@ -29,23 +29,23 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 
 ### 2.1 Tablero vacío al entrar o cambiar de cuenta
 
-- **Estado:** corrección implementada y validada localmente; pendiente de validación integrada antes de publicar.
+- **Estado:** corregido, probado localmente y publicado.
 - **Causa identificada:** `handleSession()` desbloquea la interfaz antes de esperar `connectToCloud()`. Las consultas de Supabase responden correctamente, pero el tablero se pinta antes de tener pacientes, citas y pagos.
 - **Corrección aplicada:** la interfaz permanece bloqueada con “Cargando datos de la clínica…” hasta completar la primera sincronización. Al cambiar de usuario se invalida cualquier carga previa y solo se desbloquea la sesión más reciente.
 - **Prueba de aceptación:** alternar entre las tres cuentas y entrar en una ventana nueva; el tablero nunca deberá verse vacío ni mostrar datos transitorios de otra cuenta.
 
 ### 2.2 Lista de archivos clínicos no se actualiza inmediatamente
 
-- **Estado:** defecto visual confirmado, prioridad media.
+- **Estado:** corregido, probado localmente y publicado.
 - **Hallazgo:** la carga, apertura y eliminación en Google Drive funcionan; un archivo recién guardado aparece solo tras recargar.
-- **Corrección propuesta:** después de guardar el expediente, actualizar el paciente local y volver a renderizar el detalle desde el estado ya confirmado, sin esperar al evento Realtime ni a una recarga.
+- **Corrección aplicada:** la sincronización actualiza y elimina solamente las filas de archivos que cambiaron; ya no borra toda la lista antes de insertarla, por lo que Realtime no puede leer una lista temporalmente vacía.
 - **Prueba de aceptación:** adjuntar un PNG/PDF, guardar y verlo inmediatamente; abrirlo y eliminarlo sin recargar.
 
 ## Parte 3 — Consola, accesibilidad y recursos externos
 
 ### 3.1 Avisos `aria-hidden` con foco dentro de un modal
 
-- **Estado:** defecto de accesibilidad confirmado, prioridad media.
+- **Estado:** corregido, probado localmente y publicado.
 - **Hallazgo:** al cerrar modales, se establece `aria-hidden="true"` mientras el botón interno conserva el foco. Afectó cita, paciente, comprobantes y QR.
 - **Evidencia de consola del 11 de noviembre:** se identificaron los elementos concretos: `#confirmation-cancel`, `#patient-save`, `#appointment-no-schedule`, `#modal-date` (campo oculto de fecha), botón primario del recibo de pago y botón `outline-button` del documento/recibo. Esto confirma que el problema es transversal y no exclusivo de un modal.
 - **Corrección propuesta:** centralizar apertura/cierre de modales. Antes de ocultar, mover el foco al elemento que abrió el modal o aplicar `blur()`; después usar `inert` mientras esté cerrado y devolver el foco al disparador. Conservar trampa de foco mientras el modal esté abierto.
@@ -53,33 +53,33 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 
 ### 3.2 Dependencias QR desde jsDelivr bloqueadas por Tracking Prevention
 
-- **Estado:** advertencia real del navegador; prioridad media.
+- **Estado:** corregido, probado localmente y publicado.
 - **Hallazgo:** Edge bloquea acceso a almacenamiento de `jsQR` y `qrcode-generator` cargados desde CDN. Aunque no siempre rompe el QR, agrega advertencias y depende de terceros.
 - **Corrección propuesta:** descargar, versionar y servir ambas bibliotecas localmente desde el proyecto; retirar los `<script>` de jsDelivr y actualizar CSP para usar solo `script-src 'self'`.
 - **Prueba de aceptación:** generar tarjeta QR y escanearla en Edge/Chrome sin avisos de Tracking Prevention relacionados con CDN.
 
 ### 3.3 CSP: estilos inline y fuentes en la consola histórica
 
-- **Estado:** revisar tras limpieza de caché; parcialmente corregido en la versión actual.
+- **Estado:** verificado en producción; no se agregaron excepciones `unsafe-inline` a la CSP.
 - **Hallazgo:** la consola anterior mostraba bloqueos CSP de estilos inline desde el gráfico de Finanzas y de fuentes. El código actual de `finance.js` ya usa clases CSS (`finance-bar-height-*`) en vez de `style="..."`.
 - **Corrección propuesta:** publicar/verificar la versión actual, invalidar el caché del service worker y comprobar en un perfil limpio. No agregar `unsafe-inline`; si queda una fuente externa, alojarla localmente o eliminarla.
 - **Prueba de aceptación:** abrir Finanzas en perfil limpio; cero errores de `style-src` y cero solicitudes de fuentes no permitidas.
 
 ### 3.4 Mapa de código de jsDelivr bloqueado por CSP
 
-- **Estado:** advertencia de herramientas de desarrollo, prioridad baja.
+- **Estado:** corregido al retirar la dependencia remota de jsDelivr.
 - **Hallazgo:** DevTools intenta descargar un `source map` remoto; no participa en la ejecución de la aplicación.
 - **Corrección propuesta:** al alojar QR localmente desaparece. Si se mantiene CDN, permitir solo el origen necesario en `connect-src`; no ampliar CSP sin necesidad.
 
 ### 3.5 `Invalid Refresh Token: Refresh Token Not Found`
 
-- **Estado:** defecto de manejo de sesión confirmado, prioridad media.
+- **Estado:** corregido, probado localmente y publicado.
 - **Corrección propuesta:** ante error de refresh, borrar el almacenamiento de sesión de Supabase, desmontar Realtime y regresar al inicio de sesión con un mensaje breve. Evitar que se hagan consultas con un token inválido.
 - **Prueba de aceptación:** invalidar/cerrar una sesión y recargar; debe llevar a iniciar sesión sin errores repetidos en consola.
 
 ### 3.6 `favicon.ico` 404
 
-- **Estado:** defecto menor confirmado; el video muestra varias solicitudes repetidas `GET /favicon.ico 404`.
+- **Estado:** corregido y verificado en producción (`/favicon.ico` responde 200).
 - **Corrección propuesta:** agregar un favicon local y su etiqueta `link rel="icon"`.
 
 ### 3.7 Mensajes que no requieren corrección en el sistema
@@ -93,7 +93,7 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 
 ### 4.1 Funciones `SECURITY DEFINER` ejecutables por usuarios autenticados
 
-- **Estado:** advertencia activa del asesor de Supabase, prioridad alta.
+- **Estado:** corregido y verificado en Supabase.
 - **Funciones:** `record_payment`, `record_expense`, `record_payment_refund`.
 - **Riesgo:** son necesarias para operaciones atómicas, pero por ser `SECURITY DEFINER` expuestas en `public` deben validar estrictamente rol y autorización dentro de cada función.
 - **Corrección propuesta:** mantenerlas solo si cada una exige `admin` o `receptionist` mediante `private.current_role()` y verifica que el registro pertenece a un paciente/cita válida. Revocar `EXECUTE` al rol autenticado si una función no se usa desde el cliente. Añadir pruebas con cuenta Doctor/a que confirmen error `forbidden` al invocarlas.
@@ -105,9 +105,9 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 
 ### 4.3 Índices de claves foráneas
 
-- **Estado:** recomendación de rendimiento, prioridad baja antes de escalar.
+- **Estado:** corregido y verificado en Supabase.
 - **Índices faltantes detectados:** autor de avances, creador de gastos, usuario de conexión/estado OAuth de Drive y varias claves de reembolsos.
-- **Corrección propuesta:** agregar índices cubrientes solamente para esas FKs. No borrar índices “unused” ahora: la base es reciente y el asesor aún no tiene suficiente tráfico real.
+- **Corrección aplicada:** se agregaron los siete índices de claves foráneas señalados por el asesor. No se borraron índices “unused”: la base aún no tiene suficiente tráfico real para juzgarlos.
 
 ## Parte 5 — Roles y decisiones confirmadas
 
