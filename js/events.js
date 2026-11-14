@@ -517,7 +517,8 @@ document.addEventListener('click', async event => {
       ? getAppointments().find(({ appointment }) => appointment.id === rescheduledAppointmentId)?.appointment
       : null;
     const cancelledPatient = cancelledAppointment ? resolveAppointmentPatient(cancelledAppointment) : null;
-    if (cancelledAppointment && removeAppointmentById(rescheduledAppointmentId)) {
+    const cancelledHasPayment = shouldPreserveCancelledAppointment(cancelledAppointment);
+    if (cancelledAppointment && !cancelledHasPayment && removeAppointmentById(rescheduledAppointmentId)) {
       if (!saveAppointments()) {
         addAppointmentToDateCollection(cancelledAppointment);
         rescheduleAppointmentId = null;
@@ -534,7 +535,9 @@ document.addEventListener('click', async event => {
     refreshPatientDetails(cancelledPatient);
     closeModal();
     if (cancelledAppointment) {
-      showToast('La cita cancelada se eliminó; no se agendó otra.');
+      showToast(cancelledHasPayment
+        ? 'La cita quedó cancelada y su pago se conserva como crédito al reagendar.'
+        : 'La cita cancelada se eliminó; no se agendó otra.');
     } else {
       if (wasFollowingUp) renderLists();
       showToast('No se agendó una nueva cita.');

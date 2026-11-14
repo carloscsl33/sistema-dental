@@ -472,7 +472,7 @@ function closeModal() {
     ? getAppointments().find(({ appointment }) => appointment.id === cancelledAppointmentId)?.appointment
     : null;
   const cancelledPatient = cancelledAppointment ? resolveAppointmentPatient(cancelledAppointment) : null;
-  if (cancelledAppointment?.status === 'Cancelada') {
+  if (cancelledAppointment?.status === 'Cancelada' && !getAppointmentPaidAmount(cancelledAppointment)) {
     cancelledAppointment.status = 'En espera';
     saveAppointments();
   }
@@ -489,6 +489,16 @@ function closeModal() {
   updatePageScrollLock();
 }
 
+function getAppointmentPaidAmount(appointment) {
+  if (!appointment) return 0;
+  if (appointment.paid !== undefined) return Math.max(getNumericAmount(appointment.paid), 0);
+  return Math.max(getNumericAmount(appointment.total ?? appointment.balance) - getNumericAmount(appointment.balance), 0);
+}
+
+function shouldPreserveCancelledAppointment(appointment) {
+  return getAppointmentPaidAmount(appointment) > 0;
+}
+
 async function deleteAppointment(appointmentId) {
   if (!canManageAppointments()) {
     showToast('Tu rol no puede eliminar citas.');
@@ -496,6 +506,10 @@ async function deleteAppointment(appointmentId) {
   }
   const appointment = getAppointments().find(({ appointment: item }) => item.id === appointmentId)?.appointment;
   if (!appointment) return;
+  if (shouldPreserveCancelledAppointment(appointment)) {
+    showToast('No se puede eliminar una cita con pagos. Cancélala y reagéndala para conservar el crédito.');
+    return;
+  }
   
   const patientName = appointment.name;
   const { confirmed } = await showConfirmationDialog({
@@ -523,6 +537,10 @@ function updateAppointmentStatus(appointmentId, status) {
   const todayIndex = todayAppointments.findIndex(a => a.id === appointmentId);
   if (item.appointment.status === status) {
     if (status === 'Finalizada') {
+      if (getNumericAmount(item.appointment.balance) <= 0) {
+        showToast('Esta cita ya está finalizada y su pago está cubierto.');
+        return;
+      }
       followUpAppointmentId = appointmentId;
       if (rescheduleAppointmentId === appointmentId) rescheduleAppointmentId = null;
       openPaymentReceipt(appointmentId);
@@ -536,6 +554,15 @@ function updateAppointmentStatus(appointmentId, status) {
   const patient = resolveAppointmentPatient(item.appointment);
 
   if (status === 'Finalizada') {
+    if (getNumericAmount(item.appointment.balance) <= 0) {
+      item.appointment.status = 'Finalizada';
+      followUpAppointmentId = null;
+      saveAppointments();
+      renderLists();
+      refreshPatientDetails(patient);
+      showToast('Cita finalizada. El pago ya estaba cubierto.');
+      return;
+    }
     followUpAppointmentId = appointmentId;
     if (rescheduleAppointmentId === appointmentId) rescheduleAppointmentId = null;
     openPaymentReceipt(appointmentId);

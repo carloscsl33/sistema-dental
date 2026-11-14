@@ -41,6 +41,16 @@ function openPaymentReceipt(appointmentId) {
   
   const paymentStatus = document.querySelector('#receipt-payment-status');
   const paymentAmount = document.querySelector('#receipt-payment-amount');
+  const receiptTitle = document.querySelector('#payment-receipt-title');
+  const receiptCopy = document.querySelector('#payment-receipt-modal .modal-copy');
+  const submitButton = document.querySelector('#payment-receipt-form button[type="submit"]');
+  const isFinalizing = followUpAppointmentId === appointmentId;
+
+  if (receiptTitle) receiptTitle.textContent = isFinalizing ? 'Finalizar cita y registrar pago' : 'Registrar pago / anticipo';
+  if (receiptCopy) receiptCopy.textContent = isFinalizing
+    ? 'Registra el pago pendiente para finalizar esta cita.'
+    : 'Registra un pago o anticipo sin finalizar la cita.';
+  if (submitButton) submitButton.textContent = isFinalizing ? 'Finalizar y agendar cita' : 'Guardar pago / anticipo';
   
   if (balanceAmount <= 0) {
     if (paymentStatus) paymentStatus.value = 'Completo';
@@ -100,8 +110,8 @@ function createPaymentReceiptModal() {
     <div class="modal-card payment-receipt-card" role="dialog" aria-modal="true" aria-labelledby="payment-receipt-title">
       <div class="payment-receipt-header">
         <div>
-          <h2 id="payment-receipt-title">Registrar pago</h2>
-          <p class="modal-copy">Registra el pago realizado correspondiente a esta cita.</p>
+          <h2 id="payment-receipt-title">Registrar pago / anticipo</h2>
+          <p class="modal-copy">Registra un pago o anticipo sin finalizar la cita.</p>
         </div>
         <button type="button" class="modal-close" id="payment-receipt-close" aria-label="Cerrar">×</button>
       </div>
@@ -137,7 +147,7 @@ function createPaymentReceiptModal() {
         </div>
         <div class="payment-receipt-actions">
           <button type="button" class="modal-secondary-button" id="payment-receipt-cancel">Cancelar</button>
-          <button type="submit" class="modal-primary-button">Guardar recibo y nueva cita</button>
+          <button type="submit" class="modal-primary-button">Guardar pago / anticipo</button>
         </div>
       </form>
     </div>`;

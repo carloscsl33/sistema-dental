@@ -32,7 +32,7 @@ function applyRoleAccess() {
   renderSessionIdentity();
 }
 
-async function loadCurrentAccess(session) {
+async function getAccessForSession(session) {
   if (!session?.user || !supabaseClient) return null;
   const { data, error } = await supabaseClient
     .from('profiles')
@@ -40,8 +40,19 @@ async function loadCurrentAccess(session) {
     .eq('id', session.user.id)
     .maybeSingle();
   if (error || !data || data.status !== 'approved' || !ROLE_LABELS[data.role]) return null;
-  currentAccess = { id: session.user.id, role: data.role, status: data.status, fullName: data.full_name || '', email: session.user.email || '' };
+  return { id: session.user.id, role: data.role, status: data.status, fullName: data.full_name || '', email: session.user.email || '' };
+}
+
+function setCurrentAccess(access) {
+  currentAccess = access;
   applyRoleAccess();
+  return currentAccess;
+}
+
+async function loadCurrentAccess(session) {
+  const access = await getAccessForSession(session);
+  if (!access) return null;
+  setCurrentAccess(access);
   return currentAccess;
 }
 

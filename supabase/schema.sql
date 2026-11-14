@@ -291,7 +291,11 @@ do $$ declare t text; begin
 end $$;
 create policy patient_files_insert on public.patient_files for insert to authenticated with check ((select private.is_approved()));
 create policy patients_delete      on public.patients      for delete to authenticated using ((select private.is_approved()));
-create policy appointments_delete  on public.appointments  for delete to authenticated using ((select private.is_approved()) and status <> 'finalizada');
+create policy appointments_delete  on public.appointments  for delete to authenticated using (
+  (select private.current_role()) in ('admin'::public.app_role, 'receptionist'::public.app_role)
+  and status <> 'finalizada'::public.appt_status
+  and coalesce(paid, 0) = 0
+);
 create policy profiles_select      on public.profiles      for select to authenticated using (id = (select auth.uid()));
 create policy audit_select         on public.audit_log     for select to authenticated using ((select private.is_approved()));
 create policy payments_insert      on public.payments      for insert to authenticated with check ((select private.is_approved()));

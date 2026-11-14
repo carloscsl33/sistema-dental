@@ -37,8 +37,8 @@ function showAuthView(view, focusSelector) {
   window.setTimeout(() => document.querySelector(focusSelector || ({ login: '#auth-email', recovery: '#recovery-email', reset: '#new-password' }[view]))?.focus(), 0);
 }
 
-function applyAuthState(session) {
-  const showOverlay = !session || passwordRecoveryActive;
+function applyAuthState(session, loading = false) {
+  const showOverlay = !session || passwordRecoveryActive || loading;
   document.querySelector('#auth-overlay')?.toggleAttribute('hidden', !showOverlay);
   document.body.classList.toggle('auth-locked', showOverlay);
   document.querySelectorAll('[data-logout-button]').forEach(button => button.toggleAttribute('hidden', !session));
@@ -46,31 +46,70 @@ function applyAuthState(session) {
 }
 
 let cloudSessionReady = false;
+let activeSessionUserId = null;
+let activeSessionLoad = null;
+let sessionLoadVersion = 0;
 
 async function handleSession(session) {
   if (passwordRecoveryActive) return applyAuthState(null);
-  if (session) {
-    if (!cloudSessionReady) {
-      const access = await loadCurrentAccess(session);
-      if (!access) {
-        setAuthMessage('#auth-message', 'Tu cuenta no tiene acceso activo. Comunícate con la administración de la clínica.');
-        await supabaseClient.auth.signOut({ scope: 'local' });
-        return;
-      }
-      cloudSessionReady = true;
-      applyAuthState(session);
-      await connectToCloud();
-      await loadClinicConfiguration().catch(error => console.warn('No se pudo cargar la configuración de la clínica.', error));
-      return;
-    }
-    applyAuthState(session);
-  } else {
-    if (cloudSessionReady) {
-      cloudSessionReady = false;
-      disconnectFromCloud();
-    }
+  if (!session) {
+    sessionLoadVersion += 1;
+    activeSessionUserId = null;
+    activeSessionLoad = null;
+    if (cloudSessionReady) disconnectFromCloud();
+    cloudSessionReady = false;
     clearCurrentAccess();
     applyAuthState(null);
+    return;
+  }
+
+  const userId = session.user?.id;
+  if (!userId) return;
+  if (cloudSessionReady && currentAccess.id === userId) {
+    applyAuthState(session);
+    return;
+  }
+  if (activeSessionUserId === userId && activeSessionLoad) return activeSessionLoad;
+
+  const loadVersion = ++sessionLoadVersion;
+  activeSessionUserId = userId;
+  if (cloudSessionReady || currentAccess.id) disconnectFromCloud();
+  cloudSessionReady = false;
+  clearCurrentAccess();
+  applyAuthState(session, true);
+  setAuthMessage('#auth-message', 'Cargando datos de la clínica…');
+
+  activeSessionLoad = (async () => {
+    const access = await getAccessForSession(session);
+    if (loadVersion !== sessionLoadVersion) return;
+    if (!access) {
+      setAuthMessage('#auth-message', 'Tu cuenta no tiene acceso activo. Comunícate con la administración de la clínica.');
+      await supabaseClient.auth.signOut({ scope: 'local' });
+      return;
+    }
+
+    setCurrentAccess(access);
+    cloudSessionReady = true;
+    const connected = await connectToCloud(userId);
+    if (loadVersion !== sessionLoadVersion) return;
+    if (!connected) {
+      cloudSessionReady = false;
+      clearCurrentAccess();
+      applyAuthState(session, true);
+      setAuthMessage('#auth-message', 'No se pudieron cargar los datos de la clínica. Recarga la página e inténtalo de nuevo.');
+      return;
+    }
+
+    await loadClinicConfiguration().catch(error => console.warn('No se pudo cargar la configuración de la clínica.', error));
+    if (loadVersion !== sessionLoadVersion) return;
+    setAuthMessage('#auth-message');
+    applyAuthState(session);
+  })();
+
+  try {
+    await activeSessionLoad;
+  } finally {
+    if (loadVersion === sessionLoadVersion) activeSessionLoad = null;
   }
 }
 

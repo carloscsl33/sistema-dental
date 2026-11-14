@@ -822,8 +822,8 @@ async function syncBlockedSlotsToCloud() {
   }
 }
 
-async function connectToCloud() {
-  if (!isCloudConnected()) return;
+async function connectToCloud(expectedUserId = currentAccess?.id) {
+  if (!isCloudConnected() || expectedUserId !== currentAccess?.id) return false;
   try {
     const [patientsResult, treatmentsResult, filesResult, paymentsResult, appointmentsResult, blockedResult] = await Promise.all([
       supabaseClient.from('patients').select('*'),
@@ -839,6 +839,7 @@ async function connectToCloud() {
     const essentialError = [patientsResult, appointmentsResult]
       .map(result => result.error).find(Boolean);
     if (essentialError) throw essentialError;
+    if (expectedUserId !== currentAccess?.id) return false;
 
     const optionalError = [treatmentsResult, filesResult, paymentsResult, blockedResult]
       .map(result => result.error).find(Boolean);
@@ -922,9 +923,11 @@ async function connectToCloud() {
     cloudSyncedPaymentIds = new Set((paymentsResult.error ? [] : paymentsResult.data || []).map(payment => payment.id));
 
     finishCloudRefresh();
+    return true;
   } catch (error) {
     console.error('No se pudo cargar los datos de Supabase:', error);
     showToast('No se pudieron cargar los datos de la nube. Mostrando la última copia guardada en este dispositivo.');
+    return false;
   }
 }
 
