@@ -43,7 +43,7 @@ security definer
 set search_path = ''
 as $$
 begin
-  if (select auth.uid()) is null then raise exception 'forbidden' using errcode = '42501'; end if;
+  if coalesce((select private.current_role())::text, '') not in ('admin', 'receptionist') then raise exception 'forbidden' using errcode = '42501'; end if;
   return private.register_payment(p_appointment_id, p_amount, p_method, p_paid_on, p_reference, p_notes, p_finalize);
 end $$;
 
@@ -57,7 +57,7 @@ set search_path = ''
 as $$
 declare new_id uuid;
 begin
-  if (select private.current_role()) <> 'admin'::public.app_role then raise exception 'forbidden' using errcode = '42501'; end if;
+  if coalesce((select private.current_role())::text, '') <> 'admin' then raise exception 'forbidden' using errcode = '42501'; end if;
   if p_spent_on is null or p_amount is null or p_amount <= 0 or p_amount > 1000000 then raise exception 'invalid_amount' using errcode = 'P0001'; end if;
   if nullif(btrim(coalesce(p_category, '')), '') is null then raise exception 'invalid_category' using errcode = 'P0001'; end if;
   if p_method is not null and p_method not in ('Efectivo', 'Tarjeta', 'Transferencia') then raise exception 'invalid_method' using errcode = 'P0001'; end if;
@@ -76,7 +76,7 @@ set search_path = ''
 as $$
 declare payment_row public.payments; already_refunded numeric(10,2); new_id uuid;
 begin
-  if (select private.current_role()) <> 'admin'::public.app_role then raise exception 'forbidden' using errcode = '42501'; end if;
+  if coalesce((select private.current_role())::text, '') <> 'admin' then raise exception 'forbidden' using errcode = '42501'; end if;
   if p_amount is null or p_amount <= 0 or p_refunded_on is null or nullif(btrim(coalesce(p_reason, '')), '') is null then raise exception 'invalid_refund' using errcode = 'P0001'; end if;
   select * into payment_row from public.payments where id = p_payment_id for update;
   if not found or payment_row.appointment_id is null then raise exception 'payment_not_found' using errcode = 'P0001'; end if;
