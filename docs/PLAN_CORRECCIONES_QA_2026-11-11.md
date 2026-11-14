@@ -130,7 +130,7 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 ## Pendientes externos o manuales
 
 - **Protección contra contraseñas filtradas:** Supabase la reserva para el plan Pro; no existe una corrección segura equivalente desde el código cliente.
-- **Cámara física de QR:** requiere la prueba manual en el dispositivo que usará la cámara.
+- **Cámara física de QR:** prueba manual completada correctamente el 13 de noviembre de 2026.
 
 ## Evidencia de consola incorporada
 

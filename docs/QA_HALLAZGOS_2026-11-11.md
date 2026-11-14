@@ -32,7 +32,7 @@
 
 ## Pendiente de probar
 
-- Cámara física para lectura QR (a cargo del usuario).
+- Cámara física para lectura QR: prueba manual completada correctamente el 13 de noviembre de 2026.
 - Archivos de Google Drive: prueba completa superada. Se cargó un PNG válido, se abrió desde el botón `Ver` en una pestaña `blob:` y se eliminó mediante la confirmación de la interfaz. La fila de `patient_files` ya no existe después de la operación, por lo que no quedó metadato de prueba pendiente. La actualización inmediata del listado queda como defecto visual a corregir.
 - Permisos por rol en sesiones aisladas de doctor/a y recepcionista.
 - Protección de contraseñas filtradas (requiere plan Pro de Supabase).
