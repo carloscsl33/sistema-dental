@@ -28,9 +28,7 @@ async function openPatientQr(patientId) {
     );
     document.querySelector("#patient-qr-token").textContent = token;
     const modal = document.querySelector("#patient-qr-modal");
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
-    lockPageScroll();
+    openAccessibleModal(modal);
   } catch (error) {
     console.error(error);
     showToast("No se pudo generar la tarjeta QR.");
@@ -79,15 +77,11 @@ function closePatientQrScanner() {
   stopPatientQrCamera();
   setPatientQrCameraStatus();
   const modal = document.querySelector("#patient-qr-scanner");
-  modal?.classList.remove("open");
-  modal?.setAttribute("aria-hidden", "true");
-  updatePageScrollLock();
+  closeAccessibleModal(modal);
 }
 function openPatientQrScanner() {
   const modal = document.querySelector("#patient-qr-scanner");
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden", "false");
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 async function startPatientQrCamera() {

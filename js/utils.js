@@ -30,6 +30,29 @@ function updatePageScrollLock() {
   }
 }
 
+function openAccessibleModal(modal) {
+  if (!modal) return;
+  const focused = document.activeElement;
+  modal._returnFocus = focused instanceof HTMLElement && !modal.contains(focused) ? focused : null;
+  modal.removeAttribute('inert');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  lockPageScroll();
+}
+
+function closeAccessibleModal(modal, restoreFocus = true) {
+  if (!modal) return;
+  const focused = document.activeElement;
+  if (focused instanceof HTMLElement && modal.contains(focused)) focused.blur();
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('inert', '');
+  updatePageScrollLock();
+  const returnFocus = modal._returnFocus;
+  modal._returnFocus = null;
+  if (restoreFocus && returnFocus instanceof HTMLElement && returnFocus.isConnected && !returnFocus.closest('[aria-hidden="true"], [inert]')) returnFocus.focus();
+}
+
 function generateId() {
   if (window.crypto?.randomUUID) return window.crypto.randomUUID();
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, char => {
@@ -175,21 +198,17 @@ function showConfirmationDialog({ title, message, confirmLabel = 'Continuar', in
     inputElement.removeAttribute('max');
   }
 
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 
   return new Promise(resolve => {
-    const previouslyFocused = document.activeElement;
+    const previouslyFocused = modal._returnFocus;
     const finish = confirmed => {
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
       cancelButton.removeEventListener('click', cancel);
       acceptButton.removeEventListener('click', accept);
       modal.removeEventListener('click', handleBackdropClick);
       document.removeEventListener('keydown', handleKeydown);
-      updatePageScrollLock();
-      if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) previouslyFocused.focus();
+      closeAccessibleModal(modal, false);
+      if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected && !previouslyFocused.closest('[aria-hidden="true"], [inert]')) previouslyFocused.focus();
       resolve({ confirmed, value: input ? (input.type === 'text' ? inputElement.value : Number(inputElement.value)) : null });
     };
     const cancel = () => finish(false);

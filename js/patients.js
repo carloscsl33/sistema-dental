@@ -329,17 +329,13 @@ function openPatientAppointments(patientId) {
   renderPatientAppointmentsModal(patientId);
   const modal = document.querySelector('#patient-appointments-modal');
   if (!modal) return;
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 function closePatientAppointments() {
   const modal = document.querySelector('#patient-appointments-modal');
   if (!modal) return;
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
-  updatePageScrollLock();
+  closeAccessibleModal(modal);
 }
 
 function renderPatientDirectory(query = '') {
@@ -658,20 +654,16 @@ function openPatientModal(patientId = null) {
   const formScroll = document.querySelector('#patient-form-scroll');
   if (formScroll) formScroll.scrollTop = 0;
   
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 function closePatientModal() {
   const modal = document.querySelector('#patient-modal');
   if (!modal) return;
   
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(modal);
   editingPatient = null;
   pendingClinicalFiles = [];
-  updatePageScrollLock();
 }
 
 function setPatientDateDefaults() {

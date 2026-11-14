@@ -436,9 +436,7 @@ document.addEventListener('click', async event => {
   }
   if (event.target.closest('#patient-qr-close')) {
     const modal = document.querySelector('#patient-qr-modal');
-    modal?.classList.remove('open');
-    modal?.setAttribute('aria-hidden', 'true');
-    updatePageScrollLock();
+    closeAccessibleModal(modal);
     return;
   }
   if (event.target.closest('#patient-qr-download')) {

@@ -402,9 +402,7 @@ function openModal(index = null) {
   document.querySelector('#appointment-modal .modal-copy').textContent = 'Completa los datos para agendar o actualizar una cita.';
   refreshAppointmentTimeSlots(index === null || index === undefined ? '09:00' : '');
   
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 function editAppointment(source, index) {
@@ -453,9 +451,7 @@ function editAppointment(source, index) {
   const modal = document.querySelector('#appointment-modal');
   if (!modal) return;
   
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 function closeModal() {
@@ -463,8 +459,7 @@ function closeModal() {
   if (!modal) return;
   
   hidePatientSuggestions();
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(modal);
   
   const wasSchedulingFollowUp = Boolean(followUpAppointmentId);
   const cancelledAppointmentId = rescheduleAppointmentId;
@@ -486,7 +481,6 @@ function closeModal() {
   if (wasSchedulingFollowUp || cancelledAppointment) renderLists();
   if (cancelledPatient) refreshPatientDetails(cancelledPatient);
   
-  updatePageScrollLock();
 }
 
 function getAppointmentPaidAmount(appointment) {

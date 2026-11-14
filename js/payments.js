@@ -63,9 +63,7 @@ function openPaymentReceipt(appointmentId) {
   setFieldValue('#receipt-payment-method', 'Efectivo');
   updatePaymentReceiptAmountState();
   
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 function updatePaymentReceiptAmountState() {
@@ -85,8 +83,7 @@ function closePaymentReceipt(preserveFollowUp = false) {
   const modal = document.querySelector('#payment-receipt-modal');
   if (!modal) return;
   
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(modal);
   
   const form = document.querySelector('#payment-receipt-form');
   if (form) form.reset();
@@ -95,7 +92,6 @@ function closePaymentReceipt(preserveFollowUp = false) {
     renderLists();
   }
   
-  updatePageScrollLock();
 }
 
 function createPaymentReceiptModal() {
@@ -105,6 +101,7 @@ function createPaymentReceiptModal() {
   modal.id = 'payment-receipt-modal';
   modal.className = 'modal-backdrop';
   modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('inert', '');
   
   modal.innerHTML = `
     <div class="modal-card payment-receipt-card" role="dialog" aria-modal="true" aria-labelledby="payment-receipt-title">

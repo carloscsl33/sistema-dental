@@ -19,9 +19,7 @@ function openDailyAgenda(date) {
   const canManage = canManageAppointments();
   if (!isClinicOpenOnDate(date)) {
     list.innerHTML = `<p class="daily-agenda-empty">La clínica no tiene atención este día.</p>`;
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    lockPageScroll();
+    openAccessibleModal(modal);
     return;
   }
   const slots = [];
@@ -42,17 +40,13 @@ function openDailyAgenda(date) {
     </div>`);
   }
   list.innerHTML = slots.join('') || `<p class="daily-agenda-empty">No hay horarios configurados para este día.</p>`;
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 function closeDailyAgenda() {
   const modal = document.querySelector('#daily-agenda-modal');
   if (!modal) return;
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
-  updatePageScrollLock();
+  closeAccessibleModal(modal);
 }
 
 function calendarDayMarkup(year, month, day, muted = false) {

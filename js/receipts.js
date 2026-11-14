@@ -97,6 +97,7 @@ function createPaymentDocumentModal() {
   modal.id = 'payment-document-modal';
   modal.className = 'modal-backdrop payment-document-backdrop';
   modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('inert', '');
   modal.innerHTML = `<div class="modal-card payment-document-card" role="dialog" aria-modal="true" aria-labelledby="payment-document-title"><header class="payment-document-modal-head"><div><h2 id="payment-document-title">Comprobante de pago</h2><p class="modal-copy">Guárdalo en PDF o compártelo con el paciente.</p></div><button type="button" class="modal-close" data-payment-document-close aria-label="Cerrar">×</button></header><div id="payment-document-content"></div><footer class="payment-document-actions"><button type="button" class="outline-button" data-payment-document-close>Cerrar</button><button type="button" class="outline-button" id="payment-document-share">Compartir PDF</button><button type="button" class="new-button" id="payment-document-download">Descargar PDF</button></footer></div>`;
   document.body.appendChild(modal);
 }
@@ -108,17 +109,13 @@ function openPaymentDocument(receipt) {
   if (!modal || !content) return;
   modal._receipt = receipt;
   content.innerHTML = receiptMarkup(receipt);
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
 }
 
 function closePaymentDocument() {
   const modal = document.querySelector('#payment-document-modal');
   if (!modal) return;
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
-  updatePageScrollLock();
+  closeAccessibleModal(modal);
 }
 
 function openStoredPaymentReceipt(patientId, paymentId) {

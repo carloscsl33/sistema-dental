@@ -88,9 +88,7 @@ function openClinicalProgressEditor(item = null) {
   document.querySelector('#clinical-progress-patient').textContent = getPatientFullName(findPatientById(selectedPatientId));
   input.placeholder = 'Describe el avance, procedimiento u observación...';
   input.value = item?.body || '';
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
   input.focus();
 }
 
@@ -98,15 +96,12 @@ function closeClinicalProgressModal() {
   const modal = document.querySelector('#clinical-progress-modal');
   const form = document.querySelector('#clinical-progress-form');
   if (!modal) return;
-  if (modal.contains(document.activeElement)) document.activeElement.blur();
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(modal);
   form?.reset();
   if (form) {
     delete form.dataset.progressPatientId;
     delete form.dataset.progressId;
   }
-  updatePageScrollLock();
 }
 
 document.addEventListener('click', async event => {

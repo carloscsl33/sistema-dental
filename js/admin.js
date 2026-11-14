@@ -63,19 +63,15 @@ function openManagedUserModal(user = null) {
   role.value = user?.role || 'receptionist';
   status.value = user?.status || 'approved';
   status.closest('label').hidden = !user;
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  lockPageScroll();
+  openAccessibleModal(modal);
   setTimeout(() => (user ? role : email).focus(), 0);
 }
 
 function closeManagedUserModal() {
   const modal = document.querySelector('#admin-user-modal');
   if (!modal) return;
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(modal);
   editingManagedUserId = null;
-  updatePageScrollLock();
 }
 
 async function requestManagedUserDelete(user) {

@@ -16,11 +16,14 @@ function initializeApp() {
   if (patientModal) {
     patientModal.classList.remove('open');
     patientModal.setAttribute('aria-hidden', 'true');
+    patientModal.setAttribute('inert', '');
   }
   if (appointmentModal) {
     appointmentModal.classList.remove('open');
     appointmentModal.setAttribute('aria-hidden', 'true');
+    appointmentModal.setAttribute('inert', '');
   }
+  document.querySelectorAll('.modal-backdrop').forEach(modal => modal.setAttribute('inert', ''));
 }
 
 if (document.readyState === 'loading') {
