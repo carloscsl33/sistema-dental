@@ -97,6 +97,7 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 - **Funciones:** `record_payment`, `record_expense`, `record_payment_refund`.
 - **Riesgo:** son necesarias para operaciones atómicas, pero por ser `SECURITY DEFINER` expuestas en `public` deben validar estrictamente rol y autorización dentro de cada función.
 - **Corrección propuesta:** mantenerlas solo si cada una exige `admin` o `receptionist` mediante `private.current_role()` y verifica que el registro pertenece a un paciente/cita válida. Revocar `EXECUTE` al rol autenticado si una función no se usa desde el cliente. Añadir pruebas con cuenta Doctor/a que confirmen error `forbidden` al invocarlas.
+- **Nota del asesor:** el aviso persistirá mientras estas tres funciones públicas deban ser ejecutables por los roles autorizados desde la aplicación. La verificación de rol interna y las pruebas de rechazo para roles no autorizados están implementadas; revocar `EXECUTE` rompería los cobros y gastos legítimos.
 
 ### 4.2 Protección contra contraseñas filtradas
 
@@ -125,6 +126,11 @@ Este documento separa defectos confirmados, decisiones de producto y mensajes qu
 6. Actualización inmediata de adjuntos Drive.
 7. Etiquetas de pago/anticipo y mejoras visuales.
 8. Índices de rendimiento y protección de contraseñas filtradas según plan de Supabase.
+
+## Pendientes externos o manuales
+
+- **Protección contra contraseñas filtradas:** Supabase la reserva para el plan Pro; no existe una corrección segura equivalente desde el código cliente.
+- **Cámara física de QR:** requiere la prueba manual en el dispositivo que usará la cámara.
 
 ## Evidencia de consola incorporada
 
