@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/favicon.ico", "destination": "/favicon.svg" }
+  ],
   "headers": [
     { "source": "/(.*)", "headers": [
       { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'self' blob:; frame-src blob:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" },
