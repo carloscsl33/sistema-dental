@@ -7,6 +7,7 @@ const authViews = {
 
 let passwordRecoveryActive = false;
 let invitationPasswordSetupActive = false;
+let recoveringInvalidSession = false;
 
 function setAuthMessage(id, text = '', success = false) {
   const message = document.querySelector(id);
@@ -49,6 +50,40 @@ let cloudSessionReady = false;
 let activeSessionUserId = null;
 let activeSessionLoad = null;
 let sessionLoadVersion = 0;
+
+function isInvalidRefreshTokenError(error) {
+  const message = String(error?.message || error || '').toLowerCase();
+  return message.includes('invalid refresh token') || message.includes('refresh token not found') || message.includes('refresh_token_not_found');
+}
+
+function clearStoredSupabaseSession() {
+  Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index))
+    .filter(Boolean)
+    .filter(key => key.startsWith('sb-') && key.endsWith('-auth-token'))
+    .forEach(key => localStorage.removeItem(key));
+}
+
+async function recoverInvalidSession() {
+  if (recoveringInvalidSession) return;
+  recoveringInvalidSession = true;
+  try {
+    sessionLoadVersion += 1;
+    activeSessionUserId = null;
+    activeSessionLoad = null;
+    if (cloudSessionReady) disconnectFromCloud();
+    cloudSessionReady = false;
+    clearCurrentAccess();
+    clearStoredSupabaseSession();
+    try {
+      await supabaseClient?.auth.signOut({ scope: 'local' });
+    } catch (_) {}
+    showAuthView('login');
+    applyAuthState(null);
+    setAuthMessage('#auth-message', 'Tu sesión venció. Inicia sesión de nuevo para continuar.');
+  } finally {
+    recoveringInvalidSession = false;
+  }
+}
 
 async function handleSession(session) {
   if (passwordRecoveryActive) return applyAuthState(null);
@@ -169,7 +204,11 @@ async function initializeAuth() {
     applyAuthState(null);
   }
 
-  const { data } = await supabaseClient.auth.getSession();
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (isInvalidRefreshTokenError(error)) {
+    await recoverInvalidSession();
+    return;
+  }
   if (!passwordRecoveryActive) await handleSession(data.session);
 
   supabaseClient.auth.onAuthStateChange((event, session) => {
@@ -182,6 +221,12 @@ async function initializeAuth() {
     if (!passwordRecoveryActive) handleSession(session);
   });
 }
+
+window.addEventListener?.('unhandledrejection', event => {
+  if (!isInvalidRefreshTokenError(event.reason)) return;
+  event.preventDefault();
+  recoverInvalidSession();
+});
 
 document.addEventListener('click', event => {
   const toggle = event.target.closest('[data-password-toggle], #auth-password-toggle');
